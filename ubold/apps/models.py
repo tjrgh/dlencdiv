@@ -1,5 +1,6 @@
 from django.db import models
-from ubold.users.models import User
+# from ubold.users.models import User
+from django.contrib.auth.models import User
 from django.utils import timezone
 
 from ubold.apps.constants import CATEGORY_CHOICES, CATEGORY_INFO

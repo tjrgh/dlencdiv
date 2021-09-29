@@ -80,6 +80,8 @@ DJANGO_APPS = [
     "django.forms",
 ]
 THIRD_PARTY_APPS = [
+    'rest_framework',
+    'rest_framework.authtoken',
     "crispy_forms",
     "allauth",
     "allauth.account",
@@ -110,7 +112,7 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
-AUTH_USER_MODEL = "users.User"
+# AUTH_USER_MODEL = "users.User"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
 LOGIN_REDIRECT_URL = "dashboard:index"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url

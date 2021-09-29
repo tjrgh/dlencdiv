@@ -1,6 +1,7 @@
 import pytest
 
-from ubold.users.models import User
+# from ubold.users.models import User
+from django.contrib.auth.models import User
 from ubold.users.tests.factories import UserFactory
 
 
