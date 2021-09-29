@@ -76,6 +76,8 @@ from .views import (
     components_maps_google_view,
     components_maps_vector_view,
     components_maps_mapael_view,
+
+    test,
 )
 
 
@@ -164,4 +166,7 @@ urlpatterns = [
     path("maps/google", view=components_maps_google_view, name="components.maps.google"),
     path("maps/vector", view=components_maps_vector_view, name="components.maps.vector"),
     path("maps/mapael", view=components_maps_mapael_view, name="components.maps.mapael"),
+
+    # test
+    path("test", view=test, name="test")
 ]

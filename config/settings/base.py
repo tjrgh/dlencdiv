@@ -95,6 +95,12 @@ LOCAL_APPS = [
     "ubold.layouts.apps.LayoutsConfig",
     "ubold.components.apps.ComponentsConfig",
     "ubold.accounts.apps.AccountsConfig",
+    "ubold.common.apps.CommonConfig",
+    "ubold.dart.apps.DartConfig",
+    "ubold.stocks.apps.StocksConfig",
+    "ubold.member.apps.MemberConfig",
+    "ubold.portfolio.apps.PortfolioConfig",
+
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

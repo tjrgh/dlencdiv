@@ -7,10 +7,20 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.views.generic import TemplateView
 import pandas as pd
+from ubold.common.models import Currency
+from ubold.stocks.models import StockNews
+from ubold.portfolio.models import PortfolioStocks
+from ubold.member.models import User
+from ubold.dart.models import CorpCodeData
 
 User = get_user_model()
 
 class ComponentsView(LoginRequiredMixin, TemplateView):
+    stocks = StockNews.objects.all()
+    portfolio = PortfolioStocks.objects.all()
+    member = User.objects.all()
+    dart = CorpCodeData.objects.all()
+    print("")
 
     # def get_context_data(self, **kwargs):
     #     context = super().get_context_data(**kwargs)
@@ -241,3 +251,5 @@ components_tables_jsgrid_view = ComponentsView.as_view(template_name="components
 components_maps_google_view = ComponentsView.as_view(template_name="components/maps/google.html")
 components_maps_vector_view = ComponentsView.as_view(template_name="components/maps/vector.html")
 components_maps_mapael_view = ComponentsView.as_view(template_name="components/maps/mapael.html")
+
+test = ComponentsView.as_view(template_name="components/tables/test.html")
