@@ -168,5 +168,5 @@ urlpatterns = [
     path("maps/mapael", view=components_maps_mapael_view, name="components.maps.mapael"),
 
     # test
-    path("test", view=test, name="test")
+    path("test", view=test, name="test"),
 ]

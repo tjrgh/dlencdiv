@@ -24,3 +24,5 @@ custom_pages_404_two_view = CustomView.as_view(template_name="extra/404-two.html
 custom_pages_404_view = CustomView.as_view(template_name="extra/404.html")
 custom_pages_500_two_view = CustomView.as_view(template_name="extra/500-two.html")
 custom_pages_500_view = CustomView.as_view(template_name="extra/500.html")
+
+company_info_view = CustomView.as_view(template_name='pages/company-info.html')
