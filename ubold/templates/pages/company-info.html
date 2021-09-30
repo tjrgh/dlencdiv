@@ -31,487 +31,61 @@
 
 {% block content %}
 <div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box">
+        <h4 class="page-title">기업정보</h4>
+      </div>
+    </div>
+  </div>
+  <!-- end page title -->
+
   <div class="row">
     <div class="col-12">
       <div class="card">
         <div class="card-body">
-          <h4 class="header-title">Basic Data Table</h4>
+          <h4 class="header-title">기업목록</h4>
           <p class="text-muted font-13 mb-4">
-            DataTables has most features enabled by default, so all you need to
-            do to use it with your own tables is to call the construction
-            function:
-            <code>$().DataTable();</code>.
+            기업목록 항목 설명
           </p>
 
-          <table id="basic-datatable" class="table dt-responsive nowrap w-100">
+          <table
+            id="scroll-vertical-datatable"
+            class="table dt-responsive nowrap w-100"
+          >
             <thead>
-            <tr>
-              <th>Name</th>
-              <th>Position</th>
-              <th>Office</th>
-              <th>Age</th>
-              <th>Start date</th>
-              <th>Salary</th>
-            </tr>
+              <tr>
+                <th style="width:10px">Name</th>
+                <th style="width:10px">시가총액</th>
+                <th style="width:10px">주가</th>
+                <th style="width:5px">주가변동률</th>
+                <th style="width:10px">거래량</th>
+                <th style="width:5px">PSR</th>
+                <th style="width:5px">PER</th>
+                <th style="width:5px">PEG</th>
+                <th style="width:5px">PBR</th>
+                <th style="width:5px">EPS</th>
+                <th style="width:5px">ROE</th>
+              </tr>
             </thead>
 
             <tbody>
-            <tr>
-              <td>Tiger Nixon</td>
-              <td>System Architect</td>
-              <td>Edinburgh</td>
-              <td>61</td>
-              <td>2011/04/25</td>
-              <td>$320,800</td>
-            </tr>
-            <tr>
-              <td>Garrett Winters</td>
-              <td>Accountant</td>
-              <td>Tokyo</td>
-              <td>63</td>
-              <td>2011/07/25</td>
-              <td>$170,750</td>
-            </tr>
-            <tr>
-              <td>Ashton Cox</td>
-              <td>Junior Technical Author</td>
-              <td>San Francisco</td>
-              <td>66</td>
-              <td>2009/01/12</td>
-              <td>$86,000</td>
-            </tr>
-            <tr>
-              <td>Cedric Kelly</td>
-              <td>Senior Javascript Developer</td>
-              <td>Edinburgh</td>
-              <td>22</td>
-              <td>2012/03/29</td>
-              <td>$433,060</td>
-            </tr>
-            <tr>
-              <td>Airi Satou</td>
-              <td>Accountant</td>
-              <td>Tokyo</td>
-              <td>33</td>
-              <td>2008/11/28</td>
-              <td>$162,700</td>
-            </tr>
-            <tr>
-              <td>Brielle Williamson</td>
-              <td>Integration Specialist</td>
-              <td>New York</td>
-              <td>61</td>
-              <td>2012/12/02</td>
-              <td>$372,000</td>
-            </tr>
-            <tr>
-              <td>Herrod Chandler</td>
-              <td>Sales Assistant</td>
-              <td>San Francisco</td>
-              <td>59</td>
-              <td>2012/08/06</td>
-              <td>$137,500</td>
-            </tr>
-            <tr>
-              <td>Rhona Davidson</td>
-              <td>Integration Specialist</td>
-              <td>Tokyo</td>
-              <td>55</td>
-              <td>2010/10/14</td>
-              <td>$327,900</td>
-            </tr>
-            <tr>
-              <td>Colleen Hurst</td>
-              <td>Javascript Developer</td>
-              <td>San Francisco</td>
-              <td>39</td>
-              <td>2009/09/15</td>
-              <td>$205,500</td>
-            </tr>
-            <tr>
-              <td>Sonya Frost</td>
-              <td>Software Engineer</td>
-              <td>Edinburgh</td>
-              <td>23</td>
-              <td>2008/12/13</td>
-              <td>$103,600</td>
-            </tr>
-            <tr>
-              <td>Jena Gaines</td>
-              <td>Office Manager</td>
-              <td>London</td>
-              <td>30</td>
-              <td>2008/12/19</td>
-              <td>$90,560</td>
-            </tr>
-            <tr>
-              <td>Quinn Flynn</td>
-              <td>Support Lead</td>
-              <td>Edinburgh</td>
-              <td>22</td>
-              <td>2013/03/03</td>
-              <td>$342,000</td>
-            </tr>
-            <tr>
-              <td>Charde Marshall</td>
-              <td>Regional Director</td>
-              <td>San Francisco</td>
-              <td>36</td>
-              <td>2008/10/16</td>
-              <td>$470,600</td>
-            </tr>
-            <tr>
-              <td>Haley Kennedy</td>
-              <td>Senior Marketing Designer</td>
-              <td>London</td>
-              <td>43</td>
-              <td>2012/12/18</td>
-              <td>$313,500</td>
-            </tr>
-            <tr>
-              <td>Tatyana Fitzpatrick</td>
-              <td>Regional Director</td>
-              <td>London</td>
-              <td>19</td>
-              <td>2010/03/17</td>
-              <td>$385,750</td>
-            </tr>
-            <tr>
-              <td>Michael Silva</td>
-              <td>Marketing Designer</td>
-              <td>London</td>
-              <td>66</td>
-              <td>2012/11/27</td>
-              <td>$198,500</td>
-            </tr>
-            <tr>
-              <td>Paul Byrd</td>
-              <td>Chief Financial Officer (CFO)</td>
-              <td>New York</td>
-              <td>64</td>
-              <td>2010/06/09</td>
-              <td>$725,000</td>
-            </tr>
-            <tr>
-              <td>Gloria Little</td>
-              <td>Systems Administrator</td>
-              <td>New York</td>
-              <td>59</td>
-              <td>2009/04/10</td>
-              <td>$237,500</td>
-            </tr>
-            <tr>
-              <td>Bradley Greer</td>
-              <td>Software Engineer</td>
-              <td>London</td>
-              <td>41</td>
-              <td>2012/10/13</td>
-              <td>$132,000</td>
-            </tr>
-            <tr>
-              <td>Dai Rios</td>
-              <td>Personnel Lead</td>
-              <td>Edinburgh</td>
-              <td>35</td>
-              <td>2012/09/26</td>
-              <td>$217,500</td>
-            </tr>
-            <tr>
-              <td>Jenette Caldwell</td>
-              <td>Development Lead</td>
-              <td>New York</td>
-              <td>30</td>
-              <td>2011/09/03</td>
-              <td>$345,000</td>
-            </tr>
-            <tr>
-              <td>Yuri Berry</td>
-              <td>Chief Marketing Officer (CMO)</td>
-              <td>New York</td>
-              <td>40</td>
-              <td>2009/06/25</td>
-              <td>$675,000</td>
-            </tr>
-            <tr>
-              <td>Caesar Vance</td>
-              <td>Pre-Sales Support</td>
-              <td>New York</td>
-              <td>21</td>
-              <td>2011/12/12</td>
-              <td>$106,450</td>
-            </tr>
-            <tr>
-              <td>Doris Wilder</td>
-              <td>Sales Assistant</td>
-              <td>Sidney</td>
-              <td>23</td>
-              <td>2010/09/20</td>
-              <td>$85,600</td>
-            </tr>
-            <tr>
-              <td>Angelica Ramos</td>
-              <td>Chief Executive Officer (CEO)</td>
-              <td>London</td>
-              <td>47</td>
-              <td>2009/10/09</td>
-              <td>$1,200,000</td>
-            </tr>
-            <tr>
-              <td>Gavin Joyce</td>
-              <td>Developer</td>
-              <td>Edinburgh</td>
-              <td>42</td>
-              <td>2010/12/22</td>
-              <td>$92,575</td>
-            </tr>
-            <tr>
-              <td>Jennifer Chang</td>
-              <td>Regional Director</td>
-              <td>Singapore</td>
-              <td>28</td>
-              <td>2010/11/14</td>
-              <td>$357,650</td>
-            </tr>
-            <tr>
-              <td>Brenden Wagner</td>
-              <td>Software Engineer</td>
-              <td>San Francisco</td>
-              <td>28</td>
-              <td>2011/06/07</td>
-              <td>$206,850</td>
-            </tr>
-            <tr>
-              <td>Fiona Green</td>
-              <td>Chief Operating Officer (COO)</td>
-              <td>San Francisco</td>
-              <td>48</td>
-              <td>2010/03/11</td>
-              <td>$850,000</td>
-            </tr>
-            <tr>
-              <td>Shou Itou</td>
-              <td>Regional Marketing</td>
-              <td>Tokyo</td>
-              <td>20</td>
-              <td>2011/08/14</td>
-              <td>$163,000</td>
-            </tr>
-            <tr>
-              <td>Michelle House</td>
-              <td>Integration Specialist</td>
-              <td>Sidney</td>
-              <td>37</td>
-              <td>2011/06/02</td>
-              <td>$95,400</td>
-            </tr>
-            <tr>
-              <td>Suki Burks</td>
-              <td>Developer</td>
-              <td>London</td>
-              <td>53</td>
-              <td>2009/10/22</td>
-              <td>$114,500</td>
-            </tr>
-            <tr>
-              <td>Prescott Bartlett</td>
-              <td>Technical Author</td>
-              <td>London</td>
-              <td>27</td>
-              <td>2011/05/07</td>
-              <td>$145,000</td>
-            </tr>
-            <tr>
-              <td>Gavin Cortez</td>
-              <td>Team Leader</td>
-              <td>San Francisco</td>
-              <td>22</td>
-              <td>2008/10/26</td>
-              <td>$235,500</td>
-            </tr>
-            <tr>
-              <td>Martena Mccray</td>
-              <td>Post-Sales support</td>
-              <td>Edinburgh</td>
-              <td>46</td>
-              <td>2011/03/09</td>
-              <td>$324,050</td>
-            </tr>
-            <tr>
-              <td>Unity Butler</td>
-              <td>Marketing Designer</td>
-              <td>San Francisco</td>
-              <td>47</td>
-              <td>2009/12/09</td>
-              <td>$85,675</td>
-            </tr>
-            <tr>
-              <td>Howard Hatfield</td>
-              <td>Office Manager</td>
-              <td>San Francisco</td>
-              <td>51</td>
-              <td>2008/12/16</td>
-              <td>$164,500</td>
-            </tr>
-            <tr>
-              <td>Hope Fuentes</td>
-              <td>Secretary</td>
-              <td>San Francisco</td>
-              <td>41</td>
-              <td>2010/02/12</td>
-              <td>$109,850</td>
-            </tr>
-            <tr>
-              <td>Vivian Harrell</td>
-              <td>Financial Controller</td>
-              <td>San Francisco</td>
-              <td>62</td>
-              <td>2009/02/14</td>
-              <td>$452,500</td>
-            </tr>
-            <tr>
-              <td>Timothy Mooney</td>
-              <td>Office Manager</td>
-              <td>London</td>
-              <td>37</td>
-              <td>2008/12/11</td>
-              <td>$136,200</td>
-            </tr>
-            <tr>
-              <td>Jackson Bradshaw</td>
-              <td>Director</td>
-              <td>New York</td>
-              <td>65</td>
-              <td>2008/09/26</td>
-              <td>$645,750</td>
-            </tr>
-            <tr>
-              <td>Olivia Liang</td>
-              <td>Support Engineer</td>
-              <td>Singapore</td>
-              <td>64</td>
-              <td>2011/02/03</td>
-              <td>$234,500</td>
-            </tr>
-            <tr>
-              <td>Bruno Nash</td>
-              <td>Software Engineer</td>
-              <td>London</td>
-              <td>38</td>
-              <td>2011/05/03</td>
-              <td>$163,500</td>
-            </tr>
-            <tr>
-              <td>Sakura Yamamoto</td>
-              <td>Support Engineer</td>
-              <td>Tokyo</td>
-              <td>37</td>
-              <td>2009/08/19</td>
-              <td>$139,575</td>
-            </tr>
-            <tr>
-              <td>Thor Walton</td>
-              <td>Developer</td>
-              <td>New York</td>
-              <td>61</td>
-              <td>2013/08/11</td>
-              <td>$98,540</td>
-            </tr>
-            <tr>
-              <td>Finn Camacho</td>
-              <td>Support Engineer</td>
-              <td>San Francisco</td>
-              <td>47</td>
-              <td>2009/07/07</td>
-              <td>$87,500</td>
-            </tr>
-            <tr>
-              <td>Serge Baldwin</td>
-              <td>Data Coordinator</td>
-              <td>Singapore</td>
-              <td>64</td>
-              <td>2012/04/09</td>
-              <td>$138,575</td>
-            </tr>
-            <tr>
-              <td>Zenaida Frank</td>
-              <td>Software Engineer</td>
-              <td>New York</td>
-              <td>63</td>
-              <td>2010/01/04</td>
-              <td>$125,250</td>
-            </tr>
-            <tr>
-              <td>Zorita Serrano</td>
-              <td>Software Engineer</td>
-              <td>San Francisco</td>
-              <td>56</td>
-              <td>2012/06/01</td>
-              <td>$115,000</td>
-            </tr>
-            <tr>
-              <td>Jennifer Acosta</td>
-              <td>Junior Javascript Developer</td>
-              <td>Edinburgh</td>
-              <td>43</td>
-              <td>2013/02/01</td>
-              <td>$75,650</td>
-            </tr>
-            <tr>
-              <td>Cara Stevens</td>
-              <td>Sales Assistant</td>
-              <td>New York</td>
-              <td>46</td>
-              <td>2011/12/06</td>
-              <td>$145,600</td>
-            </tr>
-            <tr>
-              <td>Hermione Butler</td>
-              <td>Regional Director</td>
-              <td>London</td>
-              <td>47</td>
-              <td>2011/03/21</td>
-              <td>$356,250</td>
-            </tr>
-            <tr>
-              <td>Lael Greer</td>
-              <td>Systems Administrator</td>
-              <td>London</td>
-              <td>21</td>
-              <td>2009/02/27</td>
-              <td>$103,500</td>
-            </tr>
-            <tr>
-              <td>Jonas Alexander</td>
-              <td>Developer</td>
-              <td>San Francisco</td>
-              <td>30</td>
-              <td>2010/07/14</td>
-              <td>$86,500</td>
-            </tr>
-            <tr>
-              <td>Shad Decker</td>
-              <td>Regional Director</td>
-              <td>Edinburgh</td>
-              <td>51</td>
-              <td>2008/11/13</td>
-              <td>$183,000</td>
-            </tr>
-            <tr>
-              <td>Michael Bruce</td>
-              <td>Javascript Developer</td>
-              <td>Singapore</td>
-              <td>29</td>
-              <td>2011/06/27</td>
-              <td>$183,000</td>
-            </tr>
-            <tr>
-              <td>Donna Snider</td>
-              <td>Customer Support</td>
-              <td>New York</td>
-              <td>27</td>
-              <td>2011/01/25</td>
-              <td>$112,000</td>
-            </tr>
+              {% for row in stock_data_list %}
+                <tr>
+                  <td style="width:10px"><a href="{% url 'pages:company-info-detail' code=row.11 %}">{{ row.0}}</a></td>
+                  <td style="width:10px">{{ row.1 }}</td>
+                  <td style="width:10px">{{ row.2 }}</td>
+                  <td style="width:5px">{{ row.3 }}</td>
+                  <td style="width:10px">{{ row.4 }}</td>
+                  <td style="width:5px">{{ row.5 }}</td>
+                  <td style="width:5px">{{ row.6 }}</td>
+                  <td style="width:5px">{{ row.7 }}</td>
+                  <td style="width:5px">{{ row.8 }}</td>
+                  <td style="width:5px">{{ row.9 }}</td>
+                  <td style="width:5px">{{ row.10 }}</td>
+                </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
@@ -522,6 +96,74 @@
     <!-- end col-->
   </div>
   <!-- end row-->
+
+  <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="header-title">거래 데이터</h4>
+            <div
+              id="combine-chart"
+              data-colors="#e3eaef,#f1556c,#1abc9c"
+              class="flot-chart mt-5"
+              style="height: 350px"
+            ></div>
+          </div>
+        </div>
+        <!-- end card -->
+      </div>
+      <!-- end col -->
+    </div>
+    <!-- end row -->
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title">재무 데이터</h4>
+          <p class="text-muted font-13 mb-4">
+            재무 데이터 설명
+          </p>
+
+          <table
+            id="scroll-vertical-datatable"
+            class="table dt-responsive nowrap w-100"
+          >
+            <thead>
+              <tr>
+                <th style="width:10px">항목명</th>
+                {%  for term in term_list %}
+                  <th style="width:10px">{{ term }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for row in income_statement %}
+                <tr>
+                  <td style="width:10px">{{ row.0}}</td>
+                  <td style="width:10px">{{ row.1}}</td>
+                  <td style="width:10px">{{ row.2}}</td>
+                  <td style="width:5px">{{ row.3}}</td>
+                  <td style="width:10px">{{ row.4}}</td>
+                  <td style="width:5px">{{ row.5}}</td>
+                  <td style="width:5px">{{ row.6}}</td>
+                  <td style="width:5px">{{ row.7}}</td>
+                  <td style="width:5px">{{ row.8}}</td>
+                  <td style="width:5px">{{ row.9}}</td>
+                  <td style="width:5px">{{ row.10}}</td>
+                </tr>
+              {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+        <!-- end card body-->
+      </div>
+      <!-- end card -->
+    </div>
+    <!-- end col-->
+  </div>
 </div>
 {% endblock %}
 
@@ -546,5 +188,255 @@
 <!-- Init js -->
 <script src="{% static 'js/pages/datatables.init.js' %}"></script>
 <!-- Init js end -->
+
+
+ <script src="{% static 'libs/flot-charts/jquery.flot.js' %}"></script>
+<script src="{% static 'libs/flot-charts/jquery.flot.time.js' %}"></script>
+<script src="{% static 'libs/jquery.flot.tooltip/js/jquery.flot.tooltip.min.js' %}"></script>
+<script src="{% static 'libs/flot-charts/jquery.flot.resize.js' %}"></script>
+<script src="{% static 'libs/flot-charts/jquery.flot.pie.js' %}"></script>
+<script src="{% static 'libs/flot-charts/jquery.flot.selection.js' %}"></script>
+<script src="{% static 'libs/flot-charts/jquery.flot.stack.js' %}"></script>
+<script src="{% static 'libs/flot-orderbars/js/jquery.flot.orderBars.js' %}"></script>
+<script src="{% static 'libs/flot-charts/jquery.flot.crosshair.js' %}"></script>
+
+  <script>
+  !function (b) {
+    "use strict";
+
+    function a() {
+        this.$body = b("body"), this.$realData = []
+    }
+
+    a.prototype.createPlotGraph = function (a, o, t, r, e, l, i) {
+        b.plot(b(a), [{data: o, label: r[0], color: e[0]}, {data: t, label: r[1], color: e[1]}], {
+            series: {
+                lines: {
+                    show: !0,
+                    fill: !0,
+                    lineWidth: 2,
+                    fillColor: {colors: [{opacity: .5}, {opacity: .5}, {opacity: .8}]}
+                }, points: {show: !0}, shadowSize: 0
+            },
+            grid: {hoverable: !0, clickable: !0, borderColor: l, tickColor: "transparent", borderWidth: 1, labelMargin: 10, backgroundColor: i},
+            legend: {
+                position: "ne", margin: [0, -32], noColumns: 0, labelBoxBorderColor: null, labelFormatter: function (a, o) {
+                    return a + "&nbsp;&nbsp;"
+                }, width: 30, height: 2
+            },
+            yaxis: {axisLabel: "Daily Visits", tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}},
+            xaxis: {axisLabel: "Last Days", tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}},
+            tooltip: !0,
+            tooltipOpts: {content: "%s: Value of %x is %y", shifts: {x: -60, y: 25}, defaultTheme: !1},
+            splines: {show: !0, tension: .1, lineWidth: 1}
+        })
+    }, a.prototype.createPlotDotGraph = function (a, o, t, r, e, l, i) {
+        b.plot(b(a), [{data: o, label: r[0], color: e[0]}, {data: t, label: r[1], color: e[1]}], {
+            series: {
+                lines: {
+                    show: !0,
+                    fill: !1,
+                    lineWidth: 3,
+                    fillColor: {colors: [{opacity: .3}, {opacity: .3}]}
+                }, curvedLines: {apply: !0, active: !0, monotonicFit: !0}, splines: {show: !0, tension: .4, lineWidth: 5, fill: .4}
+            },
+            grid: {hoverable: !0, clickable: !0, borderColor: l, tickColor: "#f9f9f9", borderWidth: 1, labelMargin: 10, backgroundColor: i},
+            legend: {
+                position: "ne", margin: [0, -32], noColumns: 0, labelBoxBorderColor: null, labelFormatter: function (a, o) {
+                    return a + "&nbsp;&nbsp;"
+                }, width: 30, height: 2
+            },
+            yaxis: {axisLabel: "Gold Price(USD)", tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}},
+            xaxis: {axisLabel: "Numbers", tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}},
+            tooltip: !1
+        })
+    }, a.prototype.createPieGraph = function (a, o, t, r) {
+        r = {
+            series: {pie: {show: !0, radius: 1, label: {show: !0, radius: 1, background: {opacity: .2}}}},
+            legend: {show: !(t = [{label: o[0], data: t[0]}, {label: o[1], data: t[1]}, {label: o[2], data: t[2]}, {label: o[3], data: t[3]}, {label: o[4], data: t[4]}])},
+            grid: {hoverable: !0, clickable: !0},
+            colors: r,
+            tooltip: !0,
+            tooltipOpts: {content: "%s, %p.0%"}
+        }, b.plot(b(a), t, r)
+    }, a.prototype.randomData = function () {
+        for (0 < this.$realData.length && (this.$realData = this.$realData.slice(1)); this.$realData.length < 300;) {
+            var a = (0 < this.$realData.length ? this.$realData[this.$realData.length - 1] : 50) + 10 * Math.random() - 5;
+            a < 0 ? a = 0 : 100 < a && (a = 100), this.$realData.push(a)
+        }
+        for (var o = [], t = 0; t < this.$realData.length; ++t) o.push([t, this.$realData[t]]);
+        return o
+    }, a.prototype.createRealTimeGraph = function (a, o, t) {
+        return b.plot(a, [o], {
+            colors: t,
+            series: {grow: {active: !1}, shadowSize: 0, lines: {show: !0, fill: !0, lineWidth: 2, steps: !1}},
+            grid: {
+                show: !0,
+                aboveData: !1,
+                color: "#8391a2",
+                labelMargin: 15,
+                axisMargin: 0,
+                borderWidth: 0,
+                borderColor: null,
+                minBorderMargin: 5,
+                clickable: !0,
+                hoverable: !0,
+                autoHighlight: !1,
+                mouseActiveRadius: 20
+            },
+            tooltip: !0,
+            tooltipOpts: {content: "Value is : %y.0%", shifts: {x: -30, y: -50}},
+            yaxis: {axisLabel: "Response Time (ms)", min: 0, max: 100, tickColor: "rgba(65, 80, 95, 0.07)", color: "#8391a2"},
+            xaxis: {axisLabel: "Point Value (1000)", show: !0, tickColor: "rgba(65, 80, 95, 0.07)", color: "#8391a2"}
+        })
+    }, a.prototype.createDonutGraph = function (a, o, t, r) {
+        r = {
+            series: {pie: {show: !0, innerRadius: .5}},
+            legend: {
+                show: !(t = [{label: o[0], data: t[0]}, {label: o[1], data: t[1]}, {label: o[2], data: t[2]}, {label: o[3], data: t[3]}, {label: o[4], data: t[4]}]),
+                labelFormatter: function (a, o) {
+                    return '<div style="font-size:14px;">&nbsp;' + a + "</div>"
+                },
+                labelBoxBorderColor: null,
+                margin: 50,
+                width: 20
+            },
+            grid: {hoverable: !1, clickable: !1},
+            colors: r,
+            tooltip: !1
+        }, b.plot(b(a), t, r)
+    }, a.prototype.createStackBarGraph = function (a, o, t, r) {
+        t = {
+            bars: {show: !0, barWidth: .2, fill: 1},
+            grid: {
+                show: !0,
+                aboveData: !1,
+                labelMargin: 5,
+                axisMargin: 0,
+                borderWidth: 1,
+                minBorderMargin: 5,
+                clickable: !0,
+                hoverable: !0,
+                autoHighlight: !1,
+                mouseActiveRadius: 20,
+                borderColor: "rgba(65, 80, 95, 0.07)"
+            },
+            series: {stack: 0},
+            legend: {
+                position: "ne", margin: [0, -32], noColumns: 0, labelBoxBorderColor: null, labelFormatter: function (a, o) {
+                    return a + "&nbsp;&nbsp;"
+                }, width: 30, height: 2
+            },
+            yaxis: o.y,
+            xaxis: o.x,
+            colors: t,
+            tooltip: !0,
+            tooltipOpts: {content: "%s : %y.0", shifts: {x: -30, y: -50}}
+        }, b.plot(b(a), r, t)
+    }, a.prototype.createLineGraph = function (a, o, t, r) {
+        return t = {
+            series: {lines: {show: !0}, points: {show: !0}},
+            legend: {
+                position: "ne", margin: [0, -32], noColumns: 0, labelBoxBorderColor: null, labelFormatter: function (a, o) {
+                    return a + "&nbsp;&nbsp;"
+                }, width: 30, height: 2
+            },
+            yaxis: o.y,
+            xaxis: o.x,
+            colors: t,
+            grid: {hoverable: !0, borderColor: "rgba(65, 80, 95, 0.07)", borderWidth: 1, backgroundColor: "transparent"},
+            tooltip: !0,
+            tooltipOpts: {content: "%s : %y.0", shifts: {x: -30, y: -50}}
+        }, b.plot(b(a), r, t)
+    }, a.prototype.createCombineGraph = function (a, o, t, r, e) {
+        o = {
+            series: {shadowSize: 0},
+            grid: {hoverable: !0, clickable: !0, tickColor: "#f9f9f9", borderWidth: 1, borderColor: "rgba(65, 80, 95, 0.07)"},
+            tooltip: !0,
+            colors: e,
+            tooltipOpts: {
+                defaultTheme: !(r = [
+                  {#{#}
+                  {#  label: t[0],#}
+                  {#  data: r[0],#}
+                  {#  color: e[0],#}
+                  {#  lines: {show: !0, fill: !0},#}
+                  {#  points: {show: !0} },#}
+                  {
+                    label: t[0],
+                    data: r[0],
+                    color: e[0],
+                    lines: {show: !0},
+                    points: {show: !0} },
+                  {
+                    label: t[1],
+                    data: r[1],
+                    color: e[1],
+                    bars: {show: !0}
+                  }
+                ])
+            },
+            legend: {
+                position: "ne", margin: [0, -32], noColumns: 0, labelBoxBorderColor: null, labelFormatter: function (a, o) {
+                    return a + "&nbsp;&nbsp;"
+                }, width: 30, height: 2
+            },
+            yaxis: {axisLabel: "Point Value (1000)", tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}},
+            xaxis: {axisLabel: "Daily Hours", ticks: o, tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}}
+        }, b.plot(b(a), r, o)
+    }, a.prototype.init = function () {
+        var a = ["#4fc6e1", "#6658dd"], o = b("#website-stats").data("colors");
+        // o && (a = o.split(",")), this.createPlotGraph("#website-stats", [[0, 13], [1, 22], [2, 27], [3, 36], [4, 40], [5, 25], [6, 36], [7, 20], [8, 12], [9, 20], [10, 48], [11, 16], [12, 14]], [[0, 28], [1, 56], [2, 26], [3, 20], [4, 21], [5, 25], [6, 19], [7, 22], [8, 35], [9, 28], [10, 36], [11, 19], [12, 11]], ["Bitcoin", "Ethereum", "Litecoin"], a, "rgba(65, 80, 95, 0.07)", "transparent"), a = ["#6658dd", "#f1556c"], (o = b("#website-stats1").data("colors")) && (a = o.split(",")), this.createPlotDotGraph("#website-stats1", [[0, 2], [1, 4], [2, 7], [3, 9], [4, 6], [5, 3], [6, 10], [7, 8], [8, 5], [9, 14], [10, 10], [11, 10], [12, 8]], [[0, 1], [1, 3], [2, 6], [3, 7], [4, 4], [5, 2], [6, 8], [7, 6], [8, 4], [9, 10], [10, 8], [11, 14], [12, 5]], ["Bitcoin", "Ethereum"], a, "rgba(65, 80, 95, 0.07)", "transparent"), a = ["#4a81d4", "#f672a7", "#f7b84b", "#4fc6e1", "#1abc9c"], (o = b("#pie-chart").data("colors")) && (a = o.split(",")), this.createPieGraph("#pie-chart", ["Bitcoin", "Ethereum", "Litecoin", "Bitcoin Cash", "Cardano"], [48, 30, 15, 32, 26], a), a = ["#4a81d4"], (o = b("#flotRealTime").data("colors")) && (a = o.split(","));
+        var t = this.createRealTimeGraph("#flotRealTime", this.randomData(), [a]);
+        t.draw();
+        var r = this;
+        !function a() {
+            t.setData([r.randomData()]), t.draw(), setTimeout(a, (b("html").hasClass("mobile-device"), 500))
+        }(), a = ["#4a81d4", "#f672a7", "#f7b84b", "#4fc6e1", "#1abc9c"], (o = b("#donut-chart").data("colors")) && (a = o.split(",")), this.createDonutGraph("#donut-chart", ["Bitcoin", "Ethereum", "Litecoin", "Bitcoin Cash", "Cardano"], [48, 30, 15, 32, 26], a);
+        {#var trade_volume = {{ data_list|safe }}#}
+        var trade_volume_list = {{ trade_volume_list }}
+        var close_price_list = {{ close_price_list }}
+        var input_trade_volume_list = []
+        var input_close_price_list = []
+        for(var temp=0; temp<24;temp++){
+          input_trade_volume_list.push([temp, trade_volume_list[temp]])
+          input_close_price_list.push([temp, close_price_list[temp]])
+        }
+        var e = [input_close_price_list, input_trade_volume_list],
+            a = ["#f1556c", "#1abc9c"];
+        (o = b("#combine-chart").data("colors")) && (a = o.split(",")), this.createCombineGraph("#combine-chart", [[0, "22h"], [1, ""], [2, "00h"], [3, ""], [4, "02h"], [5, ""], [6, "04h"], [7, ""], [8, "06h"], [9, ""], [10, "08h"], [11, ""], [12, "10h"], [13, ""], [14, "12h"], [15, ""], [16, "14h"], [17, ""], [18, "16h"], [19, ""], [20, "18h"], [21, ""], [22, "20h"], [23, ""]], ["주가", "거래량"], e, a);
+        for (var l = [], i = 0; i <= 10; i += 1) l.push([i, parseInt(30 * Math.random())]);
+        for (var s = [], i = 0; i <= 10; i += 1) s.push([i, parseInt(30 * Math.random())]);
+        for (var n = [], i = 0; i <= 10; i += 1) n.push([i, parseInt(30 * Math.random())]);
+        (e = new Array).push({label: "Series One", data: l, bars: {order: 1}}), e.push({label: "Series Two", data: s, bars: {order: 2}}), e.push({
+            label: "Series Three",
+            data: n,
+            bars: {order: 3}
+        }), a = ["#4fc6e1", "#f7b84b", "#4a81d4"], (o = b("#ordered-bars-chart").data("colors")) && (a = o.split(",")), this.createStackBarGraph("#ordered-bars-chart", {
+            y: {
+                axisLabel: "Sales Value (USD)",
+                tickColor: "rgba(65, 80, 95, 0.07)",
+                font: {color: "#8391a2"}
+            }, x: {axisLabel: "Last 10 Days", tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}}
+        }, a, e);
+        for (var c = [], h = [], i = 0; i < 12; i += .2) c.push([i, Math.sin(i + 0)]), h.push([i, Math.cos(i + 0)]);
+        e = [{data: c, label: "Google"}, {
+            data: h,
+            label: "Yahoo"
+        }], a = ["#6c757d", "#f1556c"], (o = b("#line-chart-alt").data("colors")) && (a = o.split(",")), this.createLineGraph("#line-chart-alt", {
+            y: {
+                min: -1.2,
+                max: 1.2,
+                tickColor: "rgba(65, 80, 95, 0.07)",
+                font: {color: "#8391a2"}
+            }, x: {tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}}
+        }, a, e)
+    }, b.FlotChart = new a, b.FlotChart.Constructor = a
+  }(window.jQuery), function () {
+      "use strict";
+      window.jQuery.FlotChart.init()
+  }();
+
+</script>
 
 {% endblock %}

@@ -43,4 +43,5 @@ urlpatterns = [
 
     # company info
     path('companyinfo', view=company_info_view, name='company-info'),
+    path("companyinfo/<str:code>", view=company_info_view, name="company-info-detail"),
 ]

@@ -170,5 +170,5 @@ urlpatterns = [
 
     # test
     path("test", view=test, name="test"),
-    path("test/<str:code>", view=test, name="test")
+    path("test/<str:code>", view=test, name="test"),
 ]
