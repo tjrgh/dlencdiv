@@ -181,6 +181,7 @@ class CompanyInfoView(LoginRequiredMixin, TemplateView):
 
             context["close_price_list"] = close_price_list
             context["trade_volume_list"] = trade_volume_list
+            context["comp_name"] = BasicInfo.objects.get(code=self.stock_code).name
 
             # 재무 데이터
             income_statement = pd.DataFrame(

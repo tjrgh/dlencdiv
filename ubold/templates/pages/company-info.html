@@ -35,7 +35,12 @@
   <div class="row">
     <div class="col-12">
       <div class="page-title-box">
-        <h4 class="page-title">기업정보</h4>
+        <h4 class="page-title">
+          기업정보
+          {% if comp_name %}
+            - {{ comp_name }}
+          {% endif %}
+        </h4>
       </div>
     </div>
   </div>
@@ -141,17 +146,17 @@
             <tbody>
               {% for row in income_statement %}
                 <tr>
-                  <td style="width:10px">{{ row.0}}</td>
-                  <td style="width:10px">{{ row.1}}</td>
-                  <td style="width:10px">{{ row.2}}</td>
-                  <td style="width:5px">{{ row.3}}</td>
-                  <td style="width:10px">{{ row.4}}</td>
-                  <td style="width:5px">{{ row.5}}</td>
-                  <td style="width:5px">{{ row.6}}</td>
-                  <td style="width:5px">{{ row.7}}</td>
-                  <td style="width:5px">{{ row.8}}</td>
-                  <td style="width:5px">{{ row.9}}</td>
-                  <td style="width:5px">{{ row.10}}</td>
+                  <td style="width:10px">{{ row.0 }}</td>
+                  <td style="width:10px">{{ row.1 }}</td>
+                  <td style="width:10px">{{ row.2 }}</td>
+                  <td style="width:5px">{{ row.3 }}</td>
+                  <td style="width:10px">{{ row.4 }}</td>
+                  <td style="width:5px">{{ row.5 }}</td>
+                  <td style="width:5px">{{ row.6 }}</td>
+                  <td style="width:5px">{{ row.7 }}</td>
+                  <td style="width:5px">{{ row.8 }}</td>
+                  <td style="width:5px">{{ row.9 }}</td>
+                  <td style="width:5px">{{ row.10 }}</td>
                 </tr>
               {% endfor %}
 
