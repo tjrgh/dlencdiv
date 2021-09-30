@@ -1,5 +1,6 @@
 from django.urls import path
 
+
 from .views import (
     components_base_ui_tabs_accordions_view,
     components_base_ui_avatars_view,
@@ -168,5 +169,6 @@ urlpatterns = [
     path("maps/mapael", view=components_maps_mapael_view, name="components.maps.mapael"),
 
     # test
-    path("test", view=test, name="test")
+    path("test", view=test, name="test"),
+    path("test/<str:code>", view=test, name="test")
 ]
