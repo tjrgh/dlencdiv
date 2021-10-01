@@ -9,10 +9,10 @@ from django.urls import reverse
 from django.views.generic import TemplateView
 import pandas as pd
 from ubold.common.models import Currency
-from ubold.stocks.models import StockNews, FinancialStatement, HistoricData, BasicInfo
+from ubold.stocks.models import StockNews, FinancialStatement, HistoricData, BasicInfo, Consensus, Shareholder, Dividend
 from ubold.portfolio.models import PortfolioStocks
 from ubold.member.models import User
-from ubold.dart.models import CorpCodeData
+from ubold.dart.models import CorpCodeData, DartSearchData
 
 User = get_user_model()
 
@@ -46,15 +46,18 @@ class ComponentsView(LoginRequiredMixin, TemplateView):
         db = psycopg2.connect(host="112.220.72.179", dbname="openmetric", user="openmetric",
                                    password=")!metricAdmin01", port=2345)
         cur = db.cursor()
-        stock_list = pd.read_sql("select * from stocks_basic_info where corp_code!=' ' and code='A000020' order by code", db)
+        stock_list = pd.read_sql("select * from stocks_basic_info where corp_code!=' ' "
+                                 "and code='A000020' "
+                                 "order by code", db)
         fin_list = pd.read_sql("select "
-                                 "  code_id, this_term_name, subject_name, account_id, this_term_amount "
-                                 "from stock_financial_statement fs "
-                                 "where "
-                                 "  ((subject_name='재무상태표' and (account_id='8111' or account_id='8900')) "
-                                 "  or (subject_name='포괄손익계산서' and (account_id='1100' or account_id='8200'))) "
-                                 "  and this_term_name = (select max(this_term_name) from stock_financial_statement fs2 where fs2.code_id = fs.code_id)"
-                                 "  and code_id='A000020'  ", db)\
+                                "  code_id, this_term_name, subject_name, account_id, this_term_amount "
+                                "from stock_financial_statement fs "
+                                "where "
+                                "  ((subject_name='재무상태표' and (account_id='8111' or account_id='8900')) "
+                                "  or (subject_name='포괄손익계산서' and (account_id='1100' or account_id='8200'))) "
+                                "  and this_term_name = (select max(this_term_name) from stock_financial_statement fs2 where fs2.code_id = fs.code_id) "
+                                "  and code_id='A000020'  "
+                                "", db)\
                     .sort_values(by="code_id")
         price_list = pd.read_sql("select * "
                                  "from stocks_historic_data hd "
@@ -178,42 +181,150 @@ class ComponentsView(LoginRequiredMixin, TemplateView):
 
             # 재무 데이터
             income_statement = pd.DataFrame(list(FinancialStatement.objects.filter(code=self.stock_code, subject_name="포괄손익계산서").values()))
-            income_statement_account = income_statement.groupby(["account_id", "account_level", "account_name"], as_index=False).all()
+            income_statement = income_statement.dropna()
+            income_statement_account = income_statement.groupby(["account_id", "account_level", "account_name"], as_index=False).all() # 항목 리스트.
 
-            term_list = FinancialStatement.objects.filter(code=self.stock_code)\
+            term_list = FinancialStatement.objects.filter(code=self.stock_code).order_by("this_term_name")\
                 .values("this_term_name").annotate(Count("this_term_name"))
             term_list = [x["this_term_name"] for x in term_list]
 
+            def aaa(lv, original_df, part_df, term_list, ):
+                result = {}
+                lv_0_list = part_df[part_df["account_level"] == lv]  # 항목 리스트 중 lv 0 리스트.
+                for index, lv_0 in lv_0_list.iterrows():
+                    # 해당 항목 row 추가
+                    row = {}
+                    for term in term_list:
+                        value = original_df[(original_df["this_term_name"] == term) & (original_df["account_id"] == lv_0["account_id"])]
+                        if value.empty == True:
+                            row[term] = ""
+                        else:
+                            row[term] = format(int(value.iloc[0]["this_term_amount"]), ",d")
+                    lv_0_account_name = lv_0["account_name"].split("_")[lv]
+                    result[lv_0_account_name] = row
+                    # 해당 항목의 하위 항목들 추출.
+                    lv_0_low_list = pd.DataFrame(columns=part_df.columns)
+                    for index, r in part_df.iterrows():
+                        if (lv_0_account_name == r["account_name"].split("_")[lv]) & (r["account_level"] > lv):
+                            lv_0_low_list = pd.DataFrame.append(lv_0_low_list, r)
+                    if len(lv_0_low_list) <= 0:
+                        continue
+                    # lv_1_list = lv_0_low_list[lv_0_low_list["account_level"] == (lv+1)]
+
+                    result.update(aaa(lv+1, original_df, lv_0_low_list, term_list))
+
+                return result
+
+            income_statement_list = aaa(0, income_statement, income_statement_account, term_list)
             # 재무 데이터 정렬
-            # income_statement_list = []
-            # lv_0_list = income_statement_account[income_statement_account["account_level"]==0]
-            # for lv_0 in lv_0_list:
+            # income_statement_list = {}
+            # lv_0_list = income_statement_account[income_statement_account["account_level"]==0] # 항목 리스트 중 lv 0 리스트.
+            # for index, lv_0 in lv_0_list.iterrows():
             #     # 해당 항목 row 추가
+            #     row = {}
             #     for term in term_list:
-            #
-            #         income_statement_list.append(income_statement[(income_statement["this_term_name"]==term) & (income_statement["account_id"]==lv_0["account_id"])])
-            #
+            #         value = income_statement[(income_statement["this_term_name"]==term) & (income_statement["account_id"]==lv_0["account_id"])]
+            #         if value.empty==True:
+            #             row[term] = ""
+            #         else:
+            #             row[term] = format(int(value.iloc[0]["this_term_amount"]),",d")
+            #     lv_0_account_name = lv_0["account_name"].split("_")[0]
+            #     income_statement_list[lv_0_account_name] = (row)
             #     # 해당 항목의 하위 row 반복
-            #     lv_0_account_name = lv_0["account_name"]
-            #     lv_0_low_list = income_statement_account[lv_0_account_name in income_statement_account["account_name"].split("_")]
-            #     lv_1_list = income_statement_account[lv_0_low_list["account_level"]==1]
-            #     for lv_1 in lv_1_list:
-            #         lv_1_account_name = lv_1["account_name"]
-            #         lv_1_low_list = lv_0_low_list[lv_1_account_name in lv_0_low_list["account_name"].split("_")]
+            #     lv_0_low_list = pd.DataFrame(columns=income_statement_account.columns)
+            #     for index, r in income_statement_account.iterrows():
+            #         if lv_0_account_name == r["account_name"].split("_")[0]:
+            #             lv_0_low_list = pd.DataFrame.append(lv_0_low_list, r)
+            #     if lv_0_low_list.empty==True:
+            #         continue
+            #     lv_1_list = lv_0_low_list[lv_0_low_list["account_level"]==1]
+            #     for index, lv_1 in lv_1_list.iterrows():
+            #         # 해당 항목 row 추가
+            #         row = {}
+            #         for term in term_list:
+            #             value = income_statement[(income_statement["this_term_name"] == term) & (income_statement["account_id"] == lv_1["account_id"])]
+            #             if (value.empty == True):
+            #                 row[term] = ("")
+            #             else:
+            #                 row[term] = format(int(value.iloc[0]["this_term_amount"]),",d")
+            #
+            #         lv_1_account_name = lv_1["account_name"].split("_")[1]
+            #
+            #         income_statement_list[lv_1_account_name] = (row)
+            #
+            #         # 해당 항목의 하위 row 반복
+            #         lv_1_low_list = pd.DataFrame(columns=lv_0_low_list.columns)
+            #         for index, r in lv_0_low_list.iterrows():
+            #             if lv_1_account_name == r["account_name"].split("_")[0]:
+            #                 lv_1_low_list = pd.DataFrame.append(lv_1_low_list, r)
+            #         if lv_1_low_list.empty == True:
+            #             continue
             #         lv_2_list = lv_1_low_list[lv_1_low_list["account_level"] == 2]
-            #         for lv_2 in lv_2_list:
-            #             lv_2_account_name = lv_2["account_name"]
-            #             lv_2_low_list = lv_1_low_list[lv_2_account_name in lv_1_low_list["account_name"].split("_")]
-            #             if lv_2_low_list.empty==True:
-            #                 break
-            #             lv_3_list = lv_2_low_list[lv_2_low_list["account_level"] == 3]
 
-
-
-
-            context["income_statement"] = income_statement
+            context["income_statement"] = income_statement_list
             context["income_statement_term_list"] = term_list
 
+            # 증권사 컨센서스
+            Consensus.objects.filter(code_id=self.stock_code)
+
+            # 공시
+            if "notice_year" in kwargs:
+                notice_year = kwargs["notice_year"]
+            else:
+                notice_year = str(datetime.date.today().year)
+            notice_list = DartSearchData.objects.filter(
+                stock_code='347860', data_date__gt=notice_year+"-01-01", data_date__lt=notice_year+"-12-31"
+            ).order_by("-data_date")
+
+            context["notice_list"] = notice_list
+
+            # 주주정보
+            shareholder_list_data = {}
+            shareholder_list_df = pd.DataFrame(list(Shareholder.objects.filter(code_id=self.stock_code).values()))
+            shareholder_list_df = shareholder_list_df.dropna()
+            shareholder_name_list = shareholder_list_df.groupby(["shareholder_name"], as_index=False).all()
+
+            term_list = Shareholder.objects.filter(code=self.stock_code).order_by("term_name") \
+                .values("term_name").annotate(Count("term_name"))
+            term_list = [x["term_name"] for x in term_list]
+
+            for shareholder_name in shareholder_name_list["shareholder_name"]:
+                shareholder_list_df[shareholder_list_df["shareholder_name"]==shareholder_name]
+                row = {}
+                for term in term_list:
+                    value = shareholder_list_df[(shareholder_list_df["term_name"] == term) & (shareholder_list_df["shareholder_name"] == shareholder_name)]
+                    if value.empty == True:
+                        row[term] = ""
+                    else:
+                        row[term] = value.iloc[0]["share_per"]
+                shareholder_list_data[shareholder_name] = row
+
+            context["shareholder_list"] = shareholder_list_data
+            context["shareholder_term_list"] = term_list
+
+            # 배당 정보
+            dividend_list_data = {}
+            dividend_list_df = pd.DataFrame(list(Dividend.objects.filter(code_id=self.stock_code).values()))
+            dividend_list_df = dividend_list_df.dropna()
+            dividend_name_list = dividend_list_df.groupby(["account_name"], as_index=False).all()
+
+            term_list = Dividend.objects.filter(code=self.stock_code).order_by("term_name") \
+                .values("term_name").annotate(Count("term_name"))
+            term_list = [x["term_name"] for x in term_list]
+
+            for account_name in dividend_name_list["account_name"]:
+                dividend_list_df[dividend_list_df["account_name"] == account_name]
+                row = {}
+                for term in term_list:
+                    value = dividend_list_df[(dividend_list_df["term_name"] == term) & (dividend_list_df["account_name"] == account_name)]
+                    if value.empty == True:
+                        row[term] = ""
+                    else:
+                        row[term] = value.iloc[0]["value"]
+                dividend_list_data[account_name] = row
+
+            context["dividend_list"] = dividend_list_data
+            context["dividend_term_list"] = term_list
 
         return context
 

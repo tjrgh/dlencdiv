@@ -143,26 +143,19 @@
             <thead>
               <tr>
                 <th style="width:10px">항목명</th>
-                {%  for term in term_list %}
-                  <th style="width:10px">{{ term }}</th>
+                {%  for term in income_statement_term_list %}
+                  <th style="width:2px">{{ term }}</th>
                 {% endfor %}
               </tr>
             </thead>
 
             <tbody>
-              {% for row in income_statement %}
+              {% for account_name, value_list in income_statement.items %}
                 <tr>
-                  <td style="width:10px">{{ row.0}}</td>
-                  <td style="width:10px">{{ row.1}}</td>
-                  <td style="width:10px">{{ row.2}}</td>
-                  <td style="width:5px">{{ row.3}}</td>
-                  <td style="width:10px">{{ row.4}}</td>
-                  <td style="width:5px">{{ row.5}}</td>
-                  <td style="width:5px">{{ row.6}}</td>
-                  <td style="width:5px">{{ row.7}}</td>
-                  <td style="width:5px">{{ row.8}}</td>
-                  <td style="width:5px">{{ row.9}}</td>
-                  <td style="width:5px">{{ row.10}}</td>
+                  <td style="width:10px">{{ account_name }}</td>
+                  {%  for term, value in value_list.items %}
+                    <td style="width:2px">{{ value }}</td>
+                  {% endfor %}
                 </tr>
               {% endfor %}
 
@@ -180,69 +173,32 @@
     <div class="col-12">
       <div class="card">
         <div class="card-body">
-          <h4 class="header-title">Scroll - Vertical</h4>
+          <h4 class="header-title">공시</h4>
           <p class="text-muted font-13 mb-4">
-            This example shows the DataTables table body scrolling in the
-            vertical direction. This can generally be seen as an alternative
-            method to pagination for displaying a large table in a fairly small
-            vertical area, and as such pagination has been disabled here (note
-            that this is not mandatory, it will work just fine with pagination
-            enabled as well!).
+            공시
           </p>
 
           <table
             id="scroll-vertical-datatable"
-            class="table-bordered dt-responsive nowrap w-100"
+            class="table dt-responsive nowrap w-100"
           >
             <thead>
               <tr>
-                <th style="width:10px">Name</th>
-                <th style="width:10px">시가총액</th>
-                <th style="width:10px">주가</th>
-                <th style="width:5px">주가변동률</th>
-                <th style="width:10px">거래량</th>
-                <th style="width:5px">PSR</th>
-                <th style="width:5px">PER</th>
-                <th style="width:5px">PEG</th>
-                <th style="width:5px">PBR</th>
-                <th style="width:5px">EPS</th>
-                <th style="width:5px">ROE</th>
+                <th style="width:20px">제목</th>
+                <th style="width:10px">날짜</th>
+                <th style="width:5px">링크</th>
               </tr>
             </thead>
 
             <tbody>
-              {% for row in data_list %}
+              {% for notice in notice_list %}
                 <tr>
-                  <td style="width:10px">{{ row.0}}</td>
-                  <td style="width:10px">{{ row.1}}</td>
-                  <td style="width:10px">{{ row.2}}</td>
-                  <td style="width:5px">{{ row.3}}</td>
-                  <td style="width:10px">{{ row.4}}</td>
-                  <td style="width:5px">{{ row.5}}</td>
-                  <td style="width:5px">{{ row.6}}</td>
-                  <td style="width:5px">{{ row.7}}</td>
-                  <td style="width:5px">{{ row.8}}</td>
-                  <td style="width:5px">{{ row.9}}</td>
-                  <td style="width:5px">{{ row.10}}</td>
+                  <td style="width:20px">{{ notice.title }}</td>
+                  <td style="width:10px">{{ notice.data_date }}</td>
+                  <td style="width:5px"><a href="http://dart.fss.or.kr/dsaf001/main.do?rcpNo={{ notice.receipt_no }}">링크</a></td>
                 </tr>
               {% endfor %}
 
-              <tr>
-                <td>Michael Bruce</td>
-                <td>Javascript Developer</td>
-                <td>Singapore</td>
-                <td>29</td>
-                <td>2011/06/27</td>
-                <td>$183,000</td>
-              </tr>
-              <tr>
-                <td>Donna Snider</td>
-                <td>Customer Support</td>
-                <td>New York</td>
-                <td>27</td>
-                <td>2011/01/25</td>
-                <td>$112,000</td>
-              </tr>
             </tbody>
           </table>
         </div>
@@ -253,6 +209,89 @@
     <!-- end col-->
   </div>
 
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title">주주 정보</h4>
+          <p class="text-muted font-13 mb-4">
+            주주 정보
+          </p>
+
+          <table
+            id="scroll-horizontal-datatable"
+            class="table w-100 nowrap"
+          >
+            <thead>
+              <tr>
+                <th style="width:10px">항목명</th>
+                {%  for term in shareholder_term_list %}
+                  <th style="width:2px">{{ term }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for shareholder_name, value_list in shareholder_list.items %}
+                <tr>
+                  <td style="width:10px">{{ shareholder_name }}</td>
+                  {%  for term, value in value_list.items %}
+                    <td style="width:2px">{{ value }}</td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+        <!-- end card body-->
+      </div>
+      <!-- end card -->
+    </div>
+    <!-- end col-->
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title">배당 정보</h4>
+          <p class="text-muted font-13 mb-4">
+            배당 정보
+          </p>
+
+          <table
+            id="scroll-horizontal-datatable"
+            class="table w-100 nowrap"
+          >
+            <thead>
+              <tr>
+                <th style="width:20px">항목명</th>
+                {%  for term in dividend_term_list %}
+                  <th style="width:10px">{{ term }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for account_name, value_list in dividend_list.items %}
+                <tr>
+                  <td style="width:20px">{{ account_name }}</td>
+                  {%  for term, value in value_list.items %}
+                    <td style="width:10px">{{ value }}</td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+        <!-- end card body-->
+      </div>
+      <!-- end card -->
+    </div>
+    <!-- end col-->
+  </div>
 
   <!-- end row-->
 </div>

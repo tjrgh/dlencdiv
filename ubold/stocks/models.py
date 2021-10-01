@@ -632,12 +632,12 @@ class Shareholder(TimeStampMixin):
     )
     corp_code = models.CharField(max_length=9, help_text='DART 고유번호')
     term_name = models.CharField(max_length=10, help_text='기간')
-    shareholder = models.CharField(max_length=50, help_text='주주')
+    shareholder_name = models.CharField(max_length=50, help_text='주주')
     share_per = models.DecimalField(null=True, max_digits=21, decimal_places=2, help_text='지분')
 
     class Meta:
         db_table = 'shareholder'
-        unique_together = ["code", "term_name", "shareholder"]
+        unique_together = ["code", "term_name", "shareholder_name"]
         indexes = [
             models.Index(fields=['corp_code'], name='shareholder_corp_code_idx'),
             models.Index(fields=['code'], name='shareholder_code_idx'),
