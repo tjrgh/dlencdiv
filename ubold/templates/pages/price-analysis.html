@@ -1,0 +1,149 @@
+{% extends "vertical_base.html" %}
+{% load static i18n %}
+{% block head_title%}{% trans "Datatables" %}{% endblock head_title %}
+{% block extra_css %}
+
+<!-- third party css -->
+
+<link
+  href="{% static 'libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css' %}"
+  rel="stylesheet"
+  type="text/css"
+/>
+<link
+  href="{% static 'libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css' %}"
+  rel="stylesheet"
+  type="text/css"
+/>
+<link
+  href="{% static 'libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css' %}"
+  rel="stylesheet"
+  type="text/css"
+/>
+<link
+  href="{% static 'libs/datatables.net-select-bs4/css//select.bootstrap4.min.css' %}"
+  rel="stylesheet"
+  type="text/css"
+/>
+<!-- third party css end -->
+{% endblock %}
+
+
+{% block content %}
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box">
+        <h4 class="page-title">
+          주가분석
+        </h4>
+      </div>
+    </div>
+  </div>
+  <!-- end page title -->
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title">오늘의 공시</h4>
+          <p class="text-muted font-13 mb-4">
+            [{{ now|date:"Y-m-d" }} {{ now|time:"H:i:s" }}]
+          </p>
+
+          <table
+            id="basic-datatable"
+            class="table dt-responsive nowrap w-100"
+          >
+            <thead>
+              <tr>
+                <th style="width:10px">시간</th>
+                <th style="width:10px">시 장</th>
+                <th style="width:20px">종목명</th>
+                <th style="width:60px">공시명</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for dart in darts %}
+                <tr>
+                  <td style="width:10px">{{ dart.created_at|date:"m-d" }} <b>{{ dart.created_at|time:"H:i" }}</b></td>
+                  <td style="width:10px">
+                    {% if dart.corp_type == 'Y' %}
+                        <span>유가증권시장</span>
+                    {% elif dart.corp_type == 'K' %}
+                        <span>코스닥시장</span>
+                    {% elif dart.corp_type == 'N' %}
+                        <span>코넥스시장</span>
+                    {% else %}
+                        <span>기타</span>
+                    {% endif %}
+                  </td>
+                  <td style="width:20px">
+                    <span onclick="openDartDetail({{ dart.receipt_no }}">{{ dart.corp_name }}</span>
+                  </td>
+                  <td style="width:60px">
+                    <span onclick="openDartDetail({{ dart.receipt_no }}">{{ dart.title }}</span>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <!-- end card body-->
+      </div>
+      <!-- end card -->
+    </div>
+    <!-- end col-->
+  </div>
+  <!-- end row-->
+</div>
+{% endblock %}
+
+{% block extra_javascript %}
+
+<!-- Third party js -->
+<script src="{% static 'libs/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons/js/buttons.flash.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-keytable/js/dataTables.keyTable.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-select/js/dataTables.select.min.js' %}"></script>
+<script src="{% static 'libs/pdfmake/build/pdfmake.min.js' %}"></script>
+<script src="{% static 'libs/pdfmake/build/vfs_fonts.js' %}"></script>
+<!-- Third party js ends -->
+
+<!-- Init js -->
+{#<script src="{% static 'js/pages/datatables.init.js' %}"></script>#}
+<!-- Init js end -->
+<script>
+  function openDartDetail(recp_no) {
+      const url = 'http://dart.fss.or.kr/dsaf001/main.do?rcpNo=' + recp_no
+      const option = 'width=1000, height=800, location=no, top=100, left=200'
+      window.open(url, name = '', option)
+  }
+
+  $(document).ready(function () {
+    $("#basic-datatable").DataTable({
+        language: {
+          paginate: {
+            previous: "<i class='mdi mdi-chevron-left'>",
+            next: "<i class='mdi mdi-chevron-right'>"
+          },
+          sEmptyTable: "데이터가 없습니다.",
+          sInfo:"총 _TOTAL_ 개의 데이터 중 _START_ 번 부터 _END_번을 보여주고있습니다.",
+          sInfoEmpty:"총 0 개의 데이터 중 0번 부터 0번을 보여주고있습니다.",
+          order: [[0, "desc"]]
+        }, drawCallback: function () {
+          $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    });
+  })
+</script>
+{% endblock %}

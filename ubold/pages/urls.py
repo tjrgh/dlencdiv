@@ -18,6 +18,7 @@ from .views import (
     custom_pages_500_two_view,
     custom_pages_500_view,
     company_info_view,
+    price_analysis_view,
 )
 
 
@@ -44,4 +45,7 @@ urlpatterns = [
     # company info
     path('companyinfo', view=company_info_view, name='company-info'),
     path("companyinfo/<str:code>", view=company_info_view, name="company-info-detail"),
+
+    # 주가분석
+    path('priceanalysis', view=price_analysis_view, name="price-analysis"),
 ]
