@@ -1,0 +1,447 @@
+{% extends "vertical_base.html" %}
+{% load static i18n %}
+{% block head_title%}{% trans "Datatables" %}{% endblock head_title %}
+{% block extra_css %}
+
+<!-- third party css -->
+
+<link
+  href="{% static 'libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css' %}"
+  rel="stylesheet"
+  type="text/css"
+/>
+<link
+  href="{% static 'libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css' %}"
+  rel="stylesheet"
+  type="text/css"
+/>
+<link
+  href="{% static 'libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css' %}"
+  rel="stylesheet"
+  type="text/css"
+/>
+<link
+  href="{% static 'libs/datatables.net-select-bs4/css//select.bootstrap4.min.css' %}"
+  rel="stylesheet"
+  type="text/css"
+/>
+<!-- third party css end -->
+{% endblock %}
+
+
+{% block content %}
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box">
+        <h4 class="page-title">
+          기업정보
+          {% if comp_name %}
+            - {{ comp_name }}
+          {% endif %}
+        </h4>
+      </div>
+    </div>
+  </div>
+  <!-- end page title -->
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title">기업목록</h4>
+          <p class="text-muted font-13 mb-4">
+            기업목록 항목 설명
+          </p>
+
+          <table
+            id="scroll-vertical-datatable"
+            class="table dt-responsive nowrap w-100"
+          >
+            <thead>
+              <tr>
+                <th style="width:10px">Name</th>
+                <th style="width:10px">시가총액</th>
+                <th style="width:10px">주가</th>
+                <th style="width:5px">주가변동률</th>
+                <th style="width:10px">거래량</th>
+                <th style="width:5px">PSR</th>
+                <th style="width:5px">PER</th>
+                <th style="width:5px">PEG</th>
+                <th style="width:5px">PBR</th>
+                <th style="width:5px">EPS</th>
+                <th style="width:5px">ROE</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for row in stock_data_list %}
+                <tr>
+                  <td style="width:10px"><a href="{% url 'pages:company-info-detail' code=row.11 %}">{{ row.0}}</a></td>
+                  <td style="width:10px">{{ row.1 }}</td>
+                  <td style="width:10px">{{ row.2 }}</td>
+                  <td style="width:5px">{{ row.3 }}</td>
+                  <td style="width:10px">{{ row.4 }}</td>
+                  <td style="width:5px">{{ row.5 }}</td>
+                  <td style="width:5px">{{ row.6 }}</td>
+                  <td style="width:5px">{{ row.7 }}</td>
+                  <td style="width:5px">{{ row.8 }}</td>
+                  <td style="width:5px">{{ row.9 }}</td>
+                  <td style="width:5px">{{ row.10 }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <!-- end card body-->
+      </div>
+      <!-- end card -->
+    </div>
+    <!-- end col-->
+  </div>
+  <!-- end row-->
+
+  <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="header-title">거래 데이터</h4>
+            <div
+              id="combine-chart"
+              data-colors="#e3eaef,#f1556c,#1abc9c"
+              class="flot-chart mt-5"
+              style="height: 350px"
+            ></div>
+          </div>
+        </div>
+        <!-- end card -->
+      </div>
+      <!-- end col -->
+    </div>
+    <!-- end row -->
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title">재무 데이터</h4>
+          <p class="text-muted font-13 mb-4">
+            재무 데이터 설명
+          </p>
+
+          <table
+            id="scroll-vertical-datatable"
+            class="table dt-responsive nowrap w-100"
+          >
+            <thead>
+              <tr>
+                <th style="width:10px">항목명</th>
+                {%  for term in term_list %}
+                  <th style="width:10px">{{ term }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for row in income_statement %}
+                <tr>
+                  <td style="width:10px">{{ row.0 }}</td>
+                  <td style="width:10px">{{ row.1 }}</td>
+                  <td style="width:10px">{{ row.2 }}</td>
+                  <td style="width:5px">{{ row.3 }}</td>
+                  <td style="width:10px">{{ row.4 }}</td>
+                  <td style="width:5px">{{ row.5 }}</td>
+                  <td style="width:5px">{{ row.6 }}</td>
+                  <td style="width:5px">{{ row.7 }}</td>
+                  <td style="width:5px">{{ row.8 }}</td>
+                  <td style="width:5px">{{ row.9 }}</td>
+                  <td style="width:5px">{{ row.10 }}</td>
+                </tr>
+              {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+        <!-- end card body-->
+      </div>
+      <!-- end card -->
+    </div>
+    <!-- end col-->
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_javascript %}
+
+<!-- Third party js -->
+<script src="{% static 'libs/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons/js/buttons.flash.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-keytable/js/dataTables.keyTable.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-select/js/dataTables.select.min.js' %}"></script>
+<script src="{% static 'libs/pdfmake/build/pdfmake.min.js' %}"></script>
+<script src="{% static 'libs/pdfmake/build/vfs_fonts.js' %}"></script>
+<!-- Third party js ends -->
+
+<!-- Init js -->
+<script src="{% static 'js/pages/datatables.init.js' %}"></script>
+<!-- Init js end -->
+
+
+ <script src="{% static 'libs/flot-charts/jquery.flot.js' %}"></script>
+<script src="{% static 'libs/flot-charts/jquery.flot.time.js' %}"></script>
+<script src="{% static 'libs/jquery.flot.tooltip/js/jquery.flot.tooltip.min.js' %}"></script>
+<script src="{% static 'libs/flot-charts/jquery.flot.resize.js' %}"></script>
+<script src="{% static 'libs/flot-charts/jquery.flot.pie.js' %}"></script>
+<script src="{% static 'libs/flot-charts/jquery.flot.selection.js' %}"></script>
+<script src="{% static 'libs/flot-charts/jquery.flot.stack.js' %}"></script>
+<script src="{% static 'libs/flot-orderbars/js/jquery.flot.orderBars.js' %}"></script>
+<script src="{% static 'libs/flot-charts/jquery.flot.crosshair.js' %}"></script>
+
+  <script>
+  !function (b) {
+    "use strict";
+
+    function a() {
+        this.$body = b("body"), this.$realData = []
+    }
+
+    a.prototype.createPlotGraph = function (a, o, t, r, e, l, i) {
+        b.plot(b(a), [{data: o, label: r[0], color: e[0]}, {data: t, label: r[1], color: e[1]}], {
+            series: {
+                lines: {
+                    show: !0,
+                    fill: !0,
+                    lineWidth: 2,
+                    fillColor: {colors: [{opacity: .5}, {opacity: .5}, {opacity: .8}]}
+                }, points: {show: !0}, shadowSize: 0
+            },
+            grid: {hoverable: !0, clickable: !0, borderColor: l, tickColor: "transparent", borderWidth: 1, labelMargin: 10, backgroundColor: i},
+            legend: {
+                position: "ne", margin: [0, -32], noColumns: 0, labelBoxBorderColor: null, labelFormatter: function (a, o) {
+                    return a + "&nbsp;&nbsp;"
+                }, width: 30, height: 2
+            },
+            yaxis: {axisLabel: "Daily Visits", tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}},
+            xaxis: {axisLabel: "Last Days", tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}},
+            tooltip: !0,
+            tooltipOpts: {content: "%s: Value of %x is %y", shifts: {x: -60, y: 25}, defaultTheme: !1},
+            splines: {show: !0, tension: .1, lineWidth: 1}
+        })
+    }, a.prototype.createPlotDotGraph = function (a, o, t, r, e, l, i) {
+        b.plot(b(a), [{data: o, label: r[0], color: e[0]}, {data: t, label: r[1], color: e[1]}], {
+            series: {
+                lines: {
+                    show: !0,
+                    fill: !1,
+                    lineWidth: 3,
+                    fillColor: {colors: [{opacity: .3}, {opacity: .3}]}
+                }, curvedLines: {apply: !0, active: !0, monotonicFit: !0}, splines: {show: !0, tension: .4, lineWidth: 5, fill: .4}
+            },
+            grid: {hoverable: !0, clickable: !0, borderColor: l, tickColor: "#f9f9f9", borderWidth: 1, labelMargin: 10, backgroundColor: i},
+            legend: {
+                position: "ne", margin: [0, -32], noColumns: 0, labelBoxBorderColor: null, labelFormatter: function (a, o) {
+                    return a + "&nbsp;&nbsp;"
+                }, width: 30, height: 2
+            },
+            yaxis: {axisLabel: "Gold Price(USD)", tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}},
+            xaxis: {axisLabel: "Numbers", tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}},
+            tooltip: !1
+        })
+    }, a.prototype.createPieGraph = function (a, o, t, r) {
+        r = {
+            series: {pie: {show: !0, radius: 1, label: {show: !0, radius: 1, background: {opacity: .2}}}},
+            legend: {show: !(t = [{label: o[0], data: t[0]}, {label: o[1], data: t[1]}, {label: o[2], data: t[2]}, {label: o[3], data: t[3]}, {label: o[4], data: t[4]}])},
+            grid: {hoverable: !0, clickable: !0},
+            colors: r,
+            tooltip: !0,
+            tooltipOpts: {content: "%s, %p.0%"}
+        }, b.plot(b(a), t, r)
+    }, a.prototype.randomData = function () {
+        for (0 < this.$realData.length && (this.$realData = this.$realData.slice(1)); this.$realData.length < 300;) {
+            var a = (0 < this.$realData.length ? this.$realData[this.$realData.length - 1] : 50) + 10 * Math.random() - 5;
+            a < 0 ? a = 0 : 100 < a && (a = 100), this.$realData.push(a)
+        }
+        for (var o = [], t = 0; t < this.$realData.length; ++t) o.push([t, this.$realData[t]]);
+        return o
+    }, a.prototype.createRealTimeGraph = function (a, o, t) {
+        return b.plot(a, [o], {
+            colors: t,
+            series: {grow: {active: !1}, shadowSize: 0, lines: {show: !0, fill: !0, lineWidth: 2, steps: !1}},
+            grid: {
+                show: !0,
+                aboveData: !1,
+                color: "#8391a2",
+                labelMargin: 15,
+                axisMargin: 0,
+                borderWidth: 0,
+                borderColor: null,
+                minBorderMargin: 5,
+                clickable: !0,
+                hoverable: !0,
+                autoHighlight: !1,
+                mouseActiveRadius: 20
+            },
+            tooltip: !0,
+            tooltipOpts: {content: "Value is : %y.0%", shifts: {x: -30, y: -50}},
+            yaxis: {axisLabel: "Response Time (ms)", min: 0, max: 100, tickColor: "rgba(65, 80, 95, 0.07)", color: "#8391a2"},
+            xaxis: {axisLabel: "Point Value (1000)", show: !0, tickColor: "rgba(65, 80, 95, 0.07)", color: "#8391a2"}
+        })
+    }, a.prototype.createDonutGraph = function (a, o, t, r) {
+        r = {
+            series: {pie: {show: !0, innerRadius: .5}},
+            legend: {
+                show: !(t = [{label: o[0], data: t[0]}, {label: o[1], data: t[1]}, {label: o[2], data: t[2]}, {label: o[3], data: t[3]}, {label: o[4], data: t[4]}]),
+                labelFormatter: function (a, o) {
+                    return '<div style="font-size:14px;">&nbsp;' + a + "</div>"
+                },
+                labelBoxBorderColor: null,
+                margin: 50,
+                width: 20
+            },
+            grid: {hoverable: !1, clickable: !1},
+            colors: r,
+            tooltip: !1
+        }, b.plot(b(a), t, r)
+    }, a.prototype.createStackBarGraph = function (a, o, t, r) {
+        t = {
+            bars: {show: !0, barWidth: .2, fill: 1},
+            grid: {
+                show: !0,
+                aboveData: !1,
+                labelMargin: 5,
+                axisMargin: 0,
+                borderWidth: 1,
+                minBorderMargin: 5,
+                clickable: !0,
+                hoverable: !0,
+                autoHighlight: !1,
+                mouseActiveRadius: 20,
+                borderColor: "rgba(65, 80, 95, 0.07)"
+            },
+            series: {stack: 0},
+            legend: {
+                position: "ne", margin: [0, -32], noColumns: 0, labelBoxBorderColor: null, labelFormatter: function (a, o) {
+                    return a + "&nbsp;&nbsp;"
+                }, width: 30, height: 2
+            },
+            yaxis: o.y,
+            xaxis: o.x,
+            colors: t,
+            tooltip: !0,
+            tooltipOpts: {content: "%s : %y.0", shifts: {x: -30, y: -50}}
+        }, b.plot(b(a), r, t)
+    }, a.prototype.createLineGraph = function (a, o, t, r) {
+        return t = {
+            series: {lines: {show: !0}, points: {show: !0}},
+            legend: {
+                position: "ne", margin: [0, -32], noColumns: 0, labelBoxBorderColor: null, labelFormatter: function (a, o) {
+                    return a + "&nbsp;&nbsp;"
+                }, width: 30, height: 2
+            },
+            yaxis: o.y,
+            xaxis: o.x,
+            colors: t,
+            grid: {hoverable: !0, borderColor: "rgba(65, 80, 95, 0.07)", borderWidth: 1, backgroundColor: "transparent"},
+            tooltip: !0,
+            tooltipOpts: {content: "%s : %y.0", shifts: {x: -30, y: -50}}
+        }, b.plot(b(a), r, t)
+    }, a.prototype.createCombineGraph = function (a, o, t, r, e) {
+        o = {
+            series: {shadowSize: 0},
+            grid: {hoverable: !0, clickable: !0, tickColor: "#f9f9f9", borderWidth: 1, borderColor: "rgba(65, 80, 95, 0.07)"},
+            tooltip: !0,
+            colors: e,
+            tooltipOpts: {
+                defaultTheme: !(r = [
+                  {#{#}
+                  {#  label: t[0],#}
+                  {#  data: r[0],#}
+                  {#  color: e[0],#}
+                  {#  lines: {show: !0, fill: !0},#}
+                  {#  points: {show: !0} },#}
+                  {
+                    label: t[0],
+                    data: r[0],
+                    color: e[0],
+                    lines: {show: !0},
+                    points: {show: !0} },
+                  {
+                    label: t[1],
+                    data: r[1],
+                    color: e[1],
+                    bars: {show: !0}
+                  }
+                ])
+            },
+            legend: {
+                position: "ne", margin: [0, -32], noColumns: 0, labelBoxBorderColor: null, labelFormatter: function (a, o) {
+                    return a + "&nbsp;&nbsp;"
+                }, width: 30, height: 2
+            },
+            yaxis: {axisLabel: "Point Value (1000)", tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}},
+            xaxis: {axisLabel: "Daily Hours", ticks: o, tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}}
+        }, b.plot(b(a), r, o)
+    }, a.prototype.init = function () {
+        var a = ["#4fc6e1", "#6658dd"], o = b("#website-stats").data("colors");
+        // o && (a = o.split(",")), this.createPlotGraph("#website-stats", [[0, 13], [1, 22], [2, 27], [3, 36], [4, 40], [5, 25], [6, 36], [7, 20], [8, 12], [9, 20], [10, 48], [11, 16], [12, 14]], [[0, 28], [1, 56], [2, 26], [3, 20], [4, 21], [5, 25], [6, 19], [7, 22], [8, 35], [9, 28], [10, 36], [11, 19], [12, 11]], ["Bitcoin", "Ethereum", "Litecoin"], a, "rgba(65, 80, 95, 0.07)", "transparent"), a = ["#6658dd", "#f1556c"], (o = b("#website-stats1").data("colors")) && (a = o.split(",")), this.createPlotDotGraph("#website-stats1", [[0, 2], [1, 4], [2, 7], [3, 9], [4, 6], [5, 3], [6, 10], [7, 8], [8, 5], [9, 14], [10, 10], [11, 10], [12, 8]], [[0, 1], [1, 3], [2, 6], [3, 7], [4, 4], [5, 2], [6, 8], [7, 6], [8, 4], [9, 10], [10, 8], [11, 14], [12, 5]], ["Bitcoin", "Ethereum"], a, "rgba(65, 80, 95, 0.07)", "transparent"), a = ["#4a81d4", "#f672a7", "#f7b84b", "#4fc6e1", "#1abc9c"], (o = b("#pie-chart").data("colors")) && (a = o.split(",")), this.createPieGraph("#pie-chart", ["Bitcoin", "Ethereum", "Litecoin", "Bitcoin Cash", "Cardano"], [48, 30, 15, 32, 26], a), a = ["#4a81d4"], (o = b("#flotRealTime").data("colors")) && (a = o.split(","));
+        var t = this.createRealTimeGraph("#flotRealTime", this.randomData(), [a]);
+        t.draw();
+        var r = this;
+        !function a() {
+            t.setData([r.randomData()]), t.draw(), setTimeout(a, (b("html").hasClass("mobile-device"), 500))
+        }(), a = ["#4a81d4", "#f672a7", "#f7b84b", "#4fc6e1", "#1abc9c"], (o = b("#donut-chart").data("colors")) && (a = o.split(",")), this.createDonutGraph("#donut-chart", ["Bitcoin", "Ethereum", "Litecoin", "Bitcoin Cash", "Cardano"], [48, 30, 15, 32, 26], a);
+        {#var trade_volume = {{ data_list|safe }}#}
+        var trade_volume_list = {{ trade_volume_list }}
+        var close_price_list = {{ close_price_list }}
+        var input_trade_volume_list = []
+        var input_close_price_list = []
+        for(var temp=0; temp<24;temp++){
+          input_trade_volume_list.push([temp, trade_volume_list[temp]])
+          input_close_price_list.push([temp, close_price_list[temp]])
+        }
+        var e = [input_close_price_list, input_trade_volume_list],
+            a = ["#f1556c", "#1abc9c"];
+        (o = b("#combine-chart").data("colors")) && (a = o.split(",")), this.createCombineGraph("#combine-chart", [[0, "22h"], [1, ""], [2, "00h"], [3, ""], [4, "02h"], [5, ""], [6, "04h"], [7, ""], [8, "06h"], [9, ""], [10, "08h"], [11, ""], [12, "10h"], [13, ""], [14, "12h"], [15, ""], [16, "14h"], [17, ""], [18, "16h"], [19, ""], [20, "18h"], [21, ""], [22, "20h"], [23, ""]], ["주가", "거래량"], e, a);
+        for (var l = [], i = 0; i <= 10; i += 1) l.push([i, parseInt(30 * Math.random())]);
+        for (var s = [], i = 0; i <= 10; i += 1) s.push([i, parseInt(30 * Math.random())]);
+        for (var n = [], i = 0; i <= 10; i += 1) n.push([i, parseInt(30 * Math.random())]);
+        (e = new Array).push({label: "Series One", data: l, bars: {order: 1}}), e.push({label: "Series Two", data: s, bars: {order: 2}}), e.push({
+            label: "Series Three",
+            data: n,
+            bars: {order: 3}
+        }), a = ["#4fc6e1", "#f7b84b", "#4a81d4"], (o = b("#ordered-bars-chart").data("colors")) && (a = o.split(",")), this.createStackBarGraph("#ordered-bars-chart", {
+            y: {
+                axisLabel: "Sales Value (USD)",
+                tickColor: "rgba(65, 80, 95, 0.07)",
+                font: {color: "#8391a2"}
+            }, x: {axisLabel: "Last 10 Days", tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}}
+        }, a, e);
+        for (var c = [], h = [], i = 0; i < 12; i += .2) c.push([i, Math.sin(i + 0)]), h.push([i, Math.cos(i + 0)]);
+        e = [{data: c, label: "Google"}, {
+            data: h,
+            label: "Yahoo"
+        }], a = ["#6c757d", "#f1556c"], (o = b("#line-chart-alt").data("colors")) && (a = o.split(",")), this.createLineGraph("#line-chart-alt", {
+            y: {
+                min: -1.2,
+                max: 1.2,
+                tickColor: "rgba(65, 80, 95, 0.07)",
+                font: {color: "#8391a2"}
+            }, x: {tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}}
+        }, a, e)
+    }, b.FlotChart = new a, b.FlotChart.Constructor = a
+  }(window.jQuery), function () {
+      "use strict";
+      window.jQuery.FlotChart.init()
+  }();
+
+</script>
+
+{% endblock %}

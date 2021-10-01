@@ -17,6 +17,7 @@ from .views import (
     custom_pages_404_view,
     custom_pages_500_two_view,
     custom_pages_500_view,
+    company_info_view,
 )
 
 
@@ -39,4 +40,8 @@ urlpatterns = [
     path("404", view=custom_pages_404_view, name="404"),
     path("500", view=custom_pages_500_view, name="500"),
     path("500-two", view=custom_pages_500_two_view, name="500-two"),
+
+    # company info
+    path('companyinfo', view=company_info_view, name='company-info'),
+    path("companyinfo/<str:code>", view=company_info_view, name="company-info-detail"),
 ]
