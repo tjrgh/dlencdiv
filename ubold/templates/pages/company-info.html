@@ -127,7 +127,7 @@
         <div class="card-body">
           <h4 class="header-title">재무 데이터</h4>
           <p class="text-muted font-13 mb-4">
-            재무 데이터 설명
+            재무 데이터
           </p>
 
           <table
@@ -137,26 +137,19 @@
             <thead>
               <tr>
                 <th style="width:10px">항목명</th>
-                {%  for term in term_list %}
-                  <th style="width:10px">{{ term }}</th>
+                {%  for term in income_statement_term_list %}
+                  <th style="width:2px">{{ term }}</th>
                 {% endfor %}
               </tr>
             </thead>
 
             <tbody>
-              {% for row in income_statement %}
+              {% for account_name, value_list in income_statement.items %}
                 <tr>
-                  <td style="width:10px">{{ row.0 }}</td>
-                  <td style="width:10px">{{ row.1 }}</td>
-                  <td style="width:10px">{{ row.2 }}</td>
-                  <td style="width:5px">{{ row.3 }}</td>
-                  <td style="width:10px">{{ row.4 }}</td>
-                  <td style="width:5px">{{ row.5 }}</td>
-                  <td style="width:5px">{{ row.6 }}</td>
-                  <td style="width:5px">{{ row.7 }}</td>
-                  <td style="width:5px">{{ row.8 }}</td>
-                  <td style="width:5px">{{ row.9 }}</td>
-                  <td style="width:5px">{{ row.10 }}</td>
+                  <td style="width:10px">{{ account_name }}</td>
+                  {%  for term, value in value_list.items %}
+                    <td style="width:2px">{{ value }}</td>
+                  {% endfor %}
                 </tr>
               {% endfor %}
 
@@ -169,6 +162,253 @@
     </div>
     <!-- end col-->
   </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title">공시</h4>
+          <p class="text-muted font-13 mb-4">
+            공시
+          </p>
+
+          <table
+            id="scroll-vertical-datatable"
+            class="table dt-responsive nowrap w-100"
+          >
+            <thead>
+              <tr>
+                <th style="width:20px">제목</th>
+                <th style="width:10px">날짜</th>
+                <th style="width:5px">링크</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for notice in notice_list %}
+                <tr>
+                  <td style="width:20px">{{ notice.title }}</td>
+                  <td style="width:10px">{{ notice.data_date }}</td>
+                  <td style="width:5px"><a href="http://dart.fss.or.kr/dsaf001/main.do?rcpNo={{ notice.receipt_no }}">링크</a></td>
+                </tr>
+              {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+        <!-- end card body-->
+      </div>
+      <!-- end card -->
+    </div>
+    <!-- end col-->
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title">주주 정보</h4>
+          <p class="text-muted font-13 mb-4">
+            주주 정보
+          </p>
+
+          <table
+            id="scroll-horizontal-datatable"
+            class="table w-100 nowrap"
+          >
+            <thead>
+              <tr>
+                <th style="width:10px">항목명</th>
+                {%  for term in shareholder_term_list %}
+                  <th style="width:2px">{{ term }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for shareholder_name, value_list in shareholder_list.items %}
+                <tr>
+                  <td style="width:10px">{{ shareholder_name }}</td>
+                  {%  for term, value in value_list.items %}
+                    <td style="width:2px">{{ value }}</td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+        <!-- end card body-->
+      </div>
+      <!-- end card -->
+    </div>
+    <!-- end col-->
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title">배당 정보</h4>
+          <p class="text-muted font-13 mb-4">
+            배당 정보
+          </p>
+
+          <table
+            id="scroll-horizontal-datatable"
+            class="table w-100 nowrap"
+          >
+            <thead>
+              <tr>
+                <th style="width:20px">항목명</th>
+                {%  for term in dividend_term_list %}
+                  <th style="width:10px">{{ term }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for account_name, value_list in dividend_list.items %}
+                <tr>
+                  <td style="width:20px">{{ account_name }}</td>
+                  {%  for term, value in value_list.items %}
+                    <td style="width:10px">{{ value }}</td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+        <!-- end card body-->
+      </div>
+      <!-- end card -->
+    </div>
+    <!-- end col-->
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title">평균급여 및 종업원 수</h4>
+          <p class="text-muted font-13 mb-4">
+            평균급여 및 종업원 수
+          </p>
+
+          <table
+            id="scroll-horizontal-datatable"
+            class="table w-100 nowrap"
+          >
+            <thead>
+              <tr>
+                <th style="width:20px">카테고리</th>
+                {%  for item in wcp_item_list %}
+                  <th style="width:10px">{{ item }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for category, value_list in wcp_list.items %}
+                <tr>
+                  <td style="width:20px">{{ category }}</td>
+                  {%  for item, value in value_list.items %}
+                    <td style="width:10px">{{ value }}</td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+        <!-- end card body-->
+      </div>
+      <!-- end card -->
+    </div>
+    <!-- end col-->
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title">이사회 임원 목록</h4>
+          <p class="text-muted font-13 mb-4">
+            이사회 임원 목록
+          </p>
+
+          <table
+            id="scroll-horizontal-datatable"
+            class="table w-100 nowrap"
+          >
+            <thead>
+              <tr>
+                <th style="width:20px">이름</th>
+                <th style="width:20px">업무</th>
+                <th style="width:20px">성별</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for board_meber in board_member_list %}
+                <tr>
+                  <td style="width:20px">{{ board_meber.member_name }}</td>
+                  <td style="width:20px">{{ board_meber.member_job }}</td>
+                  <td style="width:20px">{{ board_meber.member_sex }}</td>
+                </tr>
+              {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+        <!-- end card body-->
+      </div>
+      <!-- end card -->
+    </div>
+    <!-- end col-->
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title">상위 보수 지급자 목록</h4>
+          <p class="text-muted font-13 mb-4">
+            상위 보수 지급자 목록
+          </p>
+
+          <table
+            id="scroll-horizontal-datatable"
+            class="table w-100 nowrap"
+          >
+            <thead>
+              <tr>
+                <th style="width:20px">이름</th>
+                <th style="width:20px">직책</th>
+                <th style="width:20px">보수</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for executive_wage in executive_wage_list %}
+                <tr>
+                  <td style="width:20px">{{ executive_wage.worker_name }}</td>
+                  <td style="width:20px">{{ executive_wage.worker_position }}</td>
+                  <td style="width:20px">{{ executive_wage.wage }}</td>
+                </tr>
+              {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+        <!-- end card body-->
+      </div>
+      <!-- end card -->
+    </div>
+    <!-- end col-->
+  </div>
+
 </div>
 {% endblock %}
 
@@ -401,16 +641,22 @@
         {#var trade_volume = {{ data_list|safe }}#}
         var trade_volume_list = {{ trade_volume_list }}
         var close_price_list = {{ close_price_list }}
+        var price_data_date = {{ data_date|safe }}
         var input_trade_volume_list = []
         var input_close_price_list = []
-        for(var temp=0; temp<24;temp++){
+        var price_date_list = []
+        for(var temp=0; temp<trade_volume_list.length;temp++){
           input_trade_volume_list.push([temp, trade_volume_list[temp]])
           input_close_price_list.push([temp, close_price_list[temp]])
+          {#price_date_list.push([temp, price_data_date[temp]])#}
+          if (price_data_date[temp].indexOf("12-31") != -1){ price_date_list.push([temp, price_data_date[temp]]) }
+          else{ price_date_list.push([temp, ""])}
         }
+        var xLabel = [[0, "22h"], [1, ""], [2, "00h"], [3, ""], [4, "02h"], [5, ""], [6, "04h"], [7, ""], [8, "06h"], [9, ""], [10, "08h"], [11, ""], [12, "10h"], [13, ""], [14, "12h"], [15, ""], [16, "14h"], [17, ""], [18, "16h"], [19, ""], [20, "18h"], [21, ""], [22, "20h"], [23, ""]]
         var e = [input_close_price_list, input_trade_volume_list],
             a = ["#f1556c", "#1abc9c"];
-        (o = b("#combine-chart").data("colors")) && (a = o.split(",")), this.createCombineGraph("#combine-chart", [[0, "22h"], [1, ""], [2, "00h"], [3, ""], [4, "02h"], [5, ""], [6, "04h"], [7, ""], [8, "06h"], [9, ""], [10, "08h"], [11, ""], [12, "10h"], [13, ""], [14, "12h"], [15, ""], [16, "14h"], [17, ""], [18, "16h"], [19, ""], [20, "18h"], [21, ""], [22, "20h"], [23, ""]], ["주가", "거래량"], e, a);
-        for (var l = [], i = 0; i <= 10; i += 1) l.push([i, parseInt(30 * Math.random())]);
+        (o = b("#combine-chart").data("colors")) && (a = o.split(",")), this.createCombineGraph("#combine-chart", price_date_list, ["주가", "거래량"], e, a);
+        /*for (var l = [], i = 0; i <= 10; i += 1) l.push([i, parseInt(30 * Math.random())]);
         for (var s = [], i = 0; i <= 10; i += 1) s.push([i, parseInt(30 * Math.random())]);
         for (var n = [], i = 0; i <= 10; i += 1) n.push([i, parseInt(30 * Math.random())]);
         (e = new Array).push({label: "Series One", data: l, bars: {order: 1}}), e.push({label: "Series Two", data: s, bars: {order: 2}}), e.push({
@@ -423,7 +669,7 @@
                 tickColor: "rgba(65, 80, 95, 0.07)",
                 font: {color: "#8391a2"}
             }, x: {axisLabel: "Last 10 Days", tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}}
-        }, a, e);
+        }, a, e);*/
         for (var c = [], h = [], i = 0; i < 12; i += .2) c.push([i, Math.sin(i + 0)]), h.push([i, Math.cos(i + 0)]);
         e = [{data: c, label: "Google"}, {
             data: h,
