@@ -131,8 +131,8 @@
           </p>
 
           <table
-            id="scroll-vertical-datatable"
-            class="table dt-responsive nowrap w-100 overflow-scroll"
+            id="financial-statement-table"
+            class="table dt-responsive nowrap w-100"
           >
             <thead>
               <tr>
@@ -146,9 +146,9 @@
             <tbody>
               {% for account_name, value_list in income_statement.items %}
                 <tr>
-                  <td style="width:10px">{{ account_name }}</td>
+                  <td style="min-width:100px">{{ account_name }}</td>
                   {%  for term, value in value_list.items %}
-                    <td style="width:2px">{{ value }}</td>
+                    <td style="min-width:100px">{{ value }}</td>
                   {% endfor %}
                 </tr>
               {% endfor %}
@@ -687,6 +687,23 @@
       "use strict";
       window.jQuery.FlotChart.init()
   }();
+
+  $(document).ready(function () {
+    $("#financial-statement-table").DataTable({
+      scrollY: "800px",
+      scrollX: !0,
+      {#scrollCollapse: true,#}
+      paging: false,
+      language: {
+        paginate: {
+          previous: "<i class='mdi mdi-chevron-left'>",
+          next: "<i class='mdi mdi-chevron-right'>"
+        }
+      }, drawCallback: function () {
+        $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+      }
+    });
+  });
 
 </script>
 
