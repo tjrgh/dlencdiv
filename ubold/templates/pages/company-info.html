@@ -4,7 +4,11 @@
 {% block extra_css %}
 
 <!-- third party css -->
-
+<link
+  href="{% static 'css/BBD.css' %}"
+  rel="stylesheet"
+  type="text/css"
+/>
 <link
   href="{% static 'libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css' %}"
   rel="stylesheet"
@@ -46,17 +50,39 @@
   </div>
   <!-- end page title -->
 
+{#  기업 목록 #}
   <div class="row">
     <div class="col-12">
       <div class="card">
         <div class="card-body">
+          <div style="float: right">
+{#            <h6 class="font-13 mt-3">검색어</h6>#}
+            <form class="row g-3" action="/pages/companyinfo" method="get">
+              <div class="col-auto">
+                <label for="simpleinput" class="form-label" style="margin-bottom: 0">검색어</label>
+{#                <input type="text" id="simpleinput" class="form-control">#}
+              </div>
+              <div class="col-auto">
+{#                <label for="simpleinput" class="form-label">검색어</label>#}
+                <input type="text" id="searchKeyword" name="searchKeyword" class="form-control"
+                  value={{ request.GET.searchKeyword }}
+                >
+              </div>
+              <div class="col-auto">
+                <button type="submit" class="btn btn-primary waves-effect waves-light mb-2">
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+
           <h4 class="header-title">기업목록</h4>
           <p class="text-muted font-13 mb-4">
             기업목록 항목 설명
           </p>
 
           <table
-            id="scroll-vertical-datatable"
+            id="stock_list_table"
             class="table dt-responsive nowrap w-100"
           >
             <thead>
@@ -78,7 +104,8 @@
             <tbody>
               {% for row in stock_data_list %}
                 <tr>
-                  <td style="width:10px"><a href="{% url 'pages:company-info-detail' code=row.11 %}">{{ row.0}}</a></td>
+{#                  <td style="width:10px"><a href="/pages/companyinfo/{% url 'pages:company-info-detail' code=row.11 %}">{{ row.0}}</a></td>#}
+                  <td style="width:10px"><a href="/pages/companyinfo/{{ row.11 }}?{{ request.GET.urlencode }}">{{ row.0}}</a></td>
                   <td style="width:10px">{{ row.1 }}</td>
                   <td style="width:10px">{{ row.2 }}</td>
                   <td style="width:5px">{{ row.3 }}</td>
@@ -102,25 +129,46 @@
   </div>
   <!-- end row-->
 
+{#거래 데이터#}
   <div class="row">
-      <div class="col-lg-12">
-        <div class="card">
-          <div class="card-body">
-            <h4 class="header-title">거래 데이터</h4>
-            <div
-              id="combine-chart"
-              data-colors="#e3eaef,#f1556c,#1abc9c"
-              class="flot-chart mt-5"
-              style="height: 350px"
-            ></div>
-          </div>
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title">거래 데이터</h4>
+          <div
+            id="combine-chart"
+            data-colors="#e3eaef,#f1556c,#1abc9c"
+            class="flot-chart mt-5"
+            style="height: 350px"
+          ></div>
         </div>
-        <!-- end card -->
       </div>
-      <!-- end col -->
+      <!-- end card -->
     </div>
+    <!-- end col -->
+  </div>
     <!-- end row -->
 
+{#재무 데이터#}
+{#  재무 정보 그래프 #}
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title">Stacked Bar chart</h4>
+          <div
+            id="ordered-bars-chart"
+            style="height: 350px"
+            class="mt-5"
+            data-colors="#4fc6e1,#f7b84b,#4a81d4"
+          ></div>
+        </div>
+      </div>
+      <!-- end card -->
+    </div>
+  </div>
+
+{#  표괄손익계산서 #}
   <div class="row">
     <div class="col-12">
       <div class="card">
@@ -131,12 +179,19 @@
           </p>
 
           <table
-            id="scroll-vertical-datatable"
-            class="table dt-responsive nowrap w-100"
+            id="income_statement_table"
+            class="table nowrap w-100"
           >
             <thead>
               <tr>
-                <th style="width:10px">항목명</th>
+                <th style="
+                  {#width:10px;#}
+                  position: sticky;
+                  left: 0;
+                  z-index: 99;
+                  background-color: #e8e8e8;
+                  {#border-right: 0.5px solid #a0a0a0;#}
+                ">항목명</th>
                 {%  for term in income_statement_term_list %}
                   <th style="width:2px">{{ term }}</th>
                 {% endfor %}
@@ -146,8 +201,157 @@
             <tbody>
               {% for account_name, value_list in income_statement.items %}
                 <tr>
-                  <td style="width:10px">{{ account_name }}</td>
-                  {%  for term, value in value_list.items %}
+                  <td style="
+                    {#width:10px;#}
+                    position: sticky;
+                    left: 0;
+                    z-index: 99;
+                    background-color: #e8e8e8;
+                    {#border-right: 1px solid gray;#}
+                  "
+                      class="balance_sheet_account_lv{{ value_list.level }}"
+                  >
+                    {% for i in value_list.level %}
+                      {{ "&nbsp;&nbsp;&nbsp;&nbsp;" }}
+{#                      {% if forloop.last %}#}
+{#                        {{ "ㄴ" }}#}
+{#                      {% endif %}#}
+                    {% endfor %}
+                    {{ account_name }}
+                  </td> {% comment %}value_list.level{% endcomment %}
+                  {%  for term, value in value_list.data_list.items %}
+                    <td style="width:2px">{{ value }}</td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+        <!-- end card body-->
+      </div>
+      <!-- end card -->
+    </div>
+    <!-- end col-->
+  </div>
+{#  재무상태표#}
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title">재무제표</h4>
+          <p class="text-muted font-13 mb-4">
+            재무제표
+          </p>
+
+          <table
+            id="balance_sheet_table"
+            class="table nowrap w-100"
+          >
+            <thead>
+              <tr>
+                <th style="
+                  {#width:10px;#}
+                  position: sticky;
+                  left: 0;
+                  z-index: 99;
+                  background-color: #e8e8e8;
+                  {#border-right: 0.5px solid #a0a0a0;#}
+                ">항목명</th>
+                {%  for term in balance_sheet_term_list %}
+                  <th style="width:2px">{{ term }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for account_name, value_list in balance_sheet.items %}
+                <tr>
+                  <td style="
+                    {#width:10px;#}
+                    position: sticky;
+                    left: 0;
+                    z-index: 99;
+                    background-color: #e8e8e8;
+                    {#border-right: 1px solid gray;#}
+                  "
+                      class="balance_sheet_account_lv{{ value_list.level }}"
+                  >
+                    {% for i in value_list.level %}
+                      {{ "&nbsp;&nbsp;&nbsp;&nbsp;" }}
+{#                      {% if forloop.last %}#}
+{#                        {{ "ㄴ" }}#}
+{#                      {% endif %}#}
+                    {% endfor %}
+                    {{ account_name }}
+                  </td> {% comment %}value_list.level{% endcomment %}
+                  {%  for term, value in value_list.data_list.items %}
+                    <td style="width:2px">{{ value }}</td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+        <!-- end card body-->
+      </div>
+      <!-- end card -->
+    </div>
+    <!-- end col-->
+  </div>
+{#  현금흐름표#}
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title">현금 흐름표</h4>
+          <p class="text-muted font-13 mb-4">
+            현금 흐름표
+          </p>
+
+          <table
+            id="cashflow_statement_table"
+            class="table nowrap w-100"
+          >
+            <thead>
+              <tr>
+                <th style="
+                  {#width:10px;#}
+                  position: sticky;
+                  left: 0;
+                  z-index: 99;
+                  background-color: #e8e8e8;
+                  {#border-right: 0.5px solid #a0a0a0;#}
+                ">항목명</th>
+                {%  for term in cashflow_statement_term_list %}
+                  <th style="width:2px">{{ term }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for account_name, value_list in cashflow_statement.items %}
+                <tr>
+                  <td style="
+                    {#width:10px;#}
+                    position: sticky;
+                    left: 0;
+                    z-index: 99;
+                    background-color: #e8e8e8;
+                    {#border-right: 1px solid gray;#}
+                  "
+                      class="balance_sheet_account_lv{{ value_list.level }}"
+                  >
+                    {% for i in value_list.level %}
+                      {{ "&nbsp;&nbsp;&nbsp;&nbsp;" }}
+{#                      {% if forloop.last %}#}
+{#                        {{ "ㄴ" }}#}
+{#                      {% endif %}#}
+                    {% endfor %}
+                    {{ account_name }}
+                  </td> {% comment %}value_list.level{% endcomment %}
+                  {%  for term, value in value_list.data_list.items %}
                     <td style="width:2px">{{ value }}</td>
                   {% endfor %}
                 </tr>
@@ -163,6 +367,7 @@
     <!-- end col-->
   </div>
 
+{#공시#}
   <div class="row">
     <div class="col-12">
       <div class="card">
@@ -203,6 +408,7 @@
     <!-- end col-->
   </div>
 
+{#주주 정보#}
   <div class="row">
     <div class="col-12">
       <div class="card">
@@ -245,6 +451,7 @@
     <!-- end col-->
   </div>
 
+{#배당 정보#}
   <div class="row">
     <div class="col-12">
       <div class="card">
@@ -287,6 +494,7 @@
     <!-- end col-->
   </div>
 
+{#평균급여 및 종업원 수 #}
   <div class="row">
     <div class="col-12">
       <div class="card">
@@ -329,6 +537,7 @@
     <!-- end col-->
   </div>
 
+{#이사회 임원 목록#}
   <div class="row">
     <div class="col-12">
       <div class="card">
@@ -369,6 +578,7 @@
     <!-- end col-->
   </div>
 
+{#  상위 보수자 목록#}
   <div class="row">
     <div class="col-12">
       <div class="card">
@@ -432,6 +642,121 @@
 
 <!-- Init js -->
 <script src="{% static 'js/pages/datatables.init.js' %}"></script>
+<script>
+$(document).ready(function () {
+    $("#basic-datatable").DataTable({
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}}, drawCallback: function () {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    });
+    var a = $("#datatable-buttons").DataTable({
+        lengthChange: !1,
+        buttons: [{extend: "copy", className: "btn-light"}, {extend: "print", className: "btn-light"}, {extend: "pdf", className: "btn-light"}],
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    });
+    $("#selection-datatable").DataTable({
+        select: {style: "multi"},
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    }), $("#key-datatable").DataTable({
+        keys: !0,
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    }), a.buttons().container().appendTo("#datatable-buttons_wrapper .col-md-6:eq(0)"), $("#alternative-page-datatable").DataTable({
+        pagingType: "full_numbers",
+        drawCallback: function () {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    }), $("#scroll-vertical-datatable").DataTable({
+        scrollY: !0,
+        scrollCollapse: !0,
+        paging: !1,
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    }), $("#scroll-horizontal-datatable").DataTable({
+        scrollX: !0,
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    }), $("#stock_list_table").DataTable({
+        scrollY: false,
+        scrollCollapse: true,
+        paging: true,
+        searching: false,
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    }), $("#income_statement_table").DataTable({
+        scrollX: "100%",
+        scrollY: "600px",
+        scrollCollapse: true,
+        paging: false,
+        ordering: false,
+        {#rowGroup: false,#}
+        {#responsive: false,#}
+        {#fixedHeader:false,#}
+        fixedColumns: { left: "1" },
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () { $(".dataTables_paginate > .pagination").addClass("pagination-rounded") }
+    }), $("#balance_sheet_table").DataTable({
+        scrollX: "100%",
+        scrollY: "600px",
+        scrollCollapse: true,
+        paging: false,
+        ordering: false,
+        {#rowGroup: false,#}
+        {#responsive: false,#}
+        {#fixedHeader:false,#}
+        fixedColumns: { left: "1" },
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () { $(".dataTables_paginate > .pagination").addClass("pagination-rounded") }
+    }), $("#cashflow_statement_table").DataTable({
+        scrollX: "100%",
+        scrollY: "600px",
+        scrollCollapse: true,
+        paging: false,
+        ordering: false,
+        {#rowGroup: false,#}
+        {#responsive: false,#}
+        {#fixedHeader:false,#}
+        fixedColumns: { left: "1" },
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () { $(".dataTables_paginate > .pagination").addClass("pagination-rounded") }
+    }), $("#complex-header-datatable").DataTable({
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        },
+        columnDefs: [{visible: !1, targets: -1}]
+    }), $("#row-callback-datatable").DataTable({
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        },
+        createdRow: function (a, e, t) {
+            15e4 < +e[5].replace(/[\$,]/g, "") && $("td", a).eq(5).addClass("text-danger")
+        }
+    }), $("#state-saving-datatable").DataTable({
+        stateSave: !0,
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    }), $(".dataTables_length select").addClass("form-select form-select-sm"), $(".dataTables_length select").removeClass("custom-select custom-select-sm"), $(".dataTables_length label").addClass("form-label")
+});
+
+</script>
 <!-- Init js end -->
 
 
@@ -610,12 +935,14 @@
                   {
                     label: t[0],
                     data: r[0],
-                    color: e[0],
+                    yaxis: 2,
+                    color: "#4d7cd7",
                     lines: {show: !0},
-                    points: {show: !0} },
+                    points: {show: false} },
                   {
                     label: t[1],
                     data: r[1],
+                    {#yaxis: 1,#}
                     color: e[1],
                     bars: {show: !0}
                   }
@@ -626,8 +953,11 @@
                     return a + "&nbsp;&nbsp;"
                 }, width: 30, height: 2
             },
-            yaxis: {axisLabel: "Point Value (1000)", tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}},
-            xaxis: {axisLabel: "Daily Hours", ticks: o, tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}}
+            yaxes: [
+              { axisLabel: "Point Value (1000)", position: "right",tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#f1556c"}},
+              { axisLabel: "Point Value (1000)", position: "left", tickColor: "rgba(241,114,43,0.07)", font: {color: "#4d7cd7"}}
+            ],
+            xaxis: {axisLabel: "Daily Hours", ticks: o, tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#f37e2d"}}
         }, b.plot(b(a), r, o)
     }, a.prototype.init = function () {
         var a = ["#4fc6e1", "#6658dd"], o = b("#website-stats").data("colors");
@@ -654,14 +984,21 @@
         }
         var xLabel = [[0, "22h"], [1, ""], [2, "00h"], [3, ""], [4, "02h"], [5, ""], [6, "04h"], [7, ""], [8, "06h"], [9, ""], [10, "08h"], [11, ""], [12, "10h"], [13, ""], [14, "12h"], [15, ""], [16, "14h"], [17, ""], [18, "16h"], [19, ""], [20, "18h"], [21, ""], [22, "20h"], [23, ""]]
         var e = [input_close_price_list, input_trade_volume_list],
-            a = ["#f1556c", "#1abc9c"];
+            a = ["#f1556c", "#4d7cd7"];
         (o = b("#combine-chart").data("colors")) && (a = o.split(",")), this.createCombineGraph("#combine-chart", price_date_list, ["주가", "거래량"], e, a);
-        /*for (var l = [], i = 0; i <= 10; i += 1) l.push([i, parseInt(30 * Math.random())]);
+
+        {#재무 데이터 그래프. #}
+        for (var l = [], i = 0; i <= 10; i += 1) l.push([i, parseInt(30 * Math.random())]);
         for (var s = [], i = 0; i <= 10; i += 1) s.push([i, parseInt(30 * Math.random())]);
         for (var n = [], i = 0; i <= 10; i += 1) n.push([i, parseInt(30 * Math.random())]);
-        (e = new Array).push({label: "Series One", data: l, bars: {order: 1}}), e.push({label: "Series Two", data: s, bars: {order: 2}}), e.push({
+
+        var bar1 = financial_graph_data1;
+        var bar2 = financial_graph_data2;
+        var bar3 = financial_graph_data3;
+
+        (e = new Array).push({label: "Series One", data: bar1, bars: {order: 1}}), e.push({label: "Series Two", data: bar2, bars: {order: 2}}), e.push({
             label: "Series Three",
-            data: n,
+            data: bar3,
             bars: {order: 3}
         }), a = ["#4fc6e1", "#f7b84b", "#4a81d4"], (o = b("#ordered-bars-chart").data("colors")) && (a = o.split(",")), this.createStackBarGraph("#ordered-bars-chart", {
             y: {
@@ -669,7 +1006,8 @@
                 tickColor: "rgba(65, 80, 95, 0.07)",
                 font: {color: "#8391a2"}
             }, x: {axisLabel: "Last 10 Days", tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}}
-        }, a, e);*/
+        }, a, e);
+
         for (var c = [], h = [], i = 0; i < 12; i += .2) c.push([i, Math.sin(i + 0)]), h.push([i, Math.cos(i + 0)]);
         e = [{data: c, label: "Google"}, {
             data: h,
