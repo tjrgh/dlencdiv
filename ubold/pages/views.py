@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 from django.db.models import Count
 
+from ubold.stocks.models import FinancialStatement, HistoricData, BasicInfo
 from ubold.dart.models import DartSearchData
 from ubold.stocks.models import FinancialStatement, HistoricData, BasicInfo, Dividend, Shareholder, Consensus, WorkerCountAndPay, Executives, BoardMembers, ExecutiveWage
 
@@ -16,6 +17,20 @@ User = get_user_model()
 
 class CustomView(LoginRequiredMixin, TemplateView):
     pass
+
+
+class PriceAnalysisView(LoginRequiredMixin, TemplateView):
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        today = datetime.datetime.today() - datetime.timedelta(days=7)
+        data = DartSearchData.objects.filter(data_date=today.date()).order_by('-created_at')
+
+        context['now'] = today
+        context['darts'] = data
+
+        return context
 
 
 class CompanyInfoView(LoginRequiredMixin, TemplateView):
@@ -488,3 +503,4 @@ custom_pages_500_two_view = CustomView.as_view(template_name="extra/500-two.html
 custom_pages_500_view = CustomView.as_view(template_name="extra/500.html")
 
 company_info_view = CompanyInfoView.as_view(template_name='pages/company-info.html')
+price_analysis_view = PriceAnalysisView.as_view(template_name='pages/price-analysis.html')

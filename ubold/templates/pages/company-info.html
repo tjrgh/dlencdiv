@@ -451,7 +451,6 @@
     <!-- end col-->
   </div>
 
-{#배당 정보#}
   <div class="row">
     <div class="col-12">
       <div class="card">
@@ -1025,6 +1024,23 @@ $(document).ready(function () {
       "use strict";
       window.jQuery.FlotChart.init()
   }();
+
+  $(document).ready(function () {
+    $("#financial-statement-table").DataTable({
+      scrollY: "800px",
+      scrollX: !0,
+      {#scrollCollapse: true,#}
+      paging: false,
+      language: {
+        paginate: {
+          previous: "<i class='mdi mdi-chevron-left'>",
+          next: "<i class='mdi mdi-chevron-right'>"
+        }
+      }, drawCallback: function () {
+        $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+      }
+    });
+  });
 
 </script>
 
