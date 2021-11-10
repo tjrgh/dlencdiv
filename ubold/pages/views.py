@@ -1,9 +1,13 @@
+import calendar
+import random
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 from django.db.models import Count
 
-from ubold.stocks.models import FinancialStatement, HistoricData, BasicInfo
+from ubold.stocks.models import FinancialStatement, HistoricData, BasicInfo, StaffNumber, BoardMemberAverageWage, BoardMemberPersonalWage, SocialKeywords, ServiceMentionCounts, \
+    ServicePosNegWords
 from ubold.dart.models import DartSearchData
 from ubold.stocks.models import FinancialStatement, HistoricData, BasicInfo, Dividend, Shareholder, Consensus, WorkerCountAndPay, Executives, BoardMembers, ExecutiveWage
 
@@ -227,18 +231,42 @@ class CompanyInfoView(LoginRequiredMixin, TemplateView):
             context["data_date"] = data_date
 
             # 재무 데이터 그래프 데이터
-            # financial_graph_data = {}
-            # financial_graph_data1 = FinancialStatement.objects.filter(code=self.stock_code, subject_name="포괄손익계산서", account_name="수익")\
-            #     .order_by("this_term_name")  # 수익 데이터.
-            # financial_graph_data2 = FinancialStatement.objects.filter(code=self.stock_code, subject_name="포괄손익계산서", account_name="영업이익(손실)") \
-            #     .order_by("this_term_name")  # 영업이익(손실) 데이터.
-            # financial_graph_data3 = FinancialStatement.objects.filter(code=self.stock_code, subject_name="포괄손익계산서", account_name="총당기순이익") \
-            #     .order_by("this_term_name")  # 총당기순이익 데이터.
-            #
-            # financial_graph_data["financial_graph_data1"]= [ [x["this_term_name"], x["this_term_amount"] ] for x in list(financial_graph_data1)]
-            #
-            # financial_graph_data["financial_graph_data2"] = list(financial_graph_data2)
-            # financial_graph_data["financial_graph_data3"] = list(financial_graph_data3)
+            financial_graph_data = {}
+            financial_graph_data1 = FinancialStatement.objects.filter(code=self.stock_code, subject_name="포괄손익계산서", account_name="수익")\
+                .order_by("this_term_name")  # 수익 데이터.
+            financial_graph_data2 = FinancialStatement.objects.filter(code=self.stock_code, subject_name="포괄손익계산서", account_name="영업이익(손실)") \
+                .order_by("this_term_name")  # 영업이익(손실) 데이터.
+            financial_graph_data3 = FinancialStatement.objects.filter(code=self.stock_code, subject_name="포괄손익계산서", account_name="총당기순이익") \
+                .order_by("this_term_name")  # 총당기순이익 데이터.
+
+            timestamp_list = []
+            temp_list = []
+            for x in list(financial_graph_data1):
+                this_term_name = x.this_term_name.split("-")
+                temp_datetime = datetime.datetime(int(this_term_name[0]), int(this_term_name[1]), int(this_term_name[2]))-datetime.timedelta(days=15)
+                temp_list.append([calendar.timegm(temp_datetime.timetuple()) * 1000, int(x.this_term_amount)])
+                timestamp_list.append(calendar.timegm(temp_datetime.timetuple())*1000)
+                # temp_list.append([temp_datetime.isoformat()[:10], int(x.this_term_amount)])
+            financial_graph_data["financial_graph_data1"] = temp_list
+            financial_graph_data["timestamp_data"] = timestamp_list
+
+            temp_list = []
+            for x in list(financial_graph_data2):
+                this_term_name = x.this_term_name.split("-")
+                temp_datetime = datetime.datetime(int(this_term_name[0]), int(this_term_name[1]), int(this_term_name[2]))-datetime.timedelta(days=15)
+                temp_list.append([calendar.timegm(temp_datetime.timetuple()) * 1000, int(x.this_term_amount)])
+                # temp_list.append([temp_datetime.isoformat()[:10], int(x.this_term_amount)])
+            financial_graph_data["financial_graph_data2"] = temp_list
+
+            temp_list = []
+            for x in list(financial_graph_data3):
+                this_term_name = x.this_term_name.split("-")
+                temp_datetime = datetime.datetime(int(this_term_name[0]), int(this_term_name[1]), int(this_term_name[2]))-datetime.timedelta(days=15)
+                temp_list.append([calendar.timegm(temp_datetime.timetuple()) * 1000, int(x.this_term_amount)])
+                # temp_list.append([temp_datetime.isoformat()[:10], int(x.this_term_amount)])
+            financial_graph_data["financial_graph_data3"] = temp_list
+
+            context["financial_graph_data"] = financial_graph_data
 
             # 포괄손익계산서
             income_statement = pd.DataFrame(list(FinancialStatement.objects.filter(code=self.stock_code, subject_name="포괄손익계산서").values()))
@@ -343,13 +371,16 @@ class CompanyInfoView(LoginRequiredMixin, TemplateView):
             else:
                 notice_year = str(datetime.date.today().year)
             notice_list = DartSearchData.objects.filter(
-                stock_code='347860', data_date__gt=notice_year + "-01-01", data_date__lt=notice_year + "-12-31"
+                stock_code='060000', #data_date__gt=notice_year + "-01-01", data_date__lt=notice_year + "-12-31"
             ).order_by("-data_date")
 
             context["notice_list"] = notice_list
-
+            #
             # 주주정보
             shareholder_list_data = {}
+            term_list = []
+            shareholder_graph_data = {}
+            shareholder_graph_timestamp_list = []
             shareholder_list_df = pd.DataFrame(list(Shareholder.objects.filter(code_id=self.stock_code).values()))
             shareholder_list_df = shareholder_list_df.dropna()
             shareholder_name_list = shareholder_list_df.groupby(["shareholder_name"], as_index=False).all()
@@ -358,22 +389,50 @@ class CompanyInfoView(LoginRequiredMixin, TemplateView):
                 .values("term_name").annotate(Count("term_name"))
             term_list = [x["term_name"] for x in term_list]
 
+
+            for term_name in term_list:
+                temp_term = term_name.split("-")
+                temp_datetime = datetime.datetime(int(temp_term[0]), int(temp_term[1]), int(temp_term[2]))
+                shareholder_graph_timestamp_list.append(calendar.timegm(temp_datetime.timetuple()) * 1000)
+
+
             for shareholder_name in shareholder_name_list["shareholder_name"]:
                 shareholder_list_df[shareholder_list_df["shareholder_name"] == shareholder_name]
                 row = {}
+                graph_one_shareholder_row = []
                 for term in term_list:
+                    graph_one_term = []
+
+                    temp_term = term.split("-")
+                    temp_datetime = datetime.datetime(int(temp_term[0]), int(temp_term[1]), int(temp_term[2]))
+                    # graph_one_term.append(calendar.timegm(temp_datetime.timetuple()) * 1000)
+
                     value = shareholder_list_df[(shareholder_list_df["term_name"] == term) & (shareholder_list_df["shareholder_name"] == shareholder_name)]
                     if value.empty == True:
                         row[term] = ""
+                        graph_one_term.append("")
                     else:
                         row[term] = value.iloc[0]["share_per"]
+                        graph_one_term.append(float(value.iloc[0]["share_per"]))
+
+                    graph_one_shareholder_row.append(graph_one_term)
+                    graph_one_term.append(calendar.timegm(temp_datetime.timetuple()) * 1000)
+
+                shareholder_graph_data[shareholder_name] = (graph_one_shareholder_row)
+
                 shareholder_list_data[shareholder_name] = row
 
             context["shareholder_list"] = shareholder_list_data
             context["shareholder_term_list"] = term_list
+            context["shareholder_graph_data"] = shareholder_graph_data
+            context["shareholder_graph_timestamp_list"] = shareholder_graph_timestamp_list
 
             # 배당 정보
             dividend_list_data = {}
+            term_list = []
+            dividend_graph_data = {}
+            dividend_graph_timestamp_list = []
+
             dividend_list_df = pd.DataFrame(list(Dividend.objects.filter(code_id=self.stock_code).values()))
             dividend_list_df = dividend_list_df.dropna()
             dividend_name_list = dividend_list_df.groupby(["account_name"], as_index=False).all()
@@ -382,59 +441,198 @@ class CompanyInfoView(LoginRequiredMixin, TemplateView):
                 .values("term_name").annotate(Count("term_name"))
             term_list = [x["term_name"] for x in term_list]
 
+            for term_name in term_list:
+                temp_term = term_name.split("-")
+                temp_datetime = datetime.datetime(int(temp_term[0]), int(temp_term[1]), int(temp_term[2]))
+                dividend_graph_timestamp_list.append(calendar.timegm(temp_datetime.timetuple()) * 1000)
+
             for account_name in dividend_name_list["account_name"]:
                 dividend_list_df[dividend_list_df["account_name"] == account_name]
                 row = {}
+                graph_one_dividend_row = []
                 for term in term_list:
+                    graph_one_term = []
+
+                    temp_term = term.split("-")
+                    temp_datetime = datetime.datetime(int(temp_term[0]), int(temp_term[1]), int(temp_term[2]))
+                    graph_one_term.append(calendar.timegm(temp_datetime.timetuple()) * 1000)
+
                     value = dividend_list_df[(dividend_list_df["term_name"] == term) & (dividend_list_df["account_name"] == account_name)]
                     if value.empty == True:
                         row[term] = ""
+                        graph_one_term.append("")
                     else:
                         row[term] = value.iloc[0]["value"]
+                        graph_one_term.append(float(value.iloc[0]["value"]))
+
+                    graph_one_dividend_row.append(graph_one_term)
+                    # graph_one_term.append(calendar.timegm(temp_datetime.timetuple()) * 1000)
+
                 dividend_list_data[account_name] = row
+                dividend_graph_data[account_name] = graph_one_dividend_row
 
             context["dividend_list"] = dividend_list_data
             context["dividend_term_list"] = term_list
+            context["dividend_graph_data"] = dividend_graph_data
+            context["dividend_graph_timestamp_list"] = dividend_graph_timestamp_list
 
             # 평균급여 및 종업원수
             wcp_data = {}
+            wcp_item_name_list = []
+            wcp_term_list = []
             wcp_df = pd.DataFrame(list(WorkerCountAndPay.objects.filter(code_id=self.stock_code).values()))
             wcp_df = wcp_df.dropna()
 
-            if "worker_count_pay_term" in kwargs:
-                wcp_term = kwargs["worker_count_pay_term"]
-            else:
-                wcp_term = wcp_df.max()["term_name"]
-            wcp_df = wcp_df[wcp_df["term_name"] == wcp_term] #특정 기간에 대한 데이터만 남김.
+            # if "worker_count_pay_term" in kwargs:
+            #     wcp_term = kwargs["worker_count_pay_term"]
+            # else:
+            #     wcp_term = wcp_df.max()["term_name"]
+            # wcp_df = wcp_df[wcp_df["term_name"] == wcp_term] #특정 기간에 대한 데이터만 남김.
 
-            wcp_category_list = wcp_df.groupby(["worker_category", "worker_sex"], as_index=False).all()
+            wcp_term_list = list(wcp_df.groupby(["term_name"], as_index=False).all()["term_name"])
+            for term_name in wcp_term_list:
+                wcp_one_term_df = wcp_df[wcp_df["term_name"]==term_name]
+                wcp_one_term_data = {}
 
-            wcp_item_name_list = wcp_df.groupby(["item_name"], as_index=False).all()["item_name"]
-            # item_name = WorkerCountAndPay.objects.filter(code=self.stock_code).order_by("item_name") \
-            #     .values("term_name").annotate(Count("term_name"))
-            # term_list = [x["term_name"] for x in term_list]
+                wcp_category_list = wcp_one_term_df.groupby(["worker_category", "worker_sex"], as_index=False).all()
 
-            for index, wcp_category in wcp_category_list.iterrows():
-                # for wcp_sex in wcp_category_list["worker_sex"]:
-                row = {}
-                for item_name in wcp_item_name_list:
-                    value = wcp_df[(wcp_df["item_name"] == item_name) &
-                                   (wcp_df["worker_category"] == wcp_category["worker_category"]) &
-                                   (wcp_df["worker_sex"] == wcp_category["worker_sex"])
-                                   ]
-                    if value.empty == True:
-                        row[item_name] = ""
-                    else:
-                        row[item_name] = value.iloc[0]["value"]
-                worker_sex = ""
-                if wcp_category["worker_sex"]=="m": worker_sex = "남"
-                else: worker_sex="여"
-                wcp_data[wcp_category["worker_category"]+"("+worker_sex+")"] = row
+                wcp_item_name_list = wcp_one_term_df.groupby(["item_name"], as_index=False).all()["item_name"]
+                # item_name = WorkerCountAndPay.objects.filter(code=self.stock_code).order_by("item_name") \
+                #     .values("term_name").annotate(Count("term_name"))
+                # term_list = [x["term_name"] for x in term_list]
+
+                for index, wcp_category in wcp_category_list.iterrows():
+                    # for wcp_sex in wcp_category_list["worker_sex"]:
+                    row = {}
+                    for item_name in wcp_item_name_list:
+                        value = wcp_one_term_df[(wcp_one_term_df["item_name"] == item_name) &
+                                       (wcp_one_term_df["worker_category"] == wcp_category["worker_category"]) &
+                                       (wcp_one_term_df["worker_sex"] == wcp_category["worker_sex"])
+                                       ]
+                        if value.empty == True:
+                            row[item_name] = ""
+                        else:
+                            row[item_name] = str(value.iloc[0]["value"])
+                    worker_sex = ""
+                    if wcp_category["worker_sex"]=="m": worker_sex = "남"
+                    else: worker_sex="여"
+                    wcp_one_term_data[wcp_category["worker_category"]+"("+worker_sex+")"] = row
+
+                wcp_data[term_name] = wcp_one_term_data
 
             context["wcp_list"] = wcp_data
-            context["wcp_item_list"] = wcp_item_name_list
+            context["temp_wcp_data"] = wcp_data[wcp_term_list[len(wcp_term_list)-1]]
+            context["wcp_item_list"] = list(wcp_item_name_list)
+            context["wcp_term_list"] = wcp_term_list
 
-            # 임원목록
+            # 임직원 숫자 추이
+            staff_number = {}
+            term_list = []
+            staff_number_graph_data = {}
+            staff_number_graph_timestamp_list = []
+
+            staff_number_list_df = pd.DataFrame(list(StaffNumber.objects.filter(code_id=self.stock_code).values()))
+            staff_number_list_df = staff_number_list_df.dropna()
+            staff_number_name_list = staff_number_list_df.groupby(["staff_type"], as_index=False).all()
+
+            term_list = StaffNumber.objects.filter(code=self.stock_code).order_by("term_name") \
+                .values("term_name").annotate(Count("term_name"))
+            term_list = [x["term_name"] for x in term_list]
+
+            for term_name in term_list:
+                if term_name.find("12-31") != -1:
+                    temp_term = term_name.split("-")
+                    temp_datetime = datetime.datetime(int(temp_term[0]), int(temp_term[1]), int(temp_term[2]))
+                    staff_number_graph_timestamp_list.append(calendar.timegm(temp_datetime.timetuple()) * 1000)
+
+            for staff_type in staff_number_name_list["staff_type"]:
+                staff_number_list_df[staff_number_list_df["staff_type"] == staff_type]
+                row = {}
+                graph_one_staff_number_row = []
+                for term in term_list:
+                    graph_one_term = []
+
+                    temp_term = term.split("-")
+                    temp_datetime = datetime.datetime(int(temp_term[0]), int(temp_term[1]), int(temp_term[2]))
+                    graph_one_term.append(calendar.timegm(temp_datetime.timetuple()) * 1000)
+
+                    value = staff_number_list_df[(staff_number_list_df["term_name"] == term) & (staff_number_list_df["staff_type"] == staff_type)]
+                    if value.empty == True:
+                        row[term] = ""
+                        graph_one_term.append("")
+                    else:
+                        row[term] = value.iloc[0]["number"]
+                        graph_one_term.append(int(value.iloc[0]["number"]))
+
+                    graph_one_staff_number_row.append(graph_one_term)
+                    # graph_one_term.append(calendar.timegm(temp_datetime.timetuple()) * 1000)
+
+                # staff_number_list_data[staff_type] = row
+                staff_number_graph_data[staff_type] = graph_one_staff_number_row
+
+            # context["dividend_list"] = staff_number_list_data
+            # context["staff_number_term_list"] = term_list
+            context["staff_number_graph_data"] = staff_number_graph_data
+            context["staff_number_graph_timestamp_list"] = staff_number_graph_timestamp_list
+
+            # 이사회 임원 평균 보수
+            staff_number = {}
+            term_list = []
+            bm_average_wage_graph_data = {}
+            bm_average_wage_graph_timestamp_list = []
+
+            bm_average_wage_list_df = pd.DataFrame(list(BoardMemberAverageWage.objects.filter(code_id=self.stock_code).values()))
+            bm_average_wage_list_df = bm_average_wage_list_df.dropna()
+            # bm_average_wage_name_list = bm_average_wage_list_df.groupby(["staff_type"], as_index=False).all()
+
+            term_list = BoardMemberAverageWage.objects.filter(code=self.stock_code).order_by("term_name") \
+                .values("term_name").annotate(Count("term_name"))
+            term_list = [x["term_name"] for x in term_list]
+
+            for term_name in term_list:
+                if term_name.find("12-31") != -1:
+                    temp_term = term_name.split("-")
+                    temp_datetime = datetime.datetime(int(temp_term[0]), int(temp_term[1]), int(temp_term[2]))
+                    bm_average_wage_graph_timestamp_list.append(calendar.timegm(temp_datetime.timetuple()) * 1000)
+
+            total_wage_list = []
+            average_wage_list = []
+
+            for df_idx in bm_average_wage_list_df.index:
+                total_wage_row = []
+                average_wage_row = []
+                graph_one_bm_average_wage_row = []
+
+                term = bm_average_wage_list_df["term_name"][df_idx]
+                total_wage = bm_average_wage_list_df["total_wage"][df_idx]
+                average_wage = bm_average_wage_list_df["average_wage"][df_idx]
+
+                temp_term = term.split("-")
+                temp_datetime = datetime.datetime(int(temp_term[0]), int(temp_term[1]), int(temp_term[2]))
+                total_wage_row.append(calendar.timegm(temp_datetime.timetuple()) * 1000)
+                average_wage_row.append(calendar.timegm(temp_datetime.timetuple()) * 1000)
+
+                value = bm_average_wage_list_df[(bm_average_wage_list_df["term_name"] == term)]
+                if value.empty == True:
+                    total_wage_row.append("")
+                    average_wage_row.append("")
+                else:
+                    total_wage_row.append(int(value.iloc[0]["total_wage"]))
+                    average_wage_row.append(int(value.iloc[0]["average_wage"]))
+
+                total_wage_list.append(total_wage_row)
+                average_wage_list.append(average_wage_row)
+
+            bm_average_wage_graph_data["total_wage"] = total_wage_list
+            bm_average_wage_graph_data["average_wage"] = average_wage_list
+
+            # context["dividend_list"] = bm_average_wage_list_data
+            # context["bm_average_wage_term_list"] = term_list
+            context["bm_average_wage_graph_data"] = bm_average_wage_graph_data
+            context["bm_average_wage_graph_timestamp_list"] = bm_average_wage_graph_timestamp_list
+
+
+            # # 임원목록
             # executives_data = {}
             # executives_df = pd.DataFrame(list(Executives.objects.filter(code_id=self.stock_code).values()))
             # executives_df = executives_df.dropna()
@@ -442,48 +640,443 @@ class CompanyInfoView(LoginRequiredMixin, TemplateView):
             # if "executives_year" in kwargs:
             #     executives_term = kwargs["executives_year"]
             # else:
-            #     executives_term = wcp_df.max()["term_name"]
+            #     executives_term = executives_df.max()["term_name"]
             # executives_df = executives_df[executives_df["term_name"] == executives_term]  # 특정 기간에 대한 데이터만 남김.
 
             # 이사회 임원 목록
-            board_member_data = []
-            board_member_df = pd.DataFrame(list(BoardMembers.objects.filter(code=self.stock_code).values()))
+            board_member_df = pd.DataFrame(list(BoardMembers.objects.filter(code_id=self.stock_code).values()))
+            board_member_df = board_member_df.dropna()
 
-            if "board_member_term" in kwargs:
-                board_member_term = kwargs["board_member_term"]
-            else:
-                board_member_term = board_member_df.max()["term_name"]
-            board_member_df = board_member_df[board_member_df["term_name"] == board_member_term] #특정 기간에 대한 데이터만 남김.
+            board_member_data = {}
+            board_member_data["list"] = {}
+            board_member_data["term_list"] = []
 
-            # for index in board_member_df.index:
-            #     if board_member_df["member_sex"][index] == "m":
-            #         board_member_df["member_sex"][index] = "남"
-            #     else:
-            #         board_member_df["member_sex"][index] = "여"
+            board_member_term_list = list(board_member_df.groupby(["term_name"], as_index=False).all()["term_name"])
+            for term_name in board_member_term_list:
+                board_member_one_term_df = board_member_df[board_member_df["term_name"]==term_name]
+                board_member_one_term_df = board_member_one_term_df.drop(columns=["id", "created_at","updated_at","code_id","corp_code","term_name"])
+                row_list = []
+                for df_idx in board_member_one_term_df.index:
+                    row_list.append(list(board_member_one_term_df.loc[df_idx]))
 
-            for index, board_member in board_member_df.iterrows():
-                board_member_data.append(board_member.to_dict())
+                board_member_data["list"][term_name] = row_list
 
-            context["board_member_list"] = board_member_data
+            board_member_data["item_list"] = ["이름", "업무", "생년월일", "성별", "상태", "임기 기간", "임기 종료"]
+            board_member_data["term_list"] = board_member_term_list
+            board_member_data["last_term_data"] = board_member_data["list"][board_member_term_list[-1]]
+            context["board_member_data"] = board_member_data
 
-            # 임원 보수 정보
-            executive_wage_data = []
-            executive_wage_df = pd.DataFrame(list(ExecutiveWage.objects.filter(code=self.stock_code).values()))
+            # 이사회 임원 보수 정보
+            bm_personal_wage_df = pd.DataFrame(list(BoardMemberPersonalWage.objects.filter(code_id=self.stock_code).values()))
+            bm_personal_wage_df = bm_personal_wage_df.dropna()
 
-            if "executive_wage_term" in kwargs:
-                executive_wage_term = kwargs["executive_wage_term"]
-            else:
-                executive_wage_term = executive_wage_df.max()["term_name"]
-            executive_wage_df = executive_wage_df[executive_wage_df["term_name"] == executive_wage_term]
+            bm_personal_wage_data = {}
+            bm_personal_wage_data["list"] = {}
+            bm_personal_wage_data["term_list"] = []
 
-            for index, executive_wage in executive_wage_df.iterrows():
-                executive_wage_data.append(executive_wage.to_dict())
+            bm_personal_wage_term_list = list(bm_personal_wage_df.groupby(["term_name"], as_index=False).all()["term_name"])
+            for term_name in bm_personal_wage_term_list:
+                bm_personal_wage_one_term_df = bm_personal_wage_df[bm_personal_wage_df["term_name"] == term_name]
+                bm_personal_wage_one_term_df = bm_personal_wage_one_term_df.drop(columns=["id", "created_at", "updated_at", "code_id", "corp_code", "term_name"])
+                row_list = []
+                for df_idx in bm_personal_wage_one_term_df.index:
+                    row_list.append(list(bm_personal_wage_one_term_df.loc[df_idx]))
 
-            context["executive_wage_list"] = executive_wage_data
+                bm_personal_wage_data["list"][term_name] = row_list
+
+            bm_personal_wage_data["item_list"] = ["이름", "직책", "보수", "공시",]
+            bm_personal_wage_data["term_list"] = bm_personal_wage_term_list
+            bm_personal_wage_data["last_term_data"] = bm_personal_wage_data["list"][bm_personal_wage_term_list[-1]]
+            context["bm_personal_wage_data"] = bm_personal_wage_data
+
+            # # 임원 보수 정보
+            # executive_wage_data = []
+            # executive_wage_df = pd.DataFrame(list(ExecutiveWage.objects.filter(code=self.stock_code).values()))
+            #
+            # if "executive_wage_term" in kwargs:
+            #     executive_wage_term = kwargs["executive_wage_term"]
+            # else:
+            #     executive_wage_term = executive_wage_df.max()["term_name"]
+            # executive_wage_df = executive_wage_df[executive_wage_df["term_name"] == executive_wage_term]
+            #
+            # for index, executive_wage in executive_wage_df.iterrows():
+            #     executive_wage_data.append(executive_wage.to_dict())
+            #
+            # context["executive_wage_list"] = executive_wage_data
 
 
         return context
 
+# 메뉴 레벨에 해당하는 키워드 목록을 가져와, 그 키워드들에 대한 데이터들을 적절한 형태로 가공하여 페이지로 반환.
+class SocialAnalysisView(LoginRequiredMixin, TemplateView):
+    lv1 = ""
+    lv2 = ""
+    start_date = ""
+    end_date = ""
+
+    keyword = {
+        "financial":{
+            "city_bank": ["신한은행", "KB국민은행", "우리은행", "NH농협은행", "하나은행"],
+            "local_bank": ["대구은행", "부산은행", "광주은행", "전북은행", "경남은행", "제주은행"],
+            "non_face_to_face_bank": ["카카오뱅크", "K뱅크", "토스"],
+            "stock":["미래에셋증권", "KB증권", "NH투자증권", "삼성증권", "한화투자증권", "SK증권", "한국투자증권", "대신증권", "키움증권", "신한금융투자", "하나금융투자", "메리츠증권"],
+            "life_insurance":["삼성생명", "한화생명", "푸르덴셜생명", "교보생명", "HN농협생명", "미래에셋생명", "오렌지라이프", "신한생명", "동양생명", "흥국생명"],
+            "fire_insurance":["삼성화재", "동부화재", "현대해상", "KB손해보험", "메리츠화재", "흥국화재"],
+        },
+
+    }
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if ("lv1" in kwargs) & ("lv2" in kwargs):
+            lv1 = kwargs["lv1"]
+            lv2 = kwargs["lv2"]
+        else:
+            return context
+
+        # url 쿼리 스트링 가져오기.
+        if (self.request.GET.get("startDate", None) != None) & (self.request.GET.get("endDate", None) != None):
+            self.start_date = self.request.GET.get("startDate")
+            self.end_date = self.request.GET.get("endDate")
+        else:
+            self.start_date = "2021-01-01"
+            self.end_date = datetime.date.today().isoformat()
+
+        # lv에 해당하는 키워드 목록 가져오기.
+        keyword_list = self.keyword[lv1][lv2]# 해당하는 키워드 목록
+        keyword_df = pd.DataFrame(list(SocialKeywords.objects.filter(keyword__in=keyword_list, is_deleted=False, is_followed=True).values()))
+
+        # 각 키워드에 대해 db로부터 언급량 데이터 가져옴.
+        temp_mention_count_dict = {}
+        for idx in keyword_df.index:
+            temp_mention_count_df = pd.DataFrame(list(ServiceMentionCounts.objects.filter(
+                keyword_id=keyword_df["id"][idx], term_start__gt=self.start_date, term_end__lt=self.end_date).values())) # 한 키워드에 대한 언급량 데이터 목록.
+            temp_mention_count_dict[keyword_df["keyword"][idx]] = temp_mention_count_df
+
+
+        # 각 키워드의 데이터에 대해, 전체, 커뮤니티별, 인스타별, ... 트위터별로 그래프에 넘겨줄 data series 만들기.
+        # 기간에 대해 반복하며 생성.
+        # date_diff = datetime(self.end_date) - datetime(self.start_date)
+
+        start_date = datetime.date(int(self.start_date.split("-")[0]), int(self.start_date.split("-")[1]), int(self.start_date.split("-")[2]),)
+        end_date = datetime.date(int(self.end_date.split("-")[0]), int(self.end_date.split("-")[1]), int(self.end_date.split("-")[2]),)
+        target_date = datetime.date(start_date.year, start_date.month, start_date.day)
+
+        # 기간에 대한 전체 date리스트.
+        day_list = []
+        while target_date<=end_date:
+            day_list.append(calendar.timegm(target_date.timetuple()) * 1000)
+            target_date += datetime.timedelta(days=1)
+
+        # 그래프 상에 x축에서 보여줄 date리스트.
+        xaxis_day_list = []
+        xaxis_term = int((end_date - start_date).days / 10)
+        count = 0
+        target_date = datetime.date(start_date.year, start_date.month, start_date.day)
+        while target_date <= end_date:
+            if count == xaxis_term:
+                xaxis_day_list.append(calendar.timegm(target_date.timetuple()) * 1000)
+                count = 0
+            count += 1
+            target_date += datetime.timedelta(days=1)
+
+        # 전체 언급량.
+        total_mention = {}
+        for keyword_key, value in temp_mention_count_dict.items():
+            total_mention[keyword_key] = []
+
+            # 데이터가 없다면 패스
+            if value.empty == True:
+                continue
+
+            # 하나의 키워드에 대해 기간 반복하여 데이터 정리.
+            target_date = datetime.date(start_date.year, start_date.month, start_date.day)
+            while target_date <= end_date:
+                row = []
+                row.append(calendar.timegm(target_date.timetuple()) * 1000)
+                mention_count = value[value["term_start"] == target_date.isoformat()]
+                if mention_count.empty == True:
+                    row.append("null")
+                else:
+                    row.append(value[value["term_start"] == target_date.isoformat()].iloc[0]["count_sum"])
+                total_mention[keyword_key].append(row)
+
+                target_date += datetime.timedelta(days=1)
+
+        # 전체 언급량 데이터 합 구하기
+        total_mention_sum = []
+        for i in range(len(day_list)):
+            sum = 0
+            for keyword_key, value in total_mention.items():
+                if len(value)-1 < i:
+                    continue
+                temp_value = value[i][1]
+                if temp_value!='null':
+                    sum += temp_value
+            row = []
+            row.append(day_list[i])
+            row.append(sum)
+            total_mention_sum.append(row)
+        # total_mention["total"] = total_mention_sum
+
+        # # 커뮤니티 언급량.
+        # community_mention = {}
+        # for keyword_key, value in temp_mention_count_dict.items():
+        #     community_mention[keyword_key] = []
+        #
+        #     # 데이터가 없다면 패스
+        #     if value.empty == True:
+        #         continue
+        #
+        #     # 하나의 키워드에 대해 기간 반복하여 데이터 정리.
+        #     target_date = datetime.date(start_date.year, start_date.month, start_date.day)
+        #     while target_date <= end_date:
+        #         row = []
+        #         row.append(calendar.timegm(target_date.timetuple()) * 1000)
+        #         mention_count = value[value["term_start"] == target_date.isoformat()]
+        #         if mention_count.empty == True:
+        #             row.append("null")
+        #         else:
+        #             row.append(value[value["term_start"] == target_date.isoformat()].iloc[0]["community_count"])
+        #         community_mention[keyword_key].append(row)
+        #
+        #         target_date += datetime.timedelta(days=1)
+        #
+        # # 전체 언급량 데이터 합 구하기
+        # total_mention_sum = []
+        # for i in range(len(day_list)):
+        #     sum = 0
+        #     for keyword_key, value in community_mention.items():
+        #         if len(value) - 1 < i:
+        #             continue
+        #         temp_value = value[i][1]
+        #         if temp_value != 'null':
+        #             sum += temp_value
+        #     row = []
+        #     row.append(day_list[i])
+        #     row.append(sum)
+        #     total_mention_sum.append(row)
+        # # community_mention["total"] = total_mention_sum
+        #
+        # # 인스타 언급량.
+        # insta_mention = {}
+        # for keyword_key, value in temp_mention_count_dict.items():
+        #     insta_mention[keyword_key] = []
+        #
+        #     # 데이터가 없다면 패스
+        #     if value.empty == True:
+        #         continue
+        #
+        #     # 하나의 키워드에 대해 기간 반복하여 데이터 정리.
+        #     target_date = datetime.date(start_date.year, start_date.month, start_date.day)
+        #     while target_date <= end_date:
+        #         row = []
+        #         row.append(calendar.timegm(target_date.timetuple()) * 1000)
+        #         mention_count = value[value["term_start"] == target_date.isoformat()]
+        #         if mention_count.empty == True:
+        #             row.append("null")
+        #         else:
+        #             row.append(value[value["term_start"] == target_date.isoformat()].iloc[0]["insta_count"])
+        #         insta_mention[keyword_key].append(row)
+        #
+        #         target_date += datetime.timedelta(days=1)
+        #
+        # # 전체 언급량 데이터 합 구하기
+        # total_mention_sum = []
+        # for i in range(len(day_list)):
+        #     sum = 0
+        #     for keyword_key, value in insta_mention.items():
+        #         if len(value) - 1 < i:
+        #             continue
+        #         temp_value = value[i][1]
+        #         if temp_value != 'null':
+        #             sum += temp_value
+        #     row = []
+        #     row.append(day_list[i])
+        #     row.append(sum)
+        #     total_mention_sum.append(row)
+        # # insta_mention["total"] = total_mention_sum
+        #
+        # # 블로그 언급량.
+        # blog_mention = {}
+        # for keyword_key, value in temp_mention_count_dict.items():
+        #     blog_mention[keyword_key] = []
+        #
+        #     # 데이터가 없다면 패스
+        #     if value.empty == True:
+        #         continue
+        #
+        #     # 하나의 키워드에 대해 기간 반복하여 데이터 정리.
+        #     target_date = datetime.date(start_date.year, start_date.month, start_date.day)
+        #     while target_date <= end_date:
+        #         row = []
+        #         row.append(calendar.timegm(target_date.timetuple()) * 1000)
+        #         mention_count = value[value["term_start"] == target_date.isoformat()]
+        #         if mention_count.empty == True:
+        #             row.append("null")
+        #         else:
+        #             row.append(value[value["term_start"] == target_date.isoformat()].iloc[0]["blog_count"])
+        #         blog_mention[keyword_key].append(row)
+        #
+        #         target_date += datetime.timedelta(days=1)
+        #
+        # # 전체 언급량 데이터 합 구하기
+        # total_mention_sum = []
+        # for i in range(len(day_list)):
+        #     sum = 0
+        #     for keyword_key, value in blog_mention.items():
+        #         if len(value) - 1 < i:
+        #             continue
+        #         temp_value = value[i][1]
+        #         if temp_value != 'null':
+        #             sum += temp_value
+        #     row = []
+        #     row.append(day_list[i])
+        #     row.append(sum)
+        #     total_mention_sum.append(row)
+        # # blog_mention["total"] = total_mention_sum
+        #
+        # # 뉴스 언급량.
+        # news_mention = {}
+        # for keyword_key, value in temp_mention_count_dict.items():
+        #     news_mention[keyword_key] = []
+        #
+        #     # 데이터가 없다면 패스
+        #     if value.empty == True:
+        #         continue
+        #
+        #     # 하나의 키워드에 대해 기간 반복하여 데이터 정리.
+        #     target_date = datetime.date(start_date.year, start_date.month, start_date.day)
+        #     while target_date <= end_date:
+        #         row = []
+        #         row.append(calendar.timegm(target_date.timetuple()) * 1000)
+        #         mention_count = value[value["term_start"] == target_date.isoformat()]
+        #         if mention_count.empty == True:
+        #             row.append("null")
+        #         else:
+        #             row.append(value[value["term_start"] == target_date.isoformat()].iloc[0]["news_count"])
+        #         news_mention[keyword_key].append(row)
+        #
+        #         target_date += datetime.timedelta(days=1)
+        #
+        # # 전체 언급량 데이터 합 구하기
+        # total_mention_sum = []
+        # for i in range(len(day_list)):
+        #     sum = 0
+        #     for keyword_key, value in news_mention.items():
+        #         if len(value) - 1 < i:
+        #             continue
+        #         temp_value = value[i][1]
+        #         if temp_value != 'null':
+        #             sum += temp_value
+        #     row = []
+        #     row.append(day_list[i])
+        #     row.append(sum)
+        #     total_mention_sum.append(row)
+        # # news_mention["total"] = total_mention_sum
+        #
+        # # 트위터 언급량.
+        # twitter_mention = {}
+        # for keyword_key, value in temp_mention_count_dict.items():
+        #     twitter_mention[keyword_key] = []
+        #
+        #     # 데이터가 없다면 패스
+        #     if value.empty == True:
+        #         continue
+        #
+        #     # 하나의 키워드에 대해 기간 반복하여 데이터 정리.
+        #     target_date = datetime.date(start_date.year, start_date.month, start_date.day)
+        #     while target_date <= end_date:
+        #         row = []
+        #         row.append(calendar.timegm(target_date.timetuple()) * 1000)
+        #         mention_count = value[value["term_start"] == target_date.isoformat()]
+        #         if mention_count.empty == True:
+        #             row.append("null")
+        #         else:
+        #             row.append(value[value["term_start"] == target_date.isoformat()].iloc[0]["twitter_count"])
+        #         twitter_mention[keyword_key].append(row)
+        #
+        #         target_date += datetime.timedelta(days=1)
+        #
+        # # 전체 언급량 데이터 합 구하기
+        # total_mention_sum = []
+        # for i in range(len(day_list)):
+        #     sum = 0
+        #     for keyword_key, value in twitter_mention.items():
+        #         if len(value) - 1 < i:
+        #             continue
+        #         temp_value = value[i][1]
+        #         if temp_value != 'null':
+        #             sum += temp_value
+        #     row = []
+        #     row.append(day_list[i])
+        #     row.append(sum)
+        #     total_mention_sum.append(row)
+        # # twitter_mention["total"] = total_mention_sum
+
+        context["keyword_list"] = keyword_list
+        context["mention_data"] = {
+            "total_mention": {"count_list": total_mention,"name": "전체 언급량 추이"},
+            # "community_mention": {"count_list": community_mention,"name": "커뮤니티 언급량 추이"},
+            # "insta_mention": {"count_list": insta_mention,"name": "인스타 언급량 추이"},
+            # "blog_mention": {"count_list": blog_mention, "name": "블로그 언급량 추이"},
+            # "news_mention": {"count_list": news_mention, "name": "뉴스 언급량 추이"},
+            # "twitter_mention": {"count_list": twitter_mention, "name": "트위터 언급량 추이"},
+        }
+        context["xaxis_day_list"] = xaxis_day_list
+
+        # 긍, 부정어 데이터 처리
+        df = pd.DataFrame(list(ServicePosNegWords.objects.filter(
+            keyword_id=keyword_df["id"][0], term_start__gt=self.start_date, term_end__lt=self.end_date,
+            term_type="W"
+        ).order_by("-word_count").values("term_start","term_end","word","word_count","rank","pos_neg","property","keyword_id")))
+
+        a = df.groupby(["word", "pos_neg", "property"], as_index=False).sum("word_count").sort_values(by="word_count", ascending=False)
+
+        pos_neg_table_data = []
+        pos_neg_wordCloud_data = []
+        for row in df.values:
+            pos_neg_table_data.append(row)
+            pos_neg_wordCloud_data.append([row[2], row[3]])
+
+        context["pos_neg_data"] = {
+            "table": pos_neg_table_data,
+            "wordCloud": pos_neg_wordCloud_data,
+        }
+        df.groupby(["account_id", "account_level", "account_name"], as_index=False).head(1)
+        a = df.groupby(["word", "pos_neg", "property"], as_index=False).sum("word_count").sort_values(by="word_count", ascending=False)
+
+
+
+        # arr = []
+        # for i in range(100):
+        #     arr.append(["hello"+str(random.randint(0,100)), random.randint(0,100), random.randint(1000, 10000)])
+        # context["sample"] = arr
+
+        return context
+
+# class CompanyInfoView(LoginRequiredMixin, TemplateView):
+#     stock_code = ""
+#     search_keyword = ""
+#
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         result_list = []
+#
+#         # 테스트
+#         # df = pd.DataFrame(list(FinancialStatement.objects.filter(code="A000040", subject_name="재무상태표")
+#         #                        .order_by("created_at").values()))
+#         # df = df.dropna()
+#         # balance_sheet_account = balance_sheet.groupby(["account_id", "account_level", "account_name"], as_index=False).all()  # 항목 리스트.
+#         # df_account = df.groupby(["account_id", "account_level", "account_name"], as_index=False).head(1)
+#
+#         # code 인자 확인
+#         if "code" in kwargs:
+#             self.stock_code = kwargs["code"]
+#         # 검색어 확인
+#         if self.request.GET.get("searchKeyword", None) != None:
+#             self.search_keyword = self.request.GET.get("searchKeyword")
 
 # auth pages
 custom_pages_coming_soon_view = CustomView.as_view(template_name="extra/coming-soon.html")
@@ -504,3 +1097,4 @@ custom_pages_500_view = CustomView.as_view(template_name="extra/500.html")
 
 company_info_view = CompanyInfoView.as_view(template_name='pages/company-info.html')
 price_analysis_view = PriceAnalysisView.as_view(template_name='pages/price-analysis.html')
+social_analysis_view = SocialAnalysisView.as_view(template_name='pages/social-analysis.html')

@@ -152,13 +152,13 @@
 {#재무 데이터#}
 {#  재무 정보 그래프 #}
   <div class="row">
-    <div class="col-lg-6">
+    <div class="col-lg-12">
       <div class="card">
         <div class="card-body">
-          <h4 class="header-title">Stacked Bar chart</h4>
+          <h4 class="header-title">재무 정보 그래프</h4>
           <div
             id="ordered-bars-chart"
-            style="height: 350px"
+            style="height: 350px; width: 100%;"
             class="mt-5"
             data-colors="#4fc6e1,#f7b84b,#4a81d4"
           ></div>
@@ -378,7 +378,7 @@
           </p>
 
           <table
-            id="scroll-vertical-datatable"
+            id="notice-table"
             class="table dt-responsive nowrap w-100"
           >
             <thead>
@@ -408,7 +408,47 @@
     <!-- end col-->
   </div>
 
-{#주주 정보#}
+{#주주 정보 그래프. #}
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title">주주 정보 그래프</h4>
+
+          <!-- 기간 선택 -->
+          <div id="shareholder-term-select" style="display: flex; justify-content: center; width: 30%; ">
+            <select id="shareholder-term-select-start" class="form-select" style="width:50%; ">
+              {% for term in shareholder_term_list %}
+                <option value={{ forloop.counter0 }}>{{ term }}</option>
+              {% endfor %}
+            </select>
+            <span style="font-size: 1vh;">&nbsp; ~ &nbsp;</span>
+            <select id="shareholder-term-select-end" class="form-select" disabled="disabled" style="width: 50%; ">
+
+            </select>
+          </div>
+
+
+          <!-- 그래프. -->
+          <div style="display: flex; justify-content: center;">
+            <div
+              id="shareholder-graph"
+              style="height: 1500px; width:90%; display:inline-block;"
+{#              class="mt-5"#}
+              data-colors="#4fc6e1,#f7b84b,#4a81d4"
+            ></div>
+            <div id="shareholder-legend" style="
+              height: 1500px;
+              width:10%;
+            "></div>
+          </div>
+
+        </div>
+      </div>
+      <!-- end card -->
+    </div>
+  </div>
+
   <div class="row">
     <div class="col-12">
       <div class="card">
@@ -419,12 +459,19 @@
           </p>
 
           <table
-            id="scroll-horizontal-datatable"
+            id="shareholder-table"
             class="table w-100 nowrap"
           >
             <thead>
               <tr>
-                <th style="width:10px">항목명</th>
+                <th style="
+                  {#width:10px;#}
+                  position: sticky;
+                  left: 0;
+                  z-index: 99;
+                  background-color: #e8e8e8;
+                  {#border-right: 1px solid gray;#}
+                ">항목명</th>
                 {%  for term in shareholder_term_list %}
                   <th style="width:2px">{{ term }}</th>
                 {% endfor %}
@@ -434,7 +481,14 @@
             <tbody>
               {% for shareholder_name, value_list in shareholder_list.items %}
                 <tr>
-                  <td style="width:10px">{{ shareholder_name }}</td>
+                  <td style="
+                    {#width:10px;#}
+                    position: sticky;
+                    left: 0;
+                    z-index: 99;
+                    background-color: #e8e8e8;
+                    {#border-right: 1px solid gray;#}
+                  ">{{ shareholder_name }}</td>
                   {%  for term, value in value_list.items %}
                     <td style="width:2px">{{ value }}</td>
                   {% endfor %}
@@ -451,6 +505,47 @@
     <!-- end col-->
   </div>
 
+{#배당 정보 그래프#}
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title" >배당 정보 그래프</h4>
+{#          항목 그래프 checkbox#}
+          <div style="display: flex; justify-content: center; margin-top:3vh">
+            <div style="
+              {#float: left;#}
+              display: inline-block;
+              width: 15%;
+            ">
+              <ul id="dividend-graph-account">
+                  {% for account_name, value in dividend_list.items %}
+  {#                  <li><input id="{{ account_name }}" type="checkbox" checked="checked"/>{{ account_name }}</li>#}
+                    <li id="{{ account_name }}">{{ account_name }}</li>
+                  {% endfor %}
+              </ul>
+            </div>
+            <div
+              id="dividend-graph"
+              style="
+                height: 350px;
+                width: 85%;
+                {#padding-left:30%;#}
+                display:inline-block;
+                {#float:left;#}
+              "
+{#              class="mt-5"#}
+              data-colors="#4fc6e1,#f7b84b,#4a81d4"
+            ></div>
+          </div>
+
+        </div>
+      </div>
+      <!-- end card -->
+    </div>
+  </div>
+
+{#배당 정보 테이블#}
   <div class="row">
     <div class="col-12">
       <div class="card">
@@ -461,12 +556,19 @@
           </p>
 
           <table
-            id="scroll-horizontal-datatable"
+            id="dividend-table"
             class="table w-100 nowrap"
           >
             <thead>
               <tr>
-                <th style="width:20px">항목명</th>
+                <th style="
+                  {#width:10px;#}
+                  position: sticky;
+                  left: 0;
+                  z-index: 99;
+                  background-color: #e8e8e8;
+                  {#border-right: 1px solid gray;#}
+                ">항목명</th>
                 {%  for term in dividend_term_list %}
                   <th style="width:10px">{{ term }}</th>
                 {% endfor %}
@@ -476,7 +578,14 @@
             <tbody>
               {% for account_name, value_list in dividend_list.items %}
                 <tr>
-                  <td style="width:20px">{{ account_name }}</td>
+                  <td style="
+                    {#width:10px;#}
+                    position: sticky;
+                    left: 0;
+                    z-index: 99;
+                    background-color: #e8e8e8;
+                    {#border-right: 1px solid gray;#}
+                  ">{{ account_name }}</td>
                   {%  for term, value in value_list.items %}
                     <td style="width:10px">{{ value }}</td>
                   {% endfor %}
@@ -503,8 +612,14 @@
             평균급여 및 종업원 수
           </p>
 
+          <!--분기 선택 바-->
+          <div style="margin-bottom: 3vh">
+            <p class="sub-header">분기 선택</p>
+            <input type="text" id="wcp_term_list_range"/>
+          </div>
+
           <table
-            id="scroll-horizontal-datatable"
+            id="wcp-table"
             class="table w-100 nowrap"
           >
             <thead>
@@ -517,7 +632,7 @@
             </thead>
 
             <tbody>
-              {% for category, value_list in wcp_list.items %}
+              {% for category, value_list in temp_wcp_data.items %}
                 <tr>
                   <td style="width:20px">{{ category }}</td>
                   {%  for item, value in value_list.items %}
@@ -536,6 +651,60 @@
     <!-- end col-->
   </div>
 
+{#임직원 숫자 추이 그래프. #}
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title" >임직원 숫자 추이</h4>
+          <div style="display: flex; justify-content: center; margin-top:3vh">
+            <div
+              id="staff-number-graph"
+              style="
+                height: 350px;
+                width: 85%;
+                {#padding-left:30%;#}
+                display:inline-block;
+                {#float:left;#}
+              "
+{#              class="mt-5"#}
+              data-colors="#4fc6e1,#f7b84b,#4a81d4"
+            ></div>
+          </div>
+
+        </div>
+      </div>
+      <!-- end card -->
+    </div>
+  </div>
+
+{#이사회 평균 보수 그래프. #}
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title" >임직원 숫자 추이</h4>
+          <div style="display: flex; justify-content: center; margin-top:3vh">
+            <div
+              id="board-member-average-wage-graph"
+              style="
+                height: 350px;
+                width: 85%;
+                {#padding-left:30%;#}
+                display:inline-block;
+                {#float:left;#}
+              "
+{#              class="mt-5"#}
+              data-colors="#4fc6e1,#f7b84b,#4a81d4"
+            ></div>
+          </div>
+
+        </div>
+      </div>
+      <!-- end card -->
+    </div>
+  </div>
+
 {#이사회 임원 목록#}
   <div class="row">
     <div class="col-12">
@@ -546,24 +715,63 @@
             이사회 임원 목록
           </p>
 
+          <!--분기 선택 바-->
+          <div style="margin-bottom: 3vh">
+            <p class="sub-header">분기 선택</p>
+            <input type="text" id="board_member_term_list_range"/>
+          </div>
+
           <table
-            id="scroll-horizontal-datatable"
+            id="board-member-table"
             class="table w-100 nowrap"
           >
             <thead>
               <tr>
-                <th style="width:20px">이름</th>
-                <th style="width:20px">업무</th>
-                <th style="width:20px">성별</th>
+{#                <th style="width:20px">카테고리</th>#}
+                {%  for item in board_member_data.item_list %}
+                  <th style="width:10px">{{ item }}</th>
+                {% endfor %}
               </tr>
             </thead>
 
             <tbody>
-              {% for board_meber in board_member_list %}
+              {% for value_list in board_member_data.last_term_data  %}
                 <tr>
-                  <td style="width:20px">{{ board_meber.member_name }}</td>
-                  <td style="width:20px">{{ board_meber.member_job }}</td>
-                  <td style="width:20px">{{ board_meber.member_sex }}</td>
+{#                  <td style="width:20px">{{ category }}</td>#}
+                  {%  for value in value_list %}
+                    <td style="width:10px">{{ value }}</td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+
+            </tbody>
+          </table>
+
+          <h4 class="header-title" style="margin-top:8vh">이사회 임원 보수 정보</h4>
+          <p class="text-muted font-13 mb-4">
+            이사회 임원 보수 정보
+          </p>
+
+          <table
+            id="bm-personal-wage-table"
+            class="table w-100 nowrap"
+          >
+            <thead>
+              <tr>
+{#                <th style="width:20px">카테고리</th>#}
+                {%  for item in bm_personal_wage_data.item_list %}
+                  <th style="width:10px">{{ item }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for value_list in bm_personal_wage_data.last_term_data  %}
+                <tr>
+{#                  <td style="width:20px">{{ category }}</td>#}
+                  {%  for value in value_list %}
+                    <td style="width:10px">{{ value }}</td>
+                  {% endfor %}
                 </tr>
               {% endfor %}
 
@@ -577,8 +785,9 @@
     <!-- end col-->
   </div>
 
+
 {#  상위 보수자 목록#}
-  <div class="row">
+  {% comment %}<div class="row">
     <div class="col-12">
       <div class="card">
         <div class="card-body">
@@ -588,7 +797,7 @@
           </p>
 
           <table
-            id="scroll-horizontal-datatable"
+            id="executive-wage-table"
             class="table w-100 nowrap"
           >
             <thead>
@@ -616,12 +825,50 @@
       <!-- end card -->
     </div>
     <!-- end col-->
+  </div>{% endcomment %}
+
+{#  인물 정보 iframe. #}
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div id="peopleIframeDiv" style="
+            {#position:absolute; top:-360px; left:0px; overflow-x:hidden; overflow-y:hidden; width:700px;#}
+            /* position: absolute; */
+            /* top: -360px; */
+            /* left: 0px; */
+            overflow-x: hidden;
+            overflow-y: hidden;
+            width: 1215px;
+            height: 702px;
+          ">
+            <iframe id="peopleIframe" src="https://www.businesspost.co.kr/BP?command=power" scrolling="no" style="
+              position: relative;
+              width: 100vw;
+              height: 300vh;
+              top: -2073px;
+              left: -672px;
+            "></iframe>
+          </div>
+
+        <!-- end card body-->
+      </div>
+      <!-- end card -->
+    </div>
+    <!-- end col-->
   </div>
 
 </div>
+
 {% endblock %}
 
 {% block extra_javascript %}
+
+  <script>
+
+
+
+  </script>
 
 <!-- Third party js -->
 <script src="{% static 'libs/datatables.net/js/jquery.dataTables.min.js' %}"></script>
@@ -677,6 +924,81 @@ $(document).ready(function () {
         scrollY: !0,
         scrollCollapse: !0,
         paging: !1,
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    }), $("#notice-table").DataTable({
+        scrollY: false,
+        scrollCollapse: !0,
+        paging: true,
+        ordering: false,
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    }), $("#shareholder-table").DataTable({
+        scrollX: "100%",
+        scrollY: "600px",
+        scrollCollapse: true,
+        paging: false,
+        ordering: true,
+        order:[[{{ shareholder_term_list|length }}, "asc"]],
+        {#rowGroup: false,#}
+        {#responsive: false,#}
+        {#fixedHeader:false,#}
+        fixedColumns: { left: "1" },
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () { $(".dataTables_paginate > .pagination").addClass("pagination-rounded") }
+        {% comment %}scrollX: !0,
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }{% endcomment %}
+    }), $("#dividend-table").DataTable({
+        scrollX: "100%",
+        scrollY: "600px",
+        scrollCollapse: true,
+        paging: false,
+        ordering: false,
+        order:[[{{ dividend_term_list|length }}, "asc"]],
+        {#rowGroup: false,#}
+        {#responsive: false,#}
+        {#fixedHeader:false,#}
+        fixedColumns: { left: "1" },
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () { $(".dataTables_paginate > .pagination").addClass("pagination-rounded") }
+        {% comment %}scrollX: !0,
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }{% endcomment %}
+    }), $("#wcp-table").DataTable({
+        scrollX: !0,
+        ordering: false,
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    }), $("#board-member-table").DataTable({
+        scrollY: "600px",
+        ordering: false,
+        paging: false,
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    }), $("#bm-personal-wage-table").DataTable({
+        scrollY: false,
+        ordering: true,
+        order:[[2, "dec"]],
+        paging: false,
+        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+        drawCallback: function () {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    }), $("#executive-wage-table").DataTable({
+        scrollX: !0,
         language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
         drawCallback: function () {
             $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
@@ -769,7 +1091,7 @@ $(document).ready(function () {
 <script src="{% static 'libs/flot-orderbars/js/jquery.flot.orderBars.js' %}"></script>
 <script src="{% static 'libs/flot-charts/jquery.flot.crosshair.js' %}"></script>
 
-  <script>
+<script>
   !function (b) {
     "use strict";
 
@@ -878,12 +1200,12 @@ $(document).ready(function () {
         t = {
             bars: {show: !0, barWidth: .2, fill: 1},
             grid: {
-                show: !0,
-                aboveData: !1,
-                labelMargin: 5,
+                show: true,
+                aboveData: false,
+                labelMargin: 0,
                 axisMargin: 0,
                 borderWidth: 1,
-                minBorderMargin: 5,
+                minBorderMargin: 0,
                 clickable: !0,
                 hoverable: !0,
                 autoHighlight: !1,
@@ -902,7 +1224,341 @@ $(document).ready(function () {
             tooltip: !0,
             tooltipOpts: {content: "%s : %y.0", shifts: {x: -30, y: -50}}
         }, b.plot(b(a), r, t)
-    }, a.prototype.createLineGraph = function (a, o, t, r) {
+    }, a.prototype.createFinancialGraph = function (a, o, t, r) {
+        t = {
+            bars: {show: true, barWidth: 60*60*24*10*1000, fill: 1, align: "center",},
+            grid: {
+                show: true,
+                aboveData: false,
+                labelMargin: 0,
+                axisMargin: 0,
+                borderWidth: 1,
+                minBorderMargin: 0,
+                clickable: !0,
+                hoverable: !0,
+                autoHighlight: !1,
+                mouseActiveRadius: 20,
+                borderColor: "rgba(65, 80, 95, 0.07)"
+            },
+            series: {
+              stack: 0,
+              bars:{
+                barWidth: 1,
+              }
+            },
+            legend: {
+                position: "ne", margin: [0, -32], noColumns: 0, labelBoxBorderColor: null, labelFormatter: function (a, o) {
+                    return a + "&nbsp;&nbsp;"
+                }, width: 30, height: 2
+            },
+            yaxis: o.y,
+            xaxis: o.x,
+            colors: t,
+            tooltip: !0,
+            tooltipOpts: {content: "%s : %y.0", shifts: {x: -30, y: -50}}
+        }, b.plot(b(a), r, t)
+    },
+
+      {#      주주 정보 그래프 #}
+      a.prototype.createShareholderGraph = function (a, xaxis, t, r) {
+        t = {
+            bars: {
+              show: true,
+              barWidth: 60*60*24*80*1000,//x축(수평그래프라면 y축)의 단위 기준. 현재 y축이 시간 단위이므로, millisecond단위로 값을 주어야 y축에서 그만큼에 해당하는 넓이를 부여함.
+              fill: 1,
+              align: "center",
+              horizontal:true
+            },
+            grid: {
+                show: true,
+                aboveData: false,
+                labelMargin: 5,
+                axisMargin: 0,
+                borderWidth: 1,
+                minBorderMargin: 5,
+                clickable: !0,
+                hoverable: !0,
+                autoHighlight: !1,
+                mouseActiveRadius: 20,
+                borderColor: "rgba(65, 80, 95, 0.07)"
+            },
+            series: {
+              stack: true,//쌓이는 그래프 on 설정.
+            },
+            legend: {
+                position: "ne",
+                margin: [-160, 0],
+                noColumns: 1,
+                labelBoxBorderColor: null,
+                labelFormatter: function (a, o) {
+                    return a + "&nbsp;&nbsp;"
+                },
+                container: $("#shareholder-legend"),
+                width: 30,
+                height: 2,
+            },
+            {#yaxis: o.y,#}
+            xaxis: {
+                {#ticks: [0,100,100000],#}
+                {% comment %}tickFormatter: function formatter(val, axis, precision){
+                  if(Math.abs(val) > 1000000000){return (val/10000000000)+"B";}
+                  else if(Math.abs(val) > 1000000){return(val/1000000)+"M";}
+                  else if(Math.abs(val) > 1000){return (val/1000)+"T";}
+                  else{return val;}
+                },{% endcomment %}
+                tickColor: "rgba(65, 80, 95, 0.07)",
+                font: {color: "#8391a2"}
+            },
+            yaxis: {
+              ticks: xaxis,
+              {% comment %}tickFormatter: function (val, axis) {
+                  console.log(val);
+                  console.log(axis)
+                  var d = new Date(val);
+                  return d.getUTCFullYear() + "/" + (d.getUTCMonth()+1);
+              },{% endcomment %}
+              tickColor: "rgba(65, 80, 95, 0.07)",
+              font: {color: "#8391a2"},
+              mode: "time",//x축 시간 타입으로.
+              timeformat: "%Y-%q분기",//시간 타입 형태.
+              {#minTickSize: [1, "month"],#}
+            },
+            {#xaxis: o.x,#}
+            colors: t,
+            tooltip: true,
+            tooltipOpts: {content: "%s : %x.2", shifts: {x: -30, y: -50}}//마우스 올려 놓았을 때 작은 설명 모달. %x가 x축 값, .2가 표시할 소수점 자리수.
+        }, b.plot(b(a), r, t)
+    },
+
+      {#      배당 정보 그래프 #}
+      a.prototype.createDividendGraph = function (a, o, t, r) {
+        t = {
+            bars: {
+              show: false,
+              barWidth: 60*60*24*80*1000,//x축(수평그래프라면 y축)의 단위 기준. 현재 y축이 시간 단위이므로, millisecond단위로 값을 주어야 y축에서 그만큼에 해당하는 넓이를 부여함.
+              fill: 1,
+              align: "center",
+              horizontal:false
+            },
+            lines:{
+              show:true,
+
+            },
+            grid: {
+                show: true,
+                aboveData: false,
+                labelMargin: 5,
+                axisMargin: 0,
+                borderWidth: 1,
+                minBorderMargin: 5,
+                clickable: !0,
+                hoverable: !0,
+                autoHighlight: !1,
+                mouseActiveRadius: 20,
+                borderColor: "rgba(65, 80, 95, 0.07)"
+            },
+            series: {
+              stack: !1,
+              bars:{
+                barWidth: 1,
+              }
+            },
+            legend: {
+                position: "ne",
+                margin: [0, -40],
+                noColumns: 0,
+                labelBoxBorderColor: null,
+                labelFormatter: function (a, o) {
+                    return a + "&nbsp;&nbsp;"
+                },
+                width: 30,
+                height: 2,
+            },
+            {#yaxis: o.y,#}
+            yaxis: {
+                {#ticks: [0,100,100000],#}
+                {% comment %}tickFormatter: function formatter(val, axis, precision){
+                  if(Math.abs(val) > 1000000000){return (val/10000000000)+"B";}
+                  else if(Math.abs(val) > 1000000){return(val/1000000)+"M";}
+                  else if(Math.abs(val) > 1000){return (val/1000)+"T";}
+                  else{return val;}
+                },{% endcomment %}
+                tickColor: "rgba(65, 80, 95, 0.07)",
+                font: {color: "#8391a2"}
+            },
+            xaxis: {
+              ticks: {{ dividend_graph_timestamp_list|safe|default:"[]" }},
+              {% comment %}tickFormatter: function (val, axis) {
+                  console.log(val);
+                  console.log(axis)
+                  var d = new Date(val);
+                  return d.getUTCFullYear() + "/" + (d.getUTCMonth()+1);
+              },{% endcomment %}
+              tickColor: "rgba(65, 80, 95, 0.07)",
+              font: {color: "#8391a2"},
+              mode: "time",//x축 시간 타입으로.
+              timeformat: "%Y-%q분기",//시간 타입 형태.
+              {#minTickSize: [1, "month"],#}
+            },
+            {#xaxis: o.x,#}
+            colors: t,
+            tooltip: true,
+            tooltipOpts: {content: "%s : %x.2", shifts: {x: -30, y: -50}}//마우스 올려 놓았을 때 작은 설명 모달. %x가 x축 값, .2가 표시할 소수점 자리수.
+        }, b.plot(b(a), r, t)
+    },
+
+    {#임직원 숫자 추이 그래프. #}
+    a.prototype.createStaffNumberGraph = function (a, o, t, r) {
+        t = {
+            bars: {
+              show: false,
+              barWidth: 60*60*24*80*1000,//x축(수평그래프라면 y축)의 단위 기준. 현재 y축이 시간 단위이므로, millisecond단위로 값을 주어야 y축에서 그만큼에 해당하는 넓이를 부여함.
+              fill: 1,
+              horizontal:false,
+              align: "center",
+            },
+            lines:{
+              show:true,
+            },
+            grid: {
+                show: true,
+                aboveData: false,
+                labelMargin: 5,
+                axisMargin: 0,
+                borderWidth: 1,
+                minBorderMargin: 5,
+                clickable: !0,
+                hoverable: !0,
+                autoHighlight: !1,
+                mouseActiveRadius: 20,
+                borderColor: "rgba(65, 80, 95, 0.07)"
+            },
+            series: {
+              stack: !1,
+              bars:{
+                barWidth: 1,
+              }
+            },
+            legend: {
+                position: "ne",
+                margin: [0, -40],
+                noColumns: 0,
+                labelBoxBorderColor: null,
+                labelFormatter: function (a, o) {
+                    return a + "&nbsp;&nbsp;"
+                },
+                width: 30,
+                height: 2,
+            },
+            {#yaxis: o.y,#}
+            yaxis: {
+                {#ticks: [0,100,100000],#}
+                {% comment %}tickFormatter: function formatter(val, axis, precision){
+                  if(Math.abs(val) > 1000000000){return (val/10000000000)+"B";}
+                  else if(Math.abs(val) > 1000000){return(val/1000000)+"M";}
+                  else if(Math.abs(val) > 1000){return (val/1000)+"T";}
+                  else{return val;}
+                },{% endcomment %}
+                tickColor: "rgba(65, 80, 95, 0.07)",
+                font: {color: "#8391a2"}
+            },
+            xaxis: {
+              ticks: {{ staff_number_graph_timestamp_list|safe|default:"[]" }},
+              {% comment %}tickFormatter: function (val, axis) {
+                  console.log(val);
+                  console.log(axis)
+                  var d = new Date(val);
+                  return d.getUTCFullYear() + "/" + (d.getUTCMonth()+1);
+              },{% endcomment %}
+              tickColor: "rgba(65, 80, 95, 0.07)",
+              font: {color: "#8391a2"},
+              mode: "time",//x축 시간 타입으로.
+              timeformat: "%Y-%q분기",//시간 타입 형태.
+              {#minTickSize: [1, "month"],#}
+            },
+            {#xaxis: o.x,#}
+            colors: t,
+            tooltip: true,
+            tooltipOpts: {content: "%s : %x, %y명", shifts: {x: -30, y: -50}}//마우스 올려 놓았을 때 작은 설명 모달. %x가 x축 값, .2가 표시할 소수점 자리수.
+        }, b.plot(b(a), r, t)
+    },
+
+    {#이사회 평균 보수 그래프. #}
+    a.prototype.createBoardMemberAverageWageGraph = function (a, o, t, r) {
+        t = {
+            bars: {
+              show: false,
+              barWidth: 60*60*24*80*1000,//x축(수평그래프라면 y축)의 단위 기준. 현재 y축이 시간 단위이므로, millisecond단위로 값을 주어야 y축에서 그만큼에 해당하는 넓이를 부여함.
+              fill: 1,
+              horizontal:false
+            },
+            lines:{
+              show:true,
+            },
+            grid: {
+                show: true,
+                aboveData: false,
+                labelMargin: 5,
+                axisMargin: 0,
+                borderWidth: 1,
+                minBorderMargin: 5,
+                clickable: !0,
+                hoverable: !0,
+                autoHighlight: !1,
+                mouseActiveRadius: 20,
+                borderColor: "rgba(65, 80, 95, 0.07)"
+            },
+            series: {
+              stack: !1,
+              bars:{
+                barWidth: 1,
+              }
+            },
+            legend: {
+                position: "ne",
+                margin: [0, -40],
+                noColumns: 0,
+                labelBoxBorderColor: null,
+                labelFormatter: function (a, o) {
+                    return a + "&nbsp;&nbsp;"
+                },
+                width: 30,
+                height: 2,
+            },
+            {#yaxis: o.y,#}
+            yaxis: {
+                {#ticks: [0,100,100000],#}
+                {% comment %}tickFormatter: function formatter(val, axis, precision){
+                  if(Math.abs(val) > 1000000000){return (val/10000000000)+"B";}
+                  else if(Math.abs(val) > 1000000){return(val/1000000)+"M";}
+                  else if(Math.abs(val) > 1000){return (val/1000)+"T";}
+                  else{return val;}
+                },{% endcomment %}
+                tickColor: "rgba(65, 80, 95, 0.07)",
+                font: {color: "#8391a2"}
+            },
+            xaxis: {
+              ticks: {{ bm_average_wage_graph_timestamp_list|safe|default:"[]" }},
+              {% comment %}tickFormatter: function (val, axis) {
+                  console.log(val);
+                  console.log(axis)
+                  var d = new Date(val);
+                  return d.getUTCFullYear() + "/" + (d.getUTCMonth()+1);
+              },{% endcomment %}
+              tickColor: "rgba(65, 80, 95, 0.07)",
+              font: {color: "#8391a2"},
+              mode: "time",//x축 시간 타입으로.
+              timeformat: "%Y-%q분기",//시간 타입 형태.
+              {#minTickSize: [1, "month"],#}
+            },
+            {#xaxis: o.x,#}
+            colors: t,
+            tooltip: true,
+            tooltipOpts: {content: "%s : %x, %y", shifts: {x: -30, y: -50}}//마우스 올려 놓았을 때 작은 설명 모달. %x가 x축 값, .2가 표시할 소수점 자리수.
+        }, b.plot(b(a), r, t)
+    },
+
+    a.prototype.createLineGraph = function (a, o, t, r) {
         return t = {
             series: {lines: {show: !0}, points: {show: !0}},
             legend: {
@@ -968,9 +1624,11 @@ $(document).ready(function () {
             t.setData([r.randomData()]), t.draw(), setTimeout(a, (b("html").hasClass("mobile-device"), 500))
         }(), a = ["#4a81d4", "#f672a7", "#f7b84b", "#4fc6e1", "#1abc9c"], (o = b("#donut-chart").data("colors")) && (a = o.split(",")), this.createDonutGraph("#donut-chart", ["Bitcoin", "Ethereum", "Litecoin", "Bitcoin Cash", "Cardano"], [48, 30, 15, 32, 26], a);
         {#var trade_volume = {{ data_list|safe }}#}
-        var trade_volume_list = {{ trade_volume_list }}
-        var close_price_list = {{ close_price_list }}
-        var price_data_date = {{ data_date|safe }}
+
+        //거래 데이터 그래프.
+        var trade_volume_list = {{ trade_volume_list|safe|default:"[]" }}
+        var close_price_list = {{ close_price_list|safe|default:"[]" }}
+        var price_data_date = {{ data_date|safe|default:"[]" }}
         var input_trade_volume_list = []
         var input_close_price_list = []
         var price_date_list = []
@@ -987,27 +1645,187 @@ $(document).ready(function () {
         (o = b("#combine-chart").data("colors")) && (a = o.split(",")), this.createCombineGraph("#combine-chart", price_date_list, ["주가", "거래량"], e, a);
 
         {#재무 데이터 그래프. #}
-        for (var l = [], i = 0; i <= 10; i += 1) l.push([i, parseInt(30 * Math.random())]);
-        for (var s = [], i = 0; i <= 10; i += 1) s.push([i, parseInt(30 * Math.random())]);
-        for (var n = [], i = 0; i <= 10; i += 1) n.push([i, parseInt(30 * Math.random())]);
+        var bar1 = {{ financial_graph_data.financial_graph_data1|safe|default:"[]" }};
+        var bar2 = {{ financial_graph_data.financial_graph_data2|safe|default:"[]" }};
+        var bar3 = {{ financial_graph_data.financial_graph_data3|safe|default:"[]" }};
 
-        var bar1 = financial_graph_data1;
-        var bar2 = financial_graph_data2;
-        var bar3 = financial_graph_data3;
-
-        (e = new Array).push({label: "Series One", data: bar1, bars: {order: 1}}), e.push({label: "Series Two", data: bar2, bars: {order: 2}}), e.push({
-            label: "Series Three",
+        (e = new Array).push({label: "수익", data: bar1, bars: {order: 1}}), e.push({label: "영업이익(손실)", data: bar2, bars: {order: 2}}), e.push({
+            label: "총당기순이익",
             data: bar3,
             bars: {order: 3}
-        }), a = ["#4fc6e1", "#f7b84b", "#4a81d4"], (o = b("#ordered-bars-chart").data("colors")) && (a = o.split(",")), this.createStackBarGraph("#ordered-bars-chart", {
+        }), a = ["#4fc6e1", "#f7b84b", "#4a81d4"], (o = b("#ordered-bars-chart").data("colors")) && (a = o.split(",")), this.createFinancialGraph("#ordered-bars-chart", {
             y: {
-                axisLabel: "Sales Value (USD)",
+                {#axisLabel: "Sales Value (USD)",#}
+                {#ticks: [0,100,100000],#}
+                tickFormatter: function formatter(val, axis, precision){
+                  if(Math.abs(val) > 1000000000){return (val/10000000000)+"B";}
+                  else if(Math.abs(val) > 1000000){return(val/1000000)+"M";}
+                  else if(Math.abs(val) > 1000){return (val/1000)+"T";}
+                  else{return val;}
+                },
                 tickColor: "rgba(65, 80, 95, 0.07)",
                 font: {color: "#8391a2"}
-            }, x: {axisLabel: "Last 10 Days", tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#8391a2"}}
+            }, x: {
+              ticks: {{ financial_graph_data.timestamp_data|safe|default:"[]" }},
+              tickFormatter: function (val, axis) {
+                  console.log(val);
+                  console.log(axis)
+                  var d = new Date(val);
+                  return d.getUTCFullYear() + "/" + (d.getUTCMonth()+1);
+              },
+              tickColor: "rgba(65, 80, 95, 0.07)",
+              font: {color: "#8391a2"},
+              mode: "time",//x축 시간 타입으로.
+              timeformat: "%Y-%q분기",//시간 타입 형태.
+              {#minTickSize: [1, "month"],#}
+              {#autoScale: "loose",#}
+              {#autoScaleMargin: 1,#}
+            }
         }, a, e);
 
+        //주주 정보 그래프 > 그래프 표시 기간 선택.
+        var temp = this
+        var shareholderTermList = {{ shareholder_term_list|safe|default:"[]" }}
+        //기간 시작 선택시 이벤트.
+        $("#shareholder-term-select-start").change(function (){
+          var term_idx = $(this).val();//선택된 분기의 index.
+
+          //기간 종료 select 선택 가능하도록 설정, 기간 시작 분기 이후 데이터 렌더링.
+          var option_list_html = ""
+          {#var shareholderTermListAfter = shareholderTermList.slice(term_idx)#}
+          for(var i=term_idx; i<shareholderTermList.length; i++){
+            option_list_html = option_list_html + "<option value=\""+i+"\">"+shareholderTermList[i]+"</option>"
+          }
+          $("#shareholder-term-select-end").append(option_list_html)
+          $("#shareholder-term-select-end").attr("disabled", false)
+        });
+        //기간 종료 선택시 이벤트.
+        $("#shareholder-term-select-end").change(function (){
+          var term_end_idx = $(this).val();//선택된 분기의 index.
+          var term_start_idx = $("#shareholder-term-select-start").val()
+
+          {#주주 정보 그래프 렌더링. #}
+          var shareholder_graph_data = {{ shareholder_graph_data|safe|default:"[]" }};
+          var shareholder_graph_timestamp_list = {{ shareholder_graph_timestamp_list|safe|default:"[]" }}
+          shareholder_graph_timestamp_list = shareholder_graph_timestamp_list.slice(parseInt(term_start_idx), parseInt(term_end_idx)+1)
+
+          var e = new Array
+          for( var temp_key in shareholder_graph_data){
+            e.push({label:temp_key, data: shareholder_graph_data[temp_key].slice(parseInt(term_start_idx), parseInt(term_end_idx)+1), stack:"bb"})
+          }
+          a = ["#4fc6e1", "#f7b84b", "#4a81d4"], (o = b("#shareholder-graph").data("colors")) && (a = o.split(",")), temp.createShareholderGraph("#shareholder-graph",
+                  shareholder_graph_timestamp_list, a, e);
+        });
+
+        {#주주 정보 그래프 (처음 페이지 들어올시) #}
+        var shareholder_graph_data = {{ shareholder_graph_data|safe|default:"[]" }};
+        var shareholder_graph_timestamp_list = {{ shareholder_graph_timestamp_list|safe|default:"[]" }}
+        var e = new Array
+        for( var temp_key in shareholder_graph_data){
+          e.push({label:temp_key, data: shareholder_graph_data[temp_key], stack:"bb"})
+        }
+        a = ["#4fc6e1", "#f7b84b", "#4a81d4"], (o = b("#shareholder-graph").data("colors")) && (a = o.split(",")), this.createShareholderGraph("#shareholder-graph",
+                shareholder_graph_timestamp_list, a, e);
+
+        {#배당 정보 그래프. 체크박스용. #}
+        {% comment %}function doToggling(x){//체크박스에서 항목 체크시마다 그래프 다시 그리는 함수.
+          var e = new Array;
+          var dividend_graph_data = {{ dividend_graph_data|safe }};
+          //체크박스 목록 반복하며 체크된 항목의 데이터를 그래프의 데이터 목록에 추가.
+          $("#dividend-graph-account").find("input[type='checkbox']").each(function (index) {
+            if ($(this).is(":checked")) {
+                var account_name = $(this).attr("id")
+                e.push({label:account_name, data: dividend_graph_data[account_name], bars: {order: index+1}})
+            }
+          });
+
+          var color_list
+          color_list = ["#4fc6e1", "#f7b84b", "#4a81d4"],
+          (o = b("#dividend-graph").data("colors")) && (color_list = o.split(",")),
+          x.createDividendGraph("#dividend-graph", {}, color_list, e);
+        }
+
+        var temp = this
+        doToggling(temp)
+        $("#dividend-graph-account").find("input[type='checkbox']").click(function () {//체크박스에 클릭이벤트 핸들러 정의.
+            doToggling(temp);
+        });{% endcomment %}
+
+        {#배당 정보 그래프#}
+        function doToggling(x, target){//항목 선택시, 해당 항목에 대한 그래프 다시 그리는 함수.
+          var e = new Array;
+          var dividend_graph_data = {{ dividend_graph_data|safe|default:"{}" }};
+
+          //그래프 옆 항목 리스트 선택됨 표시 수정.
+          $("#dividend-graph-account").find("li").each(function (idx, el){
+            el.style.fontWeight = "normal"
+
+            if(target===undefined){
+              if(idx===0){el.style.fontWeight = "bold";}
+            }
+            else{
+              if(target.id===el.id){ el.style.fontWeight = "bold"}
+            }
+          })
+
+          if(target===undefined){
+            var temp_key = Object.keys(dividend_graph_data)[0]
+            e.push({label:temp_key, data: dividend_graph_data[temp_key], bars: {order: 1}})
+          }
+          else{
+            e.push({label:target.id, data: dividend_graph_data[target.id], bars: {order: 1}})
+          }
+
+          var color_list
+          color_list = ["#4fc6e1", "#f7b84b", "#4a81d4"],
+          (o = b("#dividend-graph").data("colors")) && (color_list = o.split(",")),
+          x.createDividendGraph("#dividend-graph", {}, color_list, e);
+        }
+
+        var temp = this
+        doToggling(temp)
+        $("#dividend-graph-account").find("li").click(function () {//항목에 클릭 이벤트 핸들러 정의.
+
+            doToggling(temp, this);
+        });
+
+        {#임직원 숫자 추이 그래프. #}
+        var e = new Array;
+        var staff_number_graph_data = {{ staff_number_graph_data|safe|default:"{}" }};
+
+        for(var staff_type in staff_number_graph_data){
+          e.push({label:staff_type, data: staff_number_graph_data[staff_type], bars: {order: 1}})
+        }
+
+        var color_list
+        color_list = ["#4fc6e1", "#f7b84b", "#4a81d4"],
+        (o = b("#dividend-graph").data("colors")) && (color_list = o.split(",")),
+        this.createStaffNumberGraph("#staff-number-graph", {}, color_list, e);
+
+        {#이사회 평균 보수 그래프. #}
+        var e = new Array;
+        var bm_average_wage_graph_data = {{ bm_average_wage_graph_data|safe|default:"{}" }};
+
+        e.push({label:"전체", data: bm_average_wage_graph_data["total_wage"], bars: {
+          show: true,
+          barWidth: 60*60*24*80*1000,//x축(수평그래프라면 y축)의 단위 기준. 현재 y축이 시간 단위이므로, millisecond단위로 값을 주어야 y축에서 그만큼에 해당하는 넓이를 부여함.
+          fill: 1,
+          horizontal:false,
+          order: 1,
+          align: "center",
+        }, lines:{show: false}})
+        e.push({label:"평균", data: bm_average_wage_graph_data["average_wage"], bars: {order: 1}})
+
+        var color_list
+        color_list = ["#4fc6e1", "#f7b84b", "#4a81d4"],
+        (o = b("#dividend-graph").data("colors")) && (color_list = o.split(",")),
+        this.createBoardMemberAverageWageGraph("#board-member-average-wage-graph", {}, color_list, e);
+
+
+
+
         for (var c = [], h = [], i = 0; i < 12; i += .2) c.push([i, Math.sin(i + 0)]), h.push([i, Math.cos(i + 0)]);
+        var e = new Array
         e = [{data: c, label: "Google"}, {
             data: h,
             label: "Yahoo"
@@ -1043,5 +1861,81 @@ $(document).ready(function () {
   });
 
 </script>
+
+{#    range 선택 바. #}
+<script src="{% static 'libs/ion-rangeslider/js/ion.rangeSlider.min.js' %}"></script>
+
+<!-- Init js -->
+{#<script src="{% static 'js/pages/range-sliders.init.js' %}"></script>#}
+  <script>
+    //평균급여 및 종업원 수 > 기간 바 렌더링.
+    var wcp_term_list = {{ wcp_term_list|safe|default:"[]" }}
+    var wcp_list = {{ wcp_list|safe|default:"[]" }}
+
+    $("#wcp_term_list_range").ionRangeSlider({
+        grid: !0,
+        from: wcp_term_list.length,
+        values: wcp_term_list
+    })
+
+    //평균급여 및 종업원 수 분기별 테이블 변경 이벤트 처리.
+    $("#wcp_term_list_range").change(function () {//항목에 클릭 이벤트 핸들러 정의.
+        var termName = $(this).val();//선택된 기간 값 가져오기.
+        var table = $("#wcp-table").DataTable();
+
+        var targetData = wcp_list[termName]//선택된 기간에 해당하는 wcp데이터 추출.
+        var newRows = []
+        for(var temp_i=0; temp_i<Object.keys(targetData).length; temp_i++){//추출한 데이터(dict형)를 테이블에 삽입할 Array형태로 정제.
+          var category = Object.keys(targetData)[temp_i]//키값인 카테고리 추출.
+          var value_list = Object.values(targetData[category])//value를 array로 변경.
+          value_list.unshift(category)//카테고리값 array 맨 앞에 추가.
+
+          newRows.push(value_list)//삽입할 데이터 변수에 추가.
+        }
+
+        table.clear()//기존 데이터 row들 삭제.
+        table.rows.add(newRows).draw()//정제된 데이터 삽입.
+    });
+
+    //이사회 임원 및 평균 보수 > 기간 바 렌더링.
+    var board_member_term_list = {{ board_member_data.term_list|safe|default:"[]" }}
+    var board_member_list = {{ board_member_data.list|safe|default:"[]" }}
+    var bm_personal_wage_list = {{ bm_personal_wage_data.list|safe|default:"[]" }}
+
+    $("#board_member_term_list_range").ionRangeSlider({
+        grid: !0,
+        from: board_member_term_list.length,
+        values: board_member_term_list
+    })
+
+    //이사회 임원 및 평균 보수 분기별 테이블 변경 이벤트 처리.
+    $("#board_member_term_list_range").change(function () {//항목에 클릭 이벤트 핸들러 정의.
+        var termName = $(this).val();//선택된 기간 값 가져오기.
+        var member_list_table = $("#board-member-table").DataTable();
+        var member_wage_table = $("#bm-personal-wage-table").DataTable();
+
+        var memberListTargetData = board_member_list[termName]//선택된 기간에 해당하는 wcp데이터 추출.
+        var memberListNewRows = []
+        for(var temp_i=0; temp_i<memberListTargetData.length; temp_i++){//추출한 데이터(dict형)를 테이블에 삽입할 Array형태로 정제.
+          memberListNewRows.push(memberListTargetData[temp_i])//삽입할 데이터 변수에 추가.
+        }
+
+        var memberWageTargetData = bm_personal_wage_list[termName]
+        var memberWageNewRows = []
+        if(memberWageTargetData !== undefined){
+          for(var temp_i=0; temp_i<memberWageTargetData.length; temp_i++){
+            memberWageNewRows.push(memberWageTargetData[temp_i])
+          }
+        }
+
+        member_list_table.clear()//기존 데이터 row들 삭제.
+        member_list_table.rows.add(memberListNewRows).draw()//정제된 데이터 삽입.
+
+        member_wage_table.clear()
+        member_wage_table.rows.add(memberWageNewRows).draw()
+    });
+
+
+  </script>
 
 {% endblock %}

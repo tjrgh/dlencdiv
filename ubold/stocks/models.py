@@ -484,6 +484,7 @@ class SocialKeywords(TimeStampMixin):
     and_include_keyword_list = models.CharField(blank=True, default='', max_length=500, help_text="'그리고' 포함어 목록")
     exclude_keyword_list = models.CharField(blank=True, default='', max_length=500, help_text='제외어 목록')
     is_followed = models.BooleanField(default=True, help_text="지속적 수집 여부")
+    is_deleted = models.BooleanField(default=False, help_text="삭제 여부")
 
     class Meta:
         db_table = 'social_keywords'
@@ -915,4 +916,69 @@ class ServicePosNegWords(TimeStampMixin):
             # models.Index(fields=['corp_code'], name='pos_neg_words_corp_code_idx'),
             # models.Index(fields=['term_type'], name='pos_neg_words_term_type_idx'),
             # models.Index(fields=['corp_code', 'subject_name', 'this_term_name'], name='stock_fin_corp_sub_term_idx'),
+        ]
+
+class StaffNumber(TimeStampMixin):
+    code = models.ForeignKey(
+        'BasicInfo'
+        , related_name='staff_number'
+        , on_delete=models.PROTECT
+        , to_field='code'
+        , help_text='종목코드'
+    )
+    corp_code = models.CharField(max_length=9, help_text='DART 고유번호')
+    staff_type = models.CharField(max_length=20, help_text='직원 유형')
+    term_name = models.CharField(max_length=10, help_text='기간명')
+    number = models.IntegerField(help_text="인원수")
+
+    class Meta:
+        db_table = 'staff_number'
+        # unique_together = ["code", "staff_type", "term_name", ]
+        indexes = [
+            models.Index(fields=['corp_code'], name='staff_number_corp_code_idx'),
+            models.Index(fields=['code'], name='staff_number_code_idx'),
+        ]
+
+class BoardMemberAverageWage(TimeStampMixin):
+    code = models.ForeignKey(
+        'BasicInfo'
+        , related_name='board_member_average_wage'
+        , on_delete=models.PROTECT
+        , to_field='code'
+        , help_text='종목코드'
+    )
+    corp_code = models.CharField(max_length=9, help_text='DART 고유번호')
+    term_name = models.CharField(max_length=10, help_text='기간명')
+    total_wage = models.BigIntegerField(help_text="전체 보수액")
+    average_wage = models.DecimalField(max_digits=21, decimal_places=2, help_text='평균 보수액')
+
+    class Meta:
+        db_table = 'board_member_average_wage'
+        # unique_together = ["code", "term_name", ]
+        indexes = [
+            models.Index(fields=['corp_code'], name='board_avg_wage_corp_code_idx'),
+            models.Index(fields=['code'], name='board_avg_wage_code_idx'),
+        ]
+
+class BoardMemberPersonalWage(TimeStampMixin):
+    code = models.ForeignKey(
+        'BasicInfo'
+        , related_name='board_member_personal_wage'
+        , on_delete=models.PROTECT
+        , to_field='code'
+        , help_text='종목코드'
+    )
+    corp_code = models.CharField(max_length=9, help_text='DART 고유번호')
+    term_name = models.CharField(max_length=10, help_text='기간명')
+    member_name = models.CharField(max_length=20, help_text='이사회 멤버 이름')
+    member_position = models.CharField(null=True, max_length=30, help_text="직책")
+    member_wage = models.BigIntegerField(help_text="보수액")
+    notice_code = models.CharField(max_length=20, help_text="출처 공시 번호")
+
+    class Meta:
+        db_table = 'board_member_personal_wage'
+        # unique_together = ["code", "term_name", "member_name", "member_position", ]
+        indexes = [
+            models.Index(fields=['corp_code'], name='board_ps_wage_corp_code_idx'),
+            models.Index(fields=['code'], name='board_ps_wage_code_idx'),
         ]

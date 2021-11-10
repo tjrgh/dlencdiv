@@ -86,6 +86,7 @@
     "toastr": "^2.1.4",
     "twitter-bootstrap-wizard": "^1.2.0",
     "waypoints": "^4.0.1",
+    "wordcloud": "^1.2.2",
     "x-editable": "^1.5.1"
   },
   "devDependencies": {

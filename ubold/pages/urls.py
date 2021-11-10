@@ -1,5 +1,6 @@
 from django.urls import path
 
+
 from .views import (
 
     custom_pages_coming_soon_view,
@@ -18,7 +19,7 @@ from .views import (
     custom_pages_500_two_view,
     custom_pages_500_view,
     company_info_view,
-    price_analysis_view,
+    price_analysis_view, social_analysis_view,
 )
 
 
@@ -48,4 +49,7 @@ urlpatterns = [
 
     # 주가분석
     path('priceanalysis', view=price_analysis_view, name="price-analysis"),
+
+    # 소셜분석
+    path('socialanalysis/<str:lv1>/<str:lv2>', view=social_analysis_view, name="social-analysis")
 ]
