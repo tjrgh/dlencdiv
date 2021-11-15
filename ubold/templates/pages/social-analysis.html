@@ -93,9 +93,18 @@
     <div class="row">
       <div class="col-lg-12">
         <div class="card">
-          <div class="card-body">
+          <div id="{{ mention_type }}Item" class="card-body">
             <h4 class="header-title" >{{ value.name }}</h4>
-            <div style="margin-top:3vh">
+
+            <div class="loading">
+              <div class="spinner-border avatar-md"></div>
+            </div>
+
+            <div class="itemContent" style="margin-top:3vh; width:100%;">
+              <div style="display: flex; justify-content: right; margin:1vh 0vw">
+                <button class="btn-primary rounded" id="{{ mention_type }}ExcelBtn" style="padding: 5px 10px;">엑셀 다운</button>
+              </div>
+
               <div
                 id="{{ mention_type }}-graph"
                 style="
@@ -114,7 +123,7 @@
                         display: inline;
                         padding: 0.2vh 0.5vw;
                       ">
-                        <div class="form-check mb-2 form-check-primary" style="
+                        <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
                           display: inline-block;
                           border: 1px solid #6658dd ;
                           border-radius: 2em;
@@ -124,14 +133,35 @@
                             class="form-check-input"
                             type="checkbox"
                             value={{ keyword }}
-                            id="{{ mention_type }}-{{ keyword }}"
+                            id="{{ mention_type }}-{{ keyword }}-checkbox"
                             checked="checked"
                             style="display: inline-block; margin-left: 0;"
                           />
-                          <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}" >{{ keyword }}</label>
+                          <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
                         </div>
                       </li>
                     {% endfor %}
+                    <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                      <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                        display: inline-block;
+                        border: 1px solid #6658dd ;
+                        border-radius: 2em;
+                        padding: 0.5vh 0.6vw;
+                      ">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          value="sum"
+                          id="{{ mention_type }}-sum-checkbox"
+                          checked="checked"
+                          style="display: inline-block; margin-left: 0;"
+                        />
+                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                      </div>
+                    </li>
                 </ul>
               </div>
             </div>
@@ -143,10 +173,91 @@
     </div>
   {% endfor %}
 
-  <div id="wordCloud" style="
-    width: 600px;
-    height: 300px;
-  ">word cloud</div>
+{#긍부정어 키워드 선택 radio. #}
+  <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div id="posNegItem" class="card-body">
+            <h4 class="header-title" >긍부정어 추이</h4>
+
+            <div class="loading">
+              <div class="spinner-border avatar-md"></div>
+            </div>
+
+            <div class="itemContent">
+              <div id="posNegKeywordRadio" style="display:flex; justify-content: center; ">
+              {% for keyword in keyword_list %}
+                <div class="form-check mb-2" style="margin: 1vh 1vw; ">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="flexRadioDefault"
+                    value="{{ keyword }}"
+                    id="posNegRadio-{{ keyword }}"
+                    checked
+                  />
+                  <label class="form-check-label" for="posNegRadio-{{ keyword }}"
+                    >{{keyword}}</label
+                  >
+                </div>
+              {% endfor %}
+            </div>
+
+              <div style="display: flex; justify-content: center; width: 100%;">
+                <div style="width: 60%; height:50vh; display: flex; justify-content: center">
+                  <div id="wordCloud" style="
+                    width: 100%;
+                    height: 100%;
+                  ">word cloud</div>
+                </div>
+
+                <div style="width: 40%;">
+                  <div style="display: flex; justify-content: right; margin:1vh 0vw">
+                    <button class="btn-primary rounded" id="posNegTableExcelBtn" style="padding: 5px 10px;">엑셀 다운</button>
+                  </div>
+
+                  <table
+                    id="posNegTable"
+                    class="table w-100 nowrap"
+                    style="width: 100%"
+                  >
+                    <thead>
+                      <tr>
+                        <th>단어</th>
+                        <th>긍부정</th>
+                        <th>건수</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                    </tbody>
+                  </table>
+                </div>
+
+              </div>
+
+              <div style="margin-top: 3vh;">
+                <div style="display: flex; justify-content: right; margin:1vh 0vw">
+                  <button class="btn-primary rounded" id="posNegGraphExcelBtn" style="padding: 5px 10px;">엑셀 다운</button>
+                </div>
+
+                <div
+                  id="posNegGraph"
+                  style="
+                    height: 450px;
+                    width: 100%;
+                  "
+                  data-colors="#4fc6e1,#f7b84b,#4a81d4"
+                ></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+  </div>
+
+
 </div>
 {% endblock %}
 
@@ -166,19 +277,7 @@
     $("#anlys-date-end").val(today.toISOString().split("T")[0])
   })
 
-  var wordCloudOpt = {
-    list : {{pos_neg_data.wordCloud|safe|default:"[]"}},
-    color: function (word, data1, data2){
-      return "black";
-    },
-    backgroundColor: null,
-    hover: function (item, dimension, event){
-      //단어 언급량 작은 모달?
-      return
-    }
-  }
-  WordCloud.minFontSize = 40
-  WordCloud(document.getElementById("wordCloud"), wordCloudOpt)
+
 
 </script>
 
@@ -227,166 +326,9 @@ $(document).ready(function () {
         drawCallback: function () {
             $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
         }
-    }), a.buttons().container().appendTo("#datatable-buttons_wrapper .col-md-6:eq(0)"), $("#alternative-page-datatable").DataTable({
-        pagingType: "full_numbers",
-        drawCallback: function () {
-            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
-        }
-    }), $("#scroll-vertical-datatable").DataTable({
-        scrollY: !0,
-        scrollCollapse: !0,
-        paging: !1,
-        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
-        drawCallback: function () {
-            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
-        }
-    }), $("#notice-table").DataTable({
-        scrollY: false,
-        scrollCollapse: !0,
-        paging: true,
-        ordering: false,
-        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
-        drawCallback: function () {
-            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
-        }
-    }), $("#shareholder-table").DataTable({
-        scrollX: "100%",
-        scrollY: "600px",
-        scrollCollapse: true,
-        paging: false,
-        ordering: true,
-        order:[[{{ shareholder_term_list|length }}, "asc"]],
-        {#rowGroup: false,#}
-        {#responsive: false,#}
-        {#fixedHeader:false,#}
-        fixedColumns: { left: "1" },
-        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
-        drawCallback: function () { $(".dataTables_paginate > .pagination").addClass("pagination-rounded") }
-        {% comment %}scrollX: !0,
-        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
-        drawCallback: function () {
-            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
-        }{% endcomment %}
-    }), $("#dividend-table").DataTable({
-        scrollX: "100%",
-        scrollY: "600px",
-        scrollCollapse: true,
-        paging: false,
-        ordering: false,
-        order:[[{{ dividend_term_list|length }}, "asc"]],
-        {#rowGroup: false,#}
-        {#responsive: false,#}
-        {#fixedHeader:false,#}
-        fixedColumns: { left: "1" },
-        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
-        drawCallback: function () { $(".dataTables_paginate > .pagination").addClass("pagination-rounded") }
-        {% comment %}scrollX: !0,
-        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
-        drawCallback: function () {
-            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
-        }{% endcomment %}
-    }), $("#wcp-table").DataTable({
-        scrollX: !0,
-        ordering: false,
-        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
-        drawCallback: function () {
-            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
-        }
-    }), $("#board-member-table").DataTable({
-        scrollY: "600px",
-        ordering: false,
-        paging: false,
-        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
-        drawCallback: function () {
-            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
-        }
-    }), $("#bm-personal-wage-table").DataTable({
-        scrollY: false,
-        ordering: true,
-        order:[[2, "dec"]],
-        paging: false,
-        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
-        drawCallback: function () {
-            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
-        }
-    }), $("#executive-wage-table").DataTable({
-        scrollX: !0,
-        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
-        drawCallback: function () {
-            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
-        }
-    }), $("#scroll-horizontal-datatable").DataTable({
-        scrollX: !0,
-        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
-        drawCallback: function () {
-            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
-        }
-    }), $("#stock_list_table").DataTable({
-        scrollY: false,
-        scrollCollapse: true,
-        paging: true,
-        searching: false,
-        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
-        drawCallback: function () {
-            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
-        }
-    }), $("#income_statement_table").DataTable({
-        scrollX: "100%",
-        scrollY: "600px",
-        scrollCollapse: true,
-        paging: false,
-        ordering: false,
-        {#rowGroup: false,#}
-        {#responsive: false,#}
-        {#fixedHeader:false,#}
-        fixedColumns: { left: "1" },
-        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
-        drawCallback: function () { $(".dataTables_paginate > .pagination").addClass("pagination-rounded") }
-    }), $("#balance_sheet_table").DataTable({
-        scrollX: "100%",
-        scrollY: "600px",
-        scrollCollapse: true,
-        paging: false,
-        ordering: false,
-        {#rowGroup: false,#}
-        {#responsive: false,#}
-        {#fixedHeader:false,#}
-        fixedColumns: { left: "1" },
-        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
-        drawCallback: function () { $(".dataTables_paginate > .pagination").addClass("pagination-rounded") }
-    }), $("#cashflow_statement_table").DataTable({
-        scrollX: "100%",
-        scrollY: "600px",
-        scrollCollapse: true,
-        paging: false,
-        ordering: false,
-        {#rowGroup: false,#}
-        {#responsive: false,#}
-        {#fixedHeader:false,#}
-        fixedColumns: { left: "1" },
-        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
-        drawCallback: function () { $(".dataTables_paginate > .pagination").addClass("pagination-rounded") }
-    }), $("#complex-header-datatable").DataTable({
-        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
-        drawCallback: function () {
-            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
-        },
-        columnDefs: [{visible: !1, targets: -1}]
-    }), $("#row-callback-datatable").DataTable({
-        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
-        drawCallback: function () {
-            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
-        },
-        createdRow: function (a, e, t) {
-            15e4 < +e[5].replace(/[\$,]/g, "") && $("td", a).eq(5).addClass("text-danger")
-        }
-    }), $("#state-saving-datatable").DataTable({
-        stateSave: !0,
-        language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
-        drawCallback: function () {
-            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
-        }
-    }), $(".dataTables_length select").addClass("form-select form-select-sm"), $(".dataTables_length select").removeClass("custom-select custom-select-sm"), $(".dataTables_length label").addClass("form-label")
+    }), a.buttons().container().appendTo("#datatable-buttons_wrapper .col-md-6:eq(0)")
+
+
 });
 
 </script>
@@ -403,7 +345,10 @@ $(document).ready(function () {
 <script src="{% static 'libs/flot-orderbars/js/jquery.flot.orderBars.js' %}"></script>
 <script src="{% static 'libs/flot-charts/jquery.flot.crosshair.js' %}"></script>
 
-
+{#<script lang="javascript" src="dist/xlsx.full.min.js"></script>#}
+<script src="{% static 'libs/xlsx/dist/xlsx.full.min.js' %}"></script>
+<script src="{% static 'libs/file-saver/dist/FileSaver.min.js' %}"></script>
+{#<script lang="javascript" src="dist/xlsx.full.min.js"></script>#}
 
 <script>
   !function (b) {
@@ -489,25 +434,47 @@ $(document).ready(function () {
               {#minTickSize: [1, "month"],#}
             },
             {#xaxis: o.x,#}
-            colors: t,
+            {#colors: t,#}
             tooltip: true,
             tooltipOpts: {content: "%s : %x, %y", shifts: {x: -30, y: -50}}//마우스 올려 놓았을 때 작은 설명 모달. %x가 x축 값, .2가 표시할 소수점 자리수.
         }, b.plot(b(a), r, t)
     },
 
-    a.prototype.setSocialAnalysisGraphOptAndCreate = function (graph_el_id, checkbox_el_id, data, color_list){
+    a.prototype.setSocialAnalysisGraphOptAndCreate = function (graph_el_id, checkbox_el_id, data, keyword_color){
       //처음 그래프 그리기.
       var graphData = new Array;//flot char 함수에 전달할 데이터 리스트.
       //모든 키워드 데이터 리스트에 추가.
       Object.keys(data).forEach(function (keyword, i){
-        graphData.push({label:keyword, data: data[keyword], color: color_list[i]})
+        graphData.push({label:keyword, data: data[keyword], color: keyword_color[keyword]})
         //flotchar의 stacked graph를 이용하여 그래프 상에 보여지는 값들의 합 bar 생성.
         //그래프 그려지는 순서 옵션 찾지 못해 graphData의 첫 번째 위치에 stacked graph데이터가 위치해야하여 unshift 사용.
-        graphData.unshift({label:"sum", data: data[keyword], bars: { show: true, fillColor:"#e3e5e5", },
-                    lines:{show: false}, color: "#e3e5e5", stack: "sum"})
+        {#graphData.unshift({label:"sum", data: data[keyword], bars: { show: true, fillColor:"#e3e5e5", },#}
+        {#            lines:{show: false}, color: "#e3e5e5", stack: "sum"})#}
       })
 
-      this.createSocialAnalysisGraph("#"+graph_el_id, {}, color_list, graphData);
+      var sumSeries = []
+      for(var i=0; i<graphData.length; i++) {
+        var graphOneSeries = graphData[i]["data"]
+        if(graphOneSeries.length===0) continue
+
+        for (var j = 0; j < graphOneSeries.length; j++) {
+          sumSeries.push([graphOneSeries[j][0], 0])
+        }
+        break;
+      }
+
+      for(var i=0; i<graphData.length; i++){
+        var graphOneSeries = graphData[i]["data"]
+
+        for(var j=0; j<graphOneSeries.length; j++){
+          if(graphOneSeries[j][1]==="null") continue
+          sumSeries[j][1] = sumSeries[j][1] + graphOneSeries[j][1]
+        }
+      }
+      graphData.unshift({label:"sum", data: sumSeries, bars: { show: true, fillColor:"#e3e5e5", },
+                  lines:{show: false}, color: "#e3e5e5", })
+
+      this.createSocialAnalysisGraph("#"+graph_el_id, {}, [], graphData);
 
       //항목 체크박스 선택시 이벤트 핸들러.
       function toggleKeyword(mainObj){
@@ -517,15 +484,41 @@ $(document).ready(function () {
         $("#"+checkbox_el_id).find("input[type='checkbox']").each(function (index) {
           if ($(this).is(":checked")) {
               var keyword = $(this).attr("value")
+              if(keyword!=="sum"){
+                graphData.push({label:keyword, data: data[keyword], color: keyword_color[keyword]})
+              }
 
-              graphData.push({label:keyword, data: data[keyword], color: color_list[index]})
               //위 '처음 그래프 그리기'와 동일한 설명.
-              graphData.unshift({label:"sum", data: data[keyword], bars: { show: true, fillColor:"#e3e5e5", },
-                    lines:{show: false}, color: "#e3e5e5", stack: "sum"})
+              {#graphData.unshift({label:"sum", data: data[keyword], bars: { show: true, fillColor:"#e3e5e5", },#}
+              {#      lines:{show: false}, color: "#e3e5e5", stack: "sum"})#}
           }
         });
 
-        mainObj.createSocialAnalysisGraph("#"+graph_el_id, {}, color_list, graphData);
+        if($("#"+checkbox_el_id).find("input[type='checkbox'][value='sum']").is(":checked")){
+          var sumSeries = []
+          for(var i=0; i<graphData.length; i++) {
+            var graphOneSeries = graphData[i]["data"]
+            if(graphOneSeries.length===0) continue
+
+            for (var j = 0; j < graphOneSeries.length; j++) {
+              sumSeries.push([graphOneSeries[j][0], 0])
+            }
+            break;
+          }
+
+          for(var i=0; i<graphData.length; i++){
+            var graphOneSeries = graphData[i]["data"]
+
+            for(var j=0; j<graphOneSeries.length; j++){
+              if(graphOneSeries[j][1]==="null") continue
+              sumSeries[j][1] = sumSeries[j][1] + graphOneSeries[j][1]
+            }
+          }
+          graphData.unshift({label:"sum", data: sumSeries, bars: { show: true, fillColor:"#e3e5e5", },
+                      lines:{show: false}, color: "#e3e5e5", })
+        }
+
+        mainObj.createSocialAnalysisGraph("#"+graph_el_id, {}, [], graphData);
       }
 
       var mainObj = this
@@ -535,46 +528,516 @@ $(document).ready(function () {
       });
     },
 
+    {#긍부정어 그래프. #}
+    a.prototype.createPosNegGraph = function (a, o, t, r) {
+        t = {
+            bars: {
+              show: true,
+              barWidth: 60*60*24*3*1000,//x축(수평그래프라면 y축)의 단위 기준. 현재 y축이 시간 단위이므로, millisecond단위로 값을 주어야 y축에서 그만큼에 해당하는 넓이를 부여함.
+              horizontal:false,
+              align: "center",
+            },
+            lines:{
+              show:false,
+            },
+            grid: {
+                show: true,
+                aboveData: false,
+                labelMargin: 5,
+                axisMargin: 0,
+                borderWidth: 1,
+                minBorderMargin: 5,
+                clickable: !0,
+                hoverable: !0,
+                autoHighlight: !1,
+                mouseActiveRadius: 20,
+                borderColor: "rgba(65, 80, 95, 0.07)"
+            },
+            series: {
+              stack: false,
+            },
+            legend: {
+                show: false,
+                position: "sw",
+                margin: [0, -40],
+                noColumns: 0,
+                labelBoxBorderColor: null,
+                labelFormatter: function (a, o) {
+                    return a + "&nbsp;&nbsp;"
+                },
+                width: 30,
+                height: 2,
+            },
+            {#yaxis: o.y,#}
+            yaxis: {
+                {#ticks: [0,100,100000],#}
+                {% comment %}tickFormatter: function formatter(val, axis, precision){
+                  if(Math.abs(val) > 1000000000){return (val/10000000000)+"B";}
+                  else if(Math.abs(val) > 1000000){return(val/1000000)+"M";}
+                  else if(Math.abs(val) > 1000){return (val/1000)+"T";}
+                  else{return val;}
+                },{% endcomment %}
+                tickColor: "rgba(65, 80, 95, 0.07)",
+                font: {color: "#8391a2"}
+            },
+            xaxis: {
+              ticks: {{ xaxis_day_list|safe|default:"[]" }},
+              {% comment %}tickFormatter: function (val, axis) {
+                  console.log(val);
+                  console.log(axis)
+                  var d = new Date(val);
+                  return d.getUTCFullYear() + "/" + (d.getUTCMonth()+1);
+              },{% endcomment %}
+              tickColor: "rgba(65, 80, 95, 0.07)",
+              font: {color: "#8391a2"},
+              mode: "time",//x축 시간 타입으로.
+              timeformat: "%Y-%m-%d",//시간 타입 형태.
+              {#minTickSize: [1, "month"],#}
+            },
+            {#xaxis: o.x,#}
+            colors: t,
+            tooltip: true,
+            tooltipOpts: {content: "%s : %x, %y", shifts: {x: -30, y: -50}}//마우스 올려 놓았을 때 작은 설명 모달. %x가 x축 값, .2가 표시할 소수점 자리수.
+        }, b.plot(b(a), r, t)
+    },
+
     a.prototype.init = function () {
-        var o
-        //그래프 색.
-        var color_list = ["#4fc6e1",   "#1abc9c", "#4a81d4", "#f7b84b", "#f1556c", "#4a81d4","#f672a7"]
+      var o
+      //그래프 색.
+      var color_list = ["#4fc6e1", "#1abc9c", "#4a81d4", "#f7b84b", "#f1556c", "#754100", "#444c57", "#ffcbcb", "#ff6347", "#ee82ee", "#fa8072", "#8000080", "#ffff00", "#ff0000"]
 
-        //키워드 체크 박스 색 변경.
-        $(".keyword-checkbox").each(function (){
-          $(this).find("ul > li > div").each(function (idx){
-            //div테두리 색 변경.
-            $(this).css("border", "1px solid "+color_list[idx])
-            //체크 박스 색 변경.
-            var checkboxEl = $(this).find("input[type='checkbox']")
-            var preStyle = checkboxEl.attr("style")
-            checkboxEl.attr("style", preStyle+" background-color: "+color_list[idx]+" !important; border-color: "+color_list[idx]+" !important; ")
-          })
+      //키워드 체크 박스 색 변경.
+      {% comment %}$(".keyword-checkbox").each(function (){
+        $(this).find("ul > li > div").each(function (idx){
+          //div테두리 색 변경.
+          $(this).css("border", "1px solid "+color_list[idx])
+          //체크 박스 색 변경.
+          var checkboxEl = $(this).find("input[type='checkbox']")
+          var preStyle = checkboxEl.attr("style")
+          checkboxEl.attr("style", preStyle+" background-color: "+color_list[idx]+" !important; border-color: "+color_list[idx]+" !important; ")
         })
+      }){% endcomment %}
 
-        {#언급량 전체 추이 그래프. #}
-        var mention_total_count_graph_data = {{ mention_data.total_mention.count_list|safe|default:"{}" }};
-        this.setSocialAnalysisGraphOptAndCreate("total_mention-graph", "total_mention-checkbox", mention_total_count_graph_data, color_list);
+      //키워드 체크 박스 색 설정
+      var keyword_list = {{ keyword_list|safe|default:"[]" }}
+      var keyword_color = {}
+      for(var i=0; i<keyword_list.length; i++){
+        keyword_color[keyword_list[i]] = color_list[i]
+      }
 
-        {#커뮤니티 추이 그래프. #}
-        var community_mention_graph_data = {{ mention_data.community_mention.count_list|safe|default:"{}" }};
-        this.setSocialAnalysisGraphOptAndCreate("community_mention-graph", "community_mention-checkbox", community_mention_graph_data, color_list);
+      $(".keyword-checkbox").each(function (){
+        $(this).find("ul > li > div").each(function (idx){
+          var keyword = $(this).attr("id").split("-")[1]
+          var checkBoxColor = ""
 
-        {#인스타 추이 그래프. #}
-        var insta_mention_graph_data = {{ mention_data.insta_mention.count_list|safe|default:"{}" }};
-        this.setSocialAnalysisGraphOptAndCreate("insta_mention-graph", "insta_mention-checkbox", insta_mention_graph_data, color_list);
+          if(keyword === "sum"){checkBoxColor = "#bfbfbf"}
+          else{checkBoxColor = keyword_color[keyword]}
 
-        {#블로그 추이 그래프. #}
-        var blog_mention_graph_data = {{ mention_data.blog_mention.count_list|safe|default:"{}" }};
-        this.setSocialAnalysisGraphOptAndCreate("blog_mention-graph", "blog_mention-checkbox", blog_mention_graph_data, color_list);
+          //div테두리 색 변경.
+          $(this).css("border", "1px solid "+checkBoxColor)
+          //체크 박스 색 변경.
+          var checkboxEl = $(this).find("input[type='checkbox']")
+          var preStyle = checkboxEl.attr("style")
+          checkboxEl.attr("style", preStyle+" background-color: "+checkBoxColor+" !important; border-color: "+checkBoxColor+" !important; ")
+        })
+      })
 
-        {#뉴스 추이 그래프. #}
-        var news_mention_graph_data = {{ mention_data.news_mention.count_list|safe|default:"{}" }};
-        this.setSocialAnalysisGraphOptAndCreate("news_mention-graph","news_mention-checkbox", news_mention_graph_data, color_list);
+      $("#total_mentionItem .loading").css("display", "none")
+      $("#total_mentionItem .itemContent").css("display", "block")
 
-        {#트위터 추이 그래프. #}
-        var twitter_mention_graph_data = {{ mention_data.twitter_mention.count_list|safe|default:"{}" }};
-        this.setSocialAnalysisGraphOptAndCreate("twitter_mention-graph", "twitter_mention-checkbox", twitter_mention_graph_data, color_list);
+      {#언급량 전체 추이 그래프. #}
+      var mention_total_count_graph_data = {{ mention_data.total_mention.count_list|safe|default:"{}" }};
+      this.setSocialAnalysisGraphOptAndCreate("total_mention-graph", "total_mention-checkbox", mention_total_count_graph_data, keyword_color);
+
+      var mainObj = this
+
+      {#전체 추이 그래프. #}
+      {% comment %}$.ajax({
+        url: "/pages/ajax/socialanalysis/mentionData?lv1=financial&lv2=local_bank&mention_source=total",
+        success: function (data){
+          console.log(data);
+
+          var mention_graph_data = data["mention_data"]["count_list"]
+          mainObj.setSocialAnalysisGraphOptAndCreate("total_mention-graph", "total_mention-checkbox", mention_graph_data, keyword_color);
+        }
+      }){% endcomment %}
+
+      var lv1 = window.location.href.split("socialanalysis/")[1].split("/")[0]
+      var lv2 = window.location.href.split("socialanalysis/")[1].split("/")[1]
+
+      {#커뮤니티 추이 그래프. #}
+      var community_mention_graph_data = {}
+      $.ajax({
+        url: "/pages/ajax/socialanalysis/mentionData?lv1="+lv1+"&lv2="+lv2+"&mention_source=community",
+        success: function (data){
+          console.log(data);
+
+          $("#community_mentionItem .loading").css("display", "none")
+          $("#community_mentionItem .itemContent").css("display", "block")
+
+          community_mention_graph_data = data["mention_data"]["count_list"]
+          mainObj.setSocialAnalysisGraphOptAndCreate("community_mention-graph", "community_mention-checkbox", community_mention_graph_data, keyword_color);
+        }
+      })
+
+      {#인스타 추이 그래프. #}
+      var insta_mention_graph_data = {}
+      $.ajax({
+        url: "/pages/ajax/socialanalysis/mentionData?lv1="+lv1+"&lv2="+lv2+"&mention_source=insta",
+        success: function (data){
+          console.log(data);
+
+          $("#insta_mentionItem .loading").css("display", "none")
+          $("#insta_mentionItem .itemContent").css("display", "block")
+
+          insta_mention_graph_data = data["mention_data"]["count_list"]
+          mainObj.setSocialAnalysisGraphOptAndCreate("insta_mention-graph", "insta_mention-checkbox", insta_mention_graph_data, keyword_color);
+        }
+      })
+
+      {#블로그 추이 그래프. #}
+      var blog_mention_graph_data = {}
+      $.ajax({
+        url: "/pages/ajax/socialanalysis/mentionData?lv1="+lv1+"&lv2="+lv2+"&mention_source=blog",
+        success: function (data){
+          console.log(data);
+
+          $("#blog_mentionItem .loading").css("display", "none")
+          $("#blog_mentionItem .itemContent").css("display", "block")
+
+          blog_mention_graph_data = data["mention_data"]["count_list"]
+          mainObj.setSocialAnalysisGraphOptAndCreate("blog_mention-graph", "blog_mention-checkbox", blog_mention_graph_data, keyword_color);
+        }
+      })
+
+      {#뉴스 추이 그래프. #}
+      var news_mention_graph_data = {}
+      $.ajax({
+        url: "/pages/ajax/socialanalysis/mentionData?lv1="+lv1+"&lv2="+lv2+"&mention_source=news",
+        success: function (data){
+          console.log(data);
+
+          $("#news_mentionItem .loading").css("display", "none")
+          $("#news_mentionItem .itemContent").css("display", "block")
+
+          news_mention_graph_data = data["mention_data"]["count_list"]
+          mainObj.setSocialAnalysisGraphOptAndCreate("news_mention-graph", "news_mention-checkbox", news_mention_graph_data, keyword_color);
+        }
+      })
+
+      {#트위터 추이 그래프. #}
+      var twitter_mention_graph_data = {}
+      $.ajax({
+        url: "/pages/ajax/socialanalysis/mentionData?lv1="+lv1+"&lv2="+lv2+"&mention_source=twitter",
+        success: function (data){
+          console.log(data);
+
+          $("#twitter_mentionItem .loading").css("display", "none")
+          $("#twitter_mentionItem .itemContent").css("display", "block")
+
+          twitter_mention_graph_data = data["mention_data"]["count_list"]
+          mainObj.setSocialAnalysisGraphOptAndCreate("twitter_mention-graph", "twitter_mention-checkbox", twitter_mention_graph_data, keyword_color);
+        }
+      })
+
+      //긍부정어 그래프, 테이블, 워드클라우드.
+      var pos_neg_data = {}
+      $.ajax({
+        url: "/pages/ajax/socialanalysis/posNegData?lv1="+lv1+"&lv2="+lv2+"",
+        success: function (data){
+          console.log(data);
+          pos_neg_data = data
+
+          $("#posNegItem .loading").css("display", "none")
+          $("#posNegItem .itemContent").css("display", "block")
+
+          //워드 클라우드 글자 크기 조정을 위한 데이터 값 조절.
+          for(var keyword in pos_neg_data){
+            var keywordWordCloudData = pos_neg_data[keyword]["wordCloud"]
+
+            //평균값 계산
+            var average = 0
+            var sum = 0
+            for(var i=0; i<keywordWordCloudData.length; i++){
+              var cloudKeyword = keywordWordCloudData[i]
+              sum += cloudKeyword[3]
+
+              {#cloudKeyword[1] = parseInt((cloudKeyword[1] / (keywordWordCloudData[0][3]/1500))/10)#}
+            }
+            average = parseInt(sum/30)
+
+            //데이터 조절.
+            for(var i=0; i<keywordWordCloudData.length; i++){
+              var cloudKeyword = keywordWordCloudData[i]
+
+              {#cloudKeyword[1] = parseInt((cloudKeyword[1] / (average/400))/10)#}
+              cloudKeyword[1] = parseInt((cloudKeyword[1] / (keywordWordCloudData[0][3]/1500))/10)
+            }
+          }
+
+
+          {#긍부정어 이벤츠 처리. #}
+          function changePosNegKeyword(target, mainObj){
+            var keyword = ""
+            if(target===null){keyword = $("#posNegKeywordRadio input[type='radio']:last").val()}
+            else{keyword = $(target).val()}
+            {#var pos_neg_data = {{ pos_neg_data|safe|default:"{}" }}#}
+            var keywordData = pos_neg_data[keyword]
+
+            //워드 클라우드 변경.
+            var wordCloudOpt = {
+              list : keywordData["wordCloud"],
+              color: function (word, weight, fontSize, distance, theta, data1){
+                if(data1[0] === "POS"){return "blue";}
+                else if(data1[0] === "NEG"){return "red";}
+                else if(data1[0] === "NEU"){return "gray";}
+                else{return "gray";}
+              },
+              backgroundColor: null,
+              drawOutOfBound: false,
+              shrinkToFit: true,
+              gridSize: 40,
+              {#minSize: 15,//최종적으로 렌더링 전에 걸러낼 글자 크기값. (15px 이하인 단어는 보이지 않음)#}
+              maxRotation: 0,
+              minRotation: 0,//minRotation, maxRotation을 동일하게 하여 모든 단어 회전률 동일하게.
+              {% comment %}hover: function (item, dimension, event){
+                //단어 언급량 작은 모달?
+                return
+              }{% endcomment %}
+            }
+            WordCloud.minFontSize = 1
+            WordCloud(document.getElementById("wordCloud"), wordCloudOpt)
+
+            //테이블 변경.
+            var posNegTable
+            if(target === null){
+              posNegTable = $("#posNegTable").DataTable({
+                scrollX: "100%",
+                scrollY: "600px",
+                scrollCollapse: true,
+                paging: false,
+                ordering: true,
+                order: [[2, "dec"]],
+                {#rowGroup: false,#}
+                {#responsive: false,#}
+                {#fixedHeader:false,#}
+                fixedColumns: { left: "1" },
+                language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+                {#drawCallback: function () { $(".dataTables_paginate > .pagination").addClass("pagination-rounded") }#}
+              });
+            }
+            else{posNegTable = $("#posNegTable").DataTable()}
+
+            var tableData = keywordData["table"]//선택된 기간에 해당하는 wcp데이터 추출.
+            var newRows = []
+            for(var temp_i=0; temp_i<tableData.length; temp_i++){//추출한 데이터(dict형)를 테이블에 삽입할 Array형태로 정제.
+              var row = tableData[temp_i]
+              newRows.push([row[0], row[1], row[3]])
+            }
+
+            posNegTable.clear()//기존 데이터 row들 삭제.
+            posNegTable.rows.add(newRows).draw()//정제된 데이터 삽입.
+
+            //그래프 변경.
+            var graphData = new Array;
+
+            var graphData = keywordData["graph"]
+            var graphData2 = []
+            graphData2.push({label:"긍정", data: graphData["pos"], color:"blue", stack:"posNeg"})
+            graphData2.push({label:"부정", data: graphData["neg"], color:"red", stack:"posNeg"})
+            graphData2.push({label:"중립", data: graphData["neu"], color:"yellow", stack:"posNeg"})
+
+            mainObj.createPosNegGraph("#posNegGraph", {}, color_list, graphData2);
+          }
+
+          $("#posNegKeywordRadio input[type='radio']").click(function (){
+            changePosNegKeyword($(this), mainObj)
+          })
+          changePosNegKeyword(null, mainObj)
+
+        }
+      })
+
+
+
+      //엑셀 다운
+      function dataToExcel(excelTitle, excelColumn, excelData){
+        // ArrayBuffer 만들어주는 함수
+        function s2ab(s) {
+            var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+            var view = new Uint8Array(buf);  //create uint8array as viewer
+            for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+            return buf;
+        }
+
+        // workbook 생성
+        var wb = XLSX.utils.book_new();
+
+        // 문서 속성세팅 ( 윈도우에서 엑셀 오른쪽 클릭 속성 -> 자세히에 있는 값들
+        // 필요 없으면 안써도 괜찮다.
+        wb.Props = {
+            Title: "title",
+            Subject: "subject",
+            Author: "programmer93",
+            Manager: "Manager",
+            Company: "Company",
+            Category: "Category",
+            Keywords: "Keywords",
+            Comments: "Comments",
+            LastAuthor: "programmer93",
+            CreatedDate: new Date(2021,1,13)
+        };
+
+        // sheet명 생성
+        wb.SheetNames.push("sheet 1");
+        // wb.SheetNames.push("sheet 2"); // 시트가 여러개인 경우
+
+        var excelRowList = []
+        excelColumn.unshift(null)
+        excelRowList.push(excelColumn)
+
+        for(var i=0; i<excelData.length; i++){
+          excelRowList.push(excelData[i])
+        }
+
+        var wsData = excelRowList;
+      // var wsData2 = [['가1' , '가2', '가3'],['나1','나2','나3']];	// 시트가 여러개인 경우
+
+        // 배열 데이터로 시트 데이터 생성
+        var ws = XLSX.utils.aoa_to_sheet(wsData);
+      // var ws2 = XLSX.utils.aoa_to_sheet(wsData2); 	//시트가 여러개인 경우
+
+        // 시트 데이터를 시트에 넣기 ( 시트 명이 없는 시트인경우 첫번째 시트에 데이터가 들어감 )
+        wb.Sheets["sheet 1"] = ws;
+        // wb.Sheets["sheet 2"] = ws2;	//시트가 여러개인 경우
+
+        // 엑셀 파일 쓰기
+        var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+
+        // 파일 다운로드
+        saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), excelTitle+'.xlsx');
+      }
+
+      function transDataForm(socialData, title){
+        // 이중 배열 형태로 데이터가 들어간다.
+        var excelData = socialData
+        var baseDate = []
+        var keywordList = []
+        var excelRowList = []
+        var keywordDataList = []
+        for(var key in excelData){
+          keywordList.push(key)
+          keywordDataList.push(excelData[key])
+          if(excelData[key].length !== 0){baseDate = excelData[key]}
+        }
+
+        for(var i=0; i<baseDate.length; i++){
+          var excelRow = []
+
+          var date = baseDate[i][0]
+          excelRow.push((new Date(date)).toISOString().split("T")[0])
+
+          for(var j=0; j<keywordDataList.length; j++){
+            if(keywordDataList[j].length-1 < i){excelRow.push(null)}
+            else{
+              var value = keywordDataList[j][i][1]
+              if(value === "null"){value = null}
+
+              excelRow.push(value)
+            }
+
+          }
+          excelRowList.push(excelRow)
+        }
+        dataToExcel(title, keywordList, excelRowList)
+      }
+
+      $("#total_mentionExcelBtn").click(function (){
+        transDataForm(mention_total_count_graph_data, "전체_언급량")
+      })
+
+      $("#community_mentionExcelBtn").click(function (){
+        transDataForm(community_mention_graph_data, "커뮤니티_언급량")
+      })
+
+      $("#insta_mentionExcelBtn").click(function (){
+        transDataForm(insta_mention_graph_data, "인스타_언급량")
+      })
+
+      $("#blog_mentionExcelBtn").click(function (){
+        transDataForm(blog_mention_graph_data, "블로그_언급량")
+      })
+
+      $("#news_mentionExcelBtn").click(function (){
+        transDataForm(news_mention_graph_data, "뉴스_언급량")
+      })
+
+      $("#twitter_mentionExcelBtn").click(function (){
+        transDataForm(twitter_mention_graph_data, "트위터_언급량")
+      })
+
+      $("#posNegTableExcelBtn").click(function (){
+        var keyword = $("#posNegKeywordRadio input[type='radio']:checked").val()
+        var targetData = pos_neg_data[keyword]["table"]
+        var excelTitle = "긍부정_단어_리스트"
+        var excelColumnList = ["단어", "긍부정", "건수"]
+        var excelDataList = []
+
+        for(var i=0; i<targetData.length; i++){
+          var data = targetData[i]
+          var posNeg = ""
+
+          if(data[1] === "POS"){posNeg = "긍정"}
+          else if(data[1] === "NEG"){posNeg = "부정"}
+          else if(data[1] === "NEU"){posNeg = "중립"}
+
+          excelDataList.push([i+1, data[0], posNeg, data[3]])
+        }
+
+        dataToExcel(excelTitle, excelColumnList, excelDataList)
+      })
+
+      $("#posNegGraphExcelBtn").click(function (){
+        var keyword = $("#posNegKeywordRadio input[type='radio']:checked").val()
+        var term_list = pos_neg_data[keyword]["graph"]["term_list"]
+        var posList = pos_neg_data[keyword]["graph"]["pos"]
+        var negList = pos_neg_data[keyword]["graph"]["neg"]
+        var neuList = pos_neg_data[keyword]["graph"]["neu"]
+
+        var excelRowList = []
+
+        for(var i=0; i<term_list.length; i++){
+          var excelRow = []
+          var currentTerm = term_list[i]
+          var termDate = new Date(currentTerm)
+          var termDateEnd = new Date(currentTerm)
+          termDateEnd = new Date(termDateEnd.setDate(termDate.getDate() + 7))
+
+          excelRow.push(termDate.toISOString().split("T")[0] + "~" + termDateEnd.toISOString().split("T")[0])
+
+          if(posList[0][0]===currentTerm){
+            var currentPos = posList.shift()
+            excelRow.push(currentPos[1])
+          }
+          else{excelRow.push(0)}
+
+          if(negList[0][0]===currentTerm){
+            var currentPos = negList.shift()
+            excelRow.push(currentPos[1])
+          }
+          else{excelRow.push(0)}
+
+          if(neuList[0][0]===currentTerm){
+            var currentPos = neuList.shift()
+            excelRow.push(currentPos[1])
+          }
+          else{excelRow.push(0)}
+
+          excelRowList.push(excelRow)
+        }
+
+        dataToExcel("긍부정_개수", ["긍정", "부정", "중립"], excelRowList)
+      })
 
 
 
@@ -609,72 +1072,6 @@ $(document).ready(function () {
 <!-- Init js -->
 {#<script src="{% static 'js/pages/range-sliders.init.js' %}"></script>#}
   <script>
-    //평균급여 및 종업원 수 > 기간 바 렌더링.
-    var wcp_term_list = {{ wcp_term_list|safe|default:"[]" }}
-    var wcp_list = {{ wcp_list|safe|default:"[]" }}
-
-    $("#wcp_term_list_range").ionRangeSlider({
-        grid: !0,
-        from: wcp_term_list.length,
-        values: wcp_term_list
-    })
-
-    //평균급여 및 종업원 수 분기별 테이블 변경 이벤트 처리.
-    $("#wcp_term_list_range").change(function () {//항목에 클릭 이벤트 핸들러 정의.
-        var termName = $(this).val();//선택된 기간 값 가져오기.
-        var table = $("#wcp-table").DataTable();
-
-        var targetData = wcp_list[termName]//선택된 기간에 해당하는 wcp데이터 추출.
-        var newRows = []
-        for(var temp_i=0; temp_i<Object.keys(targetData).length; temp_i++){//추출한 데이터(dict형)를 테이블에 삽입할 Array형태로 정제.
-          var category = Object.keys(targetData)[temp_i]//키값인 카테고리 추출.
-          var value_list = Object.values(targetData[category])//value를 array로 변경.
-          value_list.unshift(category)//카테고리값 array 맨 앞에 추가.
-
-          newRows.push(value_list)//삽입할 데이터 변수에 추가.
-        }
-
-        table.clear()//기존 데이터 row들 삭제.
-        table.rows.add(newRows).draw()//정제된 데이터 삽입.
-    });
-
-    //이사회 임원 및 평균 보수 > 기간 바 렌더링.
-    var board_member_term_list = {{ board_member_data.term_list|safe|default:"[]" }}
-    var board_member_list = {{ board_member_data.list|safe|default:"[]" }}
-    var bm_personal_wage_list = {{ bm_personal_wage_data.list|safe|default:"[]" }}
-
-    $("#board_member_term_list_range").ionRangeSlider({
-        grid: !0,
-        from: board_member_term_list.length,
-        values: board_member_term_list
-    })
-
-    //이사회 임원 및 평균 보수 분기별 테이블 변경 이벤트 처리.
-    $("#board_member_term_list_range").change(function () {//항목에 클릭 이벤트 핸들러 정의.
-        var termName = $(this).val();//선택된 기간 값 가져오기.
-        var member_list_table = $("#board-member-table").DataTable();
-        var member_wage_table = $("#bm-personal-wage-table").DataTable();
-
-        var memberListTargetData = board_member_list[termName]//선택된 기간에 해당하는 wcp데이터 추출.
-        var memberListNewRows = []
-        for(var temp_i=0; temp_i<memberListTargetData.length; temp_i++){//추출한 데이터(dict형)를 테이블에 삽입할 Array형태로 정제.
-          memberListNewRows.push(memberListTargetData[temp_i])//삽입할 데이터 변수에 추가.
-        }
-
-        var memberWageTargetData = bm_personal_wage_list[termName]
-        var memberWageNewRows = []
-        if(memberWageTargetData !== undefined){
-          for(var temp_i=0; temp_i<memberWageTargetData.length; temp_i++){
-            memberWageNewRows.push(memberWageTargetData[temp_i])
-          }
-        }
-
-        member_list_table.clear()//기존 데이터 row들 삭제.
-        member_list_table.rows.add(memberListNewRows).draw()//정제된 데이터 삽입.
-
-        member_wage_table.clear()
-        member_wage_table.rows.add(memberWageNewRows).draw()
-    });
 
 
   </script>

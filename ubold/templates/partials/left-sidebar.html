@@ -72,13 +72,6 @@
         </li>
 
         <li>
-          <a href="{% url 'apps:calendar' %}">
-            <i data-feather="users"></i>
-            <span> 소셜분석 </span>
-          </a>
-        </li>
-
-        <li>
           <a href="#sidebarMultilevel" data-bs-toggle="collapse">
             <i data-feather="share-2"></i>
             <span> 소셜 분석 </span>
@@ -96,7 +89,8 @@
                     <li> <a href="/pages/socialanalysis/financial/local_bank">지방 은행</a> </li>
                     <li> <a href="/pages/socialanalysis/financial/non_face_to_face_bank">비대면 은행</a> </li>
                     <li> <a href="/pages/socialanalysis/financial/stock">증권</a> </li>
-                    <li> <a href="/pages/socialanalysis/financial/insurance">보험</a></li>
+                    <li> <a href="/pages/socialanalysis/financial/life_insurance">생명 보험</a></li>
+                    <li> <a href="/pages/socialanalysis/financial/fire_insurance">생명 보험</a></li>
                     <li> <a href="/pages/socialanalysis/financial/card">카드</a></li>
                     <li> <a href="/pages/socialanalysis/financial/capital">캐피탈</a></li>
                   </ul>
@@ -109,7 +103,8 @@
                 </a>
                 <div class="collapse" id="circulation-multilevel">
                   <ul class="nav-second-level">
-                    <li> <a href="/pages/socialanalysis/circulation/mart">백화점/마트</a> </li>
+                    <li> <a href="/pages/socialanalysis/circulation/department_store">백화점</a> </li>
+                    <li> <a href="/pages/socialanalysis/circulation/market">대형마트</a> </li>
                     <li> <a href="/pages/socialanalysis/circulation/convenience">편의점</a> </li>
                     <li> <a href="/pages/socialanalysis/circulation/ecommerce">e커머스</a></li>
                     <li> <a href="/pages/socialanalysis/circulation/parcel">택배</a></li>
@@ -123,7 +118,8 @@
                 </a>
                 <div class="collapse" id="car-multilevel">
                   <ul class="nav-second-level">
-                    <li> <a href="/pages/socialanalysis/car/company">회사명</a> </li>
+                    <li> <a href="/pages/socialanalysis/car/domesticCompany">국내회사</a> </li>
+                    <li> <a href="/pages/socialanalysis/car/foreignCompany">해외회사</a> </li>
                     <li> <a href="/pages/socialanalysis/car/car">승용차</a> </li>
                     <li> <a href="/pages/socialanalysis/car/suv">SUV</a></li>
                     <li> <a href="/pages/socialanalysis/car/imported">수입차</a></li>
@@ -136,13 +132,14 @@
                 <a href="#food-beverage-multilevel" data-bs-toggle="collapse">
                   식음료 <span class="menu-arrow"></span>
                 </a>
-                <div class="collapse" id="#food-beverage-multilevel">
+                <div class="collapse" id="food-beverage-multilevel">
                   <ul class="nav-second-level">
-                    <li> <a href="/pages/socialanalysis/food-beverage/company">회사명</a> </li>
-                    <li> <a href="/pages/socialanalysis/food-beverage/ramen">라면</a> </li>
-                    <li> <a href="/pages/socialanalysis/food-beverage/rice">밥</a></li>
-                    <li> <a href="/pages/socialanalysis/food-beverage/alcohol">주류</a></li>
-                    <li> <a href="/pages/socialanalysis/food-beverage/franchise">프렌차이즈</a></li>
+                    <li> <a href="/pages/socialanalysis/food/company">회사명</a> </li>
+                    <li> <a href="/pages/socialanalysis/food/ramen">라면</a> </li>
+                    <li> <a href="/pages/socialanalysis/food/rice">밥</a></li>
+                    <li> <a href="/pages/socialanalysis/food/soju">주류</a></li>
+                    <li> <a href="/pages/socialanalysis/food/beer">주류</a></li>
+                    <li> <a href="/pages/socialanalysis/food/franchise">프렌차이즈</a></li>
                   </ul>
                 </div>
               </li>
@@ -153,7 +150,7 @@
                 </a>
                 <div class="collapse" id="group-company-multilevel">
                   <ul class="nav-second-level">
-                    <li> <a href="javascript: void(0);"></a> </li>
+                    <li> <a href="/pages/socialanalysis/groupCompany/majorGroup">주요 그룹사</a> </li>
                     <li> <a href="javascript: void(0);"></a> </li>
                     <li> <a href="javascript: void(0);"></a></li>
                     <li> <a href="javascript: void(0);"></a></li>
