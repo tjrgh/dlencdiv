@@ -306,6 +306,7 @@ class FinancialStatement(TimeStampMixin):
     this_term_name = models.CharField(max_length=100, help_text='당기 명')
     subject_name = models.CharField(max_length=10, help_text='재무제표명')
     account_id = models.CharField(max_length=500, help_text='계정 ID')
+    parent_account_id = models.CharField(max_length=500, null=True, blank=True, help_text="상위 account_id")
     account_name = models.CharField(max_length=100, help_text='계정명')
     account_level = models.IntegerField(help_text='LV')
     this_term_amount = models.DecimalField(

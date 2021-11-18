@@ -105,7 +105,7 @@
               {% for row in stock_data_list %}
                 <tr>
 {#                  <td style="width:10px"><a href="/pages/companyinfo/{% url 'pages:company-info-detail' code=row.11 %}">{{ row.0}}</a></td>#}
-                  <td style="width:10px"><a href="/pages/companyinfo/{{ row.11 }}">{{ row.0}}</a></td>
+                  <td style="width:10px"><a href="/pages/companyinfo/{{ row.11 }}?searchKeyword={{ row.0 }}">{{ row.0}}</a></td>
                   <td style="width:10px">{{ row.1 }}</td>
                   <td style="width:10px">{{ row.2 }}</td>
                   <td style="width:5px">{{ row.3 }}</td>
@@ -201,7 +201,7 @@
             <thead>
               <tr>
                 <th style="
-                  {#width:10px;#}
+                  width:20px;
                   position: sticky;
                   left: 0;
                   z-index: 99;
@@ -270,12 +270,11 @@
             <table
             id="balance_sheet_table"
             class="table nowrap w-100"
-            style="display: none;"
           >
             <thead>
               <tr>
                 <th style="
-                  {#width:10px;#}
+                  width:20px;
                   position: sticky;
                   left: 0;
                   z-index: 99;
@@ -349,7 +348,7 @@
             <thead>
               <tr>
                 <th style="
-                  {#width:10px;#}
+                  width:20px;
                   position: sticky;
                   left: 0;
                   z-index: 99;
@@ -433,10 +432,14 @@
                 <tr>
                   <td style="width:20px">{{ notice.title }}</td>
                   <td style="width:10px">{{ notice.data_date }}</td>
-                  <td style="width:5px"><a href="http://dart.fss.or.kr/dsaf001/main.do?rcpNo={{ notice.receipt_no }}">링크</a></td>
+                  <td style="width:5px"><a href="http://dart.fss.or.kr/dsaf001/main.do?rcpNo={{ notice.receipt_no }}" target="_blank">링크</a></td>
                 </tr>
               {% endfor %}
-
+              <tr>
+                <td style="width:20px">샘플 링크 제목</td>
+                <td style="width:10px">샘플 링크 날짜</td>
+                <td style="width:5px"><a href="http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20210317000578" target="_blank">샘플 링크</a></td>
+              </tr>
             </tbody>
           </table>
           </div>
@@ -478,12 +481,12 @@
             <div style="display: flex; justify-content: center;">
               <div
                 id="shareholder-graph"
-                style="height: 1500px; width:90%; display:inline-block;"
+                style="height: 900px; width:90%; display:inline-block;"
   {#              class="mt-5"#}
                 data-colors="#4fc6e1,#f7b84b,#4a81d4"
               ></div>
               <div id="shareholder-legend" style="
-                height: 1500px;
+                height: 900px;
                 width:10%;
               "></div>
             </div>
@@ -499,54 +502,51 @@
       <div class="card">
         <div id=shareholderTableItem" class="card-body">
           <h4 class="header-title">주주 정보</h4>
-          <p class="text-muted font-13 mb-4">
-            주주 정보
-          </p>
 
-          <div class="loading">
+          <div class="loading" style="display:none">
             <div class="spinner-border avatar-md"></div>
           </div>
 
-          <div class="itemContent">
+          <div class="itemContent" style="display: block">
             <table
-            id="shareholder-table"
-            class="table w-100 nowrap"
-          >
-            <thead>
-              <tr>
-                <th style="
-                  {#width:10px;#}
-                  position: sticky;
-                  left: 0;
-                  z-index: 99;
-                  background-color: #e8e8e8;
-                  {#border-right: 1px solid gray;#}
-                ">항목명</th>
-                {%  for term in shareholder_term_list %}
-                  <th style="width:2px">{{ term }}</th>
-                {% endfor %}
-              </tr>
-            </thead>
-
-            <tbody>
-              {% for shareholder_name, value_list in shareholder_list.items %}
+              id="shareholder-table"
+              class="table w-100 nowrap"
+            >
+              <thead>
                 <tr>
-                  <td style="
-                    {#width:10px;#}
+                  <th style="
+                    width:20px;
                     position: sticky;
                     left: 0;
                     z-index: 99;
                     background-color: #e8e8e8;
                     {#border-right: 1px solid gray;#}
-                  ">{{ shareholder_name }}</td>
-                  {%  for term, value in value_list.items %}
-                    <td style="width:2px">{{ value }}</td>
+                  ">항목명</th>
+                  {%  for term in shareholder_term_list %}
+                    <th style="width:2px">{{ term }}</th>
                   {% endfor %}
                 </tr>
-              {% endfor %}
+              </thead>
 
-            </tbody>
-          </table>
+              <tbody>
+                {% for shareholder_name, value_list in shareholder_list.items %}
+                  <tr>
+                    <td style="
+                      {#width:10px;#}
+                      position: sticky;
+                      left: 0;
+                      z-index: 99;
+                      background-color: #e8e8e8;
+                      {#border-right: 1px solid gray;#}
+                    ">{{ shareholder_name }}</td>
+                    {%  for term, value in value_list.items %}
+                      <td style="width:2px">{{ value }}</td>
+                    {% endfor %}
+                  </tr>
+                {% endfor %}
+
+              </tbody>
+            </table>
           </div>
 
         </div>
@@ -622,7 +622,7 @@
             <thead>
               <tr>
                 <th style="
-                  {#width:10px;#}
+                  width:10px;
                   position: sticky;
                   left: 0;
                   z-index: 99;
@@ -1040,6 +1040,7 @@ $(document).ready(function () {
         scrollCollapse: true,
         {#paging: true,#}
         searching: false,
+        lengthChange: false,
         language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
         drawCallback: function () {
             $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
@@ -1333,7 +1334,7 @@ $(document).ready(function () {
     },
 
       {#      배당 정보 그래프 #}
-      a.prototype.createDividendGraph = function (a, o, t, r) {
+      a.prototype.createDividendGraph = function (a, o, t, r, xaxis) {
         t = {
             bars: {
               show: false,
@@ -1386,10 +1387,13 @@ $(document).ready(function () {
                   else{return val;}
                 },{% endcomment %}
                 tickColor: "rgba(65, 80, 95, 0.07)",
-                font: {color: "#8391a2"}
+                font: {color: "#8391a2"},
+                tickFormatter: function (val, axis){
+                  return val.toLocaleString()
+                }
             },
             xaxis: {
-              ticks: {{ dividend_graph_timestamp_list|safe|default:"[]" }},
+              ticks: xaxis,
               {% comment %}tickFormatter: function (val, axis) {
                   console.log(val);
                   console.log(axis)
@@ -1537,6 +1541,9 @@ $(document).ready(function () {
                   else{return val;}
                 },{% endcomment %}
                 tickColor: "rgba(65, 80, 95, 0.07)",
+                tickFormatter: function (val, axis){
+                  return val.toLocaleString()
+                },
                 font: {color: "#8391a2"}
             },
             xaxis: {
@@ -1584,12 +1591,6 @@ $(document).ready(function () {
             colors: e,
             tooltipOpts: {
                 defaultTheme: !(r = [
-                  {#{#}
-                  {#  label: t[0],#}
-                  {#  data: r[0],#}
-                  {#  color: e[0],#}
-                  {#  lines: {show: !0, fill: !0},#}
-                  {#  points: {show: !0} },#}
                   {
                     label: t[0],
                     data: r[0],
@@ -1612,10 +1613,23 @@ $(document).ready(function () {
                 }, width: 30, height: 2
             },
             yaxes: [
-              { axisLabel: "Point Value (1000)", position: "right",tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#f1556c"}},
-              { axisLabel: "Point Value (1000)", position: "left", tickColor: "rgba(241,114,43,0.07)", font: {color: "#4d7cd7"}}
+              {
+                axisLabel: "Point Value (1000)", position: "right",tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#f1556c"},
+                tickFormatter: function (val, axis){
+                  return val.toLocaleString()
+                }
+              },
+              {
+                axisLabel: "Point Value (1000)", position: "left", tickColor: "rgba(241,114,43,0.07)", font: {color: "#4d7cd7"},
+                tickFormatter: function (val, axis){
+                  return val.toLocaleString()
+                }
+              }
             ],
-            xaxis: {axisLabel: "Daily Hours", ticks: o, tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#f37e2d"}}
+            xaxis: {
+              axisLabel: "Daily Hours", ticks: o, tickColor: "rgba(65, 80, 95, 0.07)", font: {color: "#f37e2d"},
+
+            }
         }, b.plot(b(a), r, o)
     },
     a.prototype.init = function () {
@@ -1658,7 +1672,7 @@ $(document).ready(function () {
             var input_trade_volume_list = []
             var input_close_price_list = []
             var price_date_list = []
-            for(var temp=0; temp<trade_volume_list.length;temp++){
+            for(var temp=0; temp<trade_volume_list.length; temp++){
               input_trade_volume_list.push([temp, trade_volume_list[temp]])
               input_close_price_list.push([temp, close_price_list[temp]])
               {#price_date_list.push([temp, price_data_date[temp]])#}
@@ -1791,8 +1805,16 @@ $(document).ready(function () {
             var incomeStatement = data["balance_sheet"]
 
             for(var i=0; i<incomeStatementTermList.length; i++){
+              var termName = incomeStatementTermList[i]
+              var columnName = termName.substring(2, 4)
+              switch (termName.substring(5, 7)){
+                case "03": columnName = columnName + "Q1"; break;
+                case "06": columnName = columnName + "Q2"; break;
+                case "09": columnName = columnName + "Q3"; break;
+                case "12": columnName = columnName + "Q4"; break;
+              }
               $("#balance_sheet_table > thead > tr").append(
-                "<th style='width:2px'>"+incomeStatementTermList[i]+"</th>"
+                "<th style='width:2px'>"+columnName+"</th>"
               )
             }
 
@@ -1804,6 +1826,17 @@ $(document).ready(function () {
               ordering: false,
               fixedColumns: { left: "1" },
               language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+              columnDefs:[{
+                targets: "_all",
+                render: function (data, type, row, meta){
+                  if(meta["col"] === 0){return data}
+                  else{
+                    var value = parseInt(data.replaceAll(",", ""))
+                    if(Math.abs(parseInt(value/100000000)) > 0){return (value/100000000).toFixed(2) + "억"}
+                    else{return data}
+                  }
+                }
+              }],
               drawCallback: function () { $(".dataTables_paginate > .pagination").addClass("pagination-rounded") }
             })
 
@@ -1839,8 +1872,16 @@ $(document).ready(function () {
             var incomeStatement = data["income_statement"]
 
             for(var i=0; i<incomeStatementTermList.length; i++){
+              var termName = incomeStatementTermList[i]
+              var columnName = termName.substring(2, 4)
+              switch (termName.substring(5, 7)){
+                case "03": columnName = columnName + "Q1"; break;
+                case "06": columnName = columnName + "Q2"; break;
+                case "09": columnName = columnName + "Q3"; break;
+                case "12": columnName = columnName + "Q4"; break;
+              }
               $("#income_statement_table > thead > tr").append(
-                "<th style='width:2px'>"+incomeStatementTermList[i]+"</th>"
+                "<th style='width:2px'>"+columnName+"</th>"
               )
             }
 
@@ -1851,6 +1892,17 @@ $(document).ready(function () {
               paging: false,
               ordering: false,
               fixedColumns: { left: "1" },
+              columnDefs:[{
+                targets: "_all",
+                render: function (data, type, row, meta){
+                  if(meta["col"] === 0){return data}
+                  else{
+                    var value = parseInt(data.replaceAll(",", ""))
+                    if(Math.abs(parseInt(value/100000000)) > 0){return (value/100000000).toFixed(2) + "억"}
+                    else{return data}
+                  }
+                }
+              }],
               language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
               drawCallback: function () { $(".dataTables_paginate > .pagination").addClass("pagination-rounded") }
             })
@@ -1887,8 +1939,16 @@ $(document).ready(function () {
             var incomeStatement = data["cashflow_statement"]
 
             for(var i=0; i<incomeStatementTermList.length; i++){
+              var termName = incomeStatementTermList[i]
+              var columnName = termName.substring(2, 4)
+              switch (termName.substring(5, 7)){
+                case "03": columnName = columnName + "Q1"; break;
+                case "06": columnName = columnName + "Q2"; break;
+                case "09": columnName = columnName + "Q3"; break;
+                case "12": columnName = columnName + "Q4"; break;
+              }
               $("#cashflow_statement_table > thead > tr").append(
-                "<th style='width:2px'>"+incomeStatementTermList[i]+"</th>"
+                "<th style='width:2px'>"+columnName+"</th>"
               )
             }
 
@@ -1900,6 +1960,17 @@ $(document).ready(function () {
               ordering: false,
               fixedColumns: { left: "1" },
               language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+              columnDefs:[{
+                targets: "_all",
+                render: function (data, type, row, meta){
+                  if(meta["col"] === 0){return data}
+                  else{
+                    var value = parseInt(data.replaceAll(",", ""))
+                    if(Math.abs(parseInt(value/100000000)) > 0){return (value/100000000).toFixed(2) + "억"}
+                    else{return data}
+                  }
+                }
+              }],
               drawCallback: function () { $(".dataTables_paginate > .pagination").addClass("pagination-rounded") }
             })
 
@@ -1944,13 +2015,13 @@ $(document).ready(function () {
               }
             })
 
-            var newRowList = []
+            {% comment %}var newRowList = []
             for(var i=0; i<noticeList.length; i++){
               newRowList.push(noticeList[i])
             }
 
             table.clear()//기존 데이터 row들 삭제.
-            table.rows.add(newRowList).draw()//정제된 데이터 삽입.
+            table.rows.add(newRowList).draw()//정제된 데이터 삽입.{% endcomment %}
           }
         })
 
@@ -1962,8 +2033,8 @@ $(document).ready(function () {
 
             $("#shareholderGraphItem .loading").css("display","none")
             $("#shareholderGraphItem .itemContent").css("display", "block")
-            $("#shareholderTableItem .loading").css("display","none")
-            $("#shareholderTableItem .itemContent").css("display", "block")
+            $("#shareholderTableItem .loading").css("display","none;")
+            $("#shareholderTableItem .itemContent").attr("display","block;")
 
             var shareholderTermList = data["shareholder_term_list"]
 
@@ -1997,31 +2068,78 @@ $(document).ready(function () {
               var shareholder_graph_timestamp_list = data["shareholder_graph_timestamp_list"]
               shareholder_graph_timestamp_list = shareholder_graph_timestamp_list.slice(parseInt(term_start_idx), parseInt(term_end_idx)+1)
 
-              var e = new Array
+              //가장 최근 분기의 지분을 기준으로 내림차순 정렬.
+              var sortedList = []
+              for(var shareholderName in shareholder_graph_data){
+                sortedList.push([shareholderName, shareholder_graph_data[shareholderName]])
+              }
+              sortedList.sort(function (a, b){
+                var termDataList1 = a[1]
+                var termDataList2 = b[1]
+
+                if(termDataList1[term_end_idx][0] < termDataList2[term_end_idx][0]){return 1}
+                else if(termDataList1[term_end_idx][0] > termDataList2[term_end_idx][0]){ return -1}
+                else{return 0}
+              })
+
+              var graphInputFormattedData = new Array
+              for(var i=0; i<sortedList.length; i++){
+                var row = sortedList[i]
+                graphInputFormattedData.push({label:row[0], data: row[1].slice(parseInt(term_start_idx), parseInt(term_end_idx)+1), stack:"bb"})
+              }
+
+              {% comment %}var e = new Array
               for( var temp_key in shareholder_graph_data){
                 e.push({label:temp_key, data: shareholder_graph_data[temp_key].slice(parseInt(term_start_idx), parseInt(term_end_idx)+1), stack:"bb"})
-              }
+              }{% endcomment %}
+              $("#shareholder-graph").css("height", (graphInputFormattedData[0]["data"].length * 30)+"px")
+              $("#shareholder-legend").css("height", (graphInputFormattedData.length * 25)+"px")
               a = ["#4fc6e1", "#f7b84b", "#4a81d4"], (o = b("#shareholder-graph").data("colors")) && (a = o.split(",")), mainObj.createShareholderGraph("#shareholder-graph",
-                      shareholder_graph_timestamp_list, a, e);
+                      shareholder_graph_timestamp_list, a, graphInputFormattedData);
             });
 
             {#주주 정보 그래프 (처음 페이지 들어올시) #}
             var shareholder_graph_data = data["shareholder_graph_data"]
             var shareholder_graph_timestamp_list = data["shareholder_graph_timestamp_list"]
-            var e = new Array
-            for( var temp_key in shareholder_graph_data){
-              e.push({label:temp_key, data: shareholder_graph_data[temp_key], stack:"bb"})
-            }
-            a = ["#4fc6e1", "#f7b84b", "#4a81d4"], (o = b("#shareholder-graph").data("colors")) && (a = o.split(",")), mainObj.createShareholderGraph("#shareholder-graph",
-                    shareholder_graph_timestamp_list, a, e);
 
+            //가장 최근 분기의 지분을 기준으로 내림차순 정렬.
+            var sortedList = []
+            for(var shareholderName in shareholder_graph_data){
+              sortedList.push([shareholderName, shareholder_graph_data[shareholderName]])
+            }
+            sortedList.sort(function (a, b){
+              var termDataList1 = a[1]
+              var termDataList2 = b[1]
+
+              if(termDataList1[termDataList1.length-1][0] < termDataList2[termDataList2.length-1][0]){return 1}
+              else if(termDataList1[termDataList1.length-1][0] > termDataList2[termDataList2.length-1][0]){ return -1}
+              else{return 0}
+            })
+
+            var graphInputFormattedData = new Array
+            for(var i=0; i<sortedList.length; i++){
+              var row = sortedList[i]
+              graphInputFormattedData.push({label:row[0], data: row[1], stack:"bb"})
+            }
+            $("#shareholder-graph").css("height", (graphInputFormattedData[0]["data"].length * 30)+"px")
+            $("#shareholder-legend").css("height", (graphInputFormattedData.length * 25)+"px")
+            a = ["#4fc6e1", "#f7b84b", "#4a81d4"], (o = b("#shareholder-graph").data("colors")) && (a = o.split(",")), mainObj.createShareholderGraph("#shareholder-graph",
+                    shareholder_graph_timestamp_list, a, graphInputFormattedData);
 
             //주주 정보 테이블.
             var tableDataList = data["shareholder_list"]
 
             for(var i=0; i<shareholderTermList.length; i++){
+              var termName = shareholderTermList[i]
+              var columnName = termName.substring(2, 4)
+              switch (termName.substring(5, 7)){
+                case "03": columnName = columnName + "Q1"; break;
+                case "06": columnName = columnName + "Q2"; break;
+                case "09": columnName = columnName + "Q3"; break;
+                case "12": columnName = columnName + "Q4"; break;
+              }
               $("#shareholder-table > thead > tr").append(
-                "<th style='width:2px'>"+shareholderTermList[i]+"</th>"
+                "<th style='width:2px'>"+columnName+"</th>"
               )
             }
 
@@ -2034,6 +2152,16 @@ $(document).ready(function () {
               order:[[shareholderTermList.length-1, "dsc"]],
               fixedColumns: { left: "1" },
               language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+              columnDefs:[{
+                targets: "_all",
+                render: function (data, type, row, meta){
+                  if(meta["col"] === 0){return data}
+                  else{
+                    if(data===""){return data}
+                    else{return data + "%"}
+                  }
+                }
+              }],
               drawCallback: function () { $(".dataTables_paginate > .pagination").addClass("pagination-rounded") }
             })
 
@@ -2076,6 +2204,7 @@ $(document).ready(function () {
             function doToggling(x, target){//항목 선택시, 해당 항목에 대한 그래프 다시 그리는 함수.
               var e = new Array;
               var dividend_graph_data = data["dividend_graph_data"]
+              var dividend_graph_timestamp_list = data["dividend_graph_timestamp_list"]
 
               //그래프 옆 항목 리스트 선택됨 표시 수정.
               $("#dividend-graph-account").find("li").each(function (idx, el){
@@ -2100,7 +2229,7 @@ $(document).ready(function () {
               var color_list
               color_list = ["#4fc6e1", "#f7b84b", "#4a81d4"],
               (o = b("#dividend-graph").data("colors")) && (color_list = o.split(",")),
-              mainObj.createDividendGraph("#dividend-graph", {}, color_list, e);
+              mainObj.createDividendGraph("#dividend-graph", {}, color_list, e, dividend_graph_timestamp_list);
             }
 
             doToggling(mainObj)
@@ -2109,13 +2238,21 @@ $(document).ready(function () {
             });
 
 
-            //주주 정보 테이블.
+            //배당 정보 테이블.
             var tableDataList = data["dividend_list"]
             var termList = data["dividend_term_list"]
 
             for(var i=0; i<termList.length; i++){
+              var termName = termList[i]
+              var columnName = termName.substring(2, 4)
+              switch (termName.substring(5, 7)){
+                case "03": columnName = columnName + "Q1"; break;
+                case "06": columnName = columnName + "Q2"; break;
+                case "09": columnName = columnName + "Q3"; break;
+                case "12": columnName = columnName + "Q4"; break;
+              }
               $("#dividend-table > thead > tr").append(
-                "<th style='width:10px'>"+termList[i]+"</th>"
+                "<th style='width:10px'>"+columnName+"</th>"
               )
             }
 
@@ -2127,6 +2264,23 @@ $(document).ready(function () {
               ordering: false,
               fixedColumns: { left: "1" },
               language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+              columnDefs:[{
+                targets: "_all",
+                render: function (data, type, row, meta){
+                  if((meta["col"] === 0) || (data==="")){return data}
+                  else{
+                    var percentAccountList = ["배당성향(%)", "보통주현금배당률(%)", "주당현금배당률(소주주,보통주)(%)"]
+                    var valueAccountList = ["당기순이익(원)", "보통주현금배당액", "주당순이익(원)", "주당순자산(원)", "주당현금배당액(소주주,보통주)(원)"]
+
+                    if(percentAccountList.includes(row[0])){
+                      return data + "%"
+                    }
+                    else if(valueAccountList.includes(row[0])){
+                      return parseInt(data).toLocaleString()
+                    }
+                  }
+                }
+              }],
               drawCallback: function () { $(".dataTables_paginate > .pagination").addClass("pagination-rounded") }
             })
 
@@ -2177,6 +2331,19 @@ $(document).ready(function () {
                 scrollX: !0,
                 ordering: false,
                 language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+                columnDefs:[{
+                  targets: "_all",
+                  render: function (data, type, row, meta){
+                    if(meta["col"] === 0){return data}
+                    else{
+                      if(data===""){return data}
+                      else{
+                        if(meta["col"]===5){return data}
+                        else{return parseInt(data).toLocaleString()}
+                      }
+                    }
+                  }
+                }],
                 drawCallback: function () {
                     $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
                 }

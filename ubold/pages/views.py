@@ -1,5 +1,4 @@
 import calendar
-import random
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -7,10 +6,11 @@ from django.http import JsonResponse
 from django.views.generic import TemplateView
 from django.db.models import Count
 
-from ubold.stocks.models import FinancialStatement, HistoricData, BasicInfo, StaffNumber, BoardMemberAverageWage, BoardMemberPersonalWage, SocialKeywords, ServiceMentionCounts, \
+from ubold.pages import common_util
+from ubold.stocks.models import StaffNumber, BoardMemberAverageWage, BoardMemberPersonalWage, SocialKeywords, ServiceMentionCounts, \
     ServicePosNegWords
 from ubold.dart.models import DartSearchData
-from ubold.stocks.models import FinancialStatement, HistoricData, BasicInfo, Dividend, Shareholder, Consensus, WorkerCountAndPay, Executives, BoardMembers, ExecutiveWage
+from ubold.stocks.models import FinancialStatement, HistoricData, BasicInfo, Dividend, Shareholder, WorkerCountAndPay, BoardMembers
 
 import numpy as np
 import pandas as pd
@@ -64,7 +64,6 @@ keyword_group = {
 class CustomView(LoginRequiredMixin, TemplateView):
     pass
 
-
 class PriceAnalysisView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
@@ -102,7 +101,7 @@ class CompanyInfoView(LoginRequiredMixin, TemplateView):
             self.search_keyword = self.request.GET.get("searchKeyword")
 
         # 검색어로 종목 검색 및 주요 지표 계산.
-        if (self.search_keyword != "") & (self.stock_code == ""):
+        if (self.search_keyword != "") :
             today = datetime.date.today()
             today_date = today
             if today.weekday() > 4:  # 오늘이 토,일요일이라면
@@ -758,8 +757,16 @@ def company_info_price_data(request):
     else:
         return
 
+    today_datetime = datetime.datetime.today()
+    today_iso = common_util.datetime_to_iso(today_datetime)
+    # today_iso = str(today_datetime.year)+"-"+str(today_datetime.month)+"-"+str(today_datetime.day)
+
+    term_start_datetime = datetime.date(today_datetime.year-5, today_datetime.month, today_datetime.day)
+    term_start_iso = common_util.datetime_to_iso(term_start_datetime)
+    # term_start_iso = str(term_start_datetime.year)+"-"+str(term_start_datetime.month)+"-"+str(term_start_datetime.day)
+
     # 주가 데이터 가져오기.
-    trade_data_list = HistoricData.objects.filter(code=stock_code).order_by("date")
+    trade_data_list = HistoricData.objects.filter(code=stock_code, date__gt=term_start_iso, date__lt=today_iso).order_by("date")
     close_price_list = list(trade_data_list.values_list("close_price", flat=True))
     close_price_list = [int(x) for x in close_price_list]
     trade_volume_list = list(trade_data_list.values_list("transaction_volume", flat=True))
@@ -781,13 +788,19 @@ def company_info_financial_graph_data(request):
     else:
         return
 
+    today_datetime = datetime.datetime.today()
+    today_iso = common_util.datetime_to_iso(today_datetime)
+    term_start_datetime = datetime.date(today_datetime.year - 5, today_datetime.month, today_datetime.day)
+    term_start_iso = common_util.datetime_to_iso(term_start_datetime)
+
+
     # 재무 데이터 그래프 데이터
     financial_graph_data = {}
-    financial_graph_data1 = FinancialStatement.objects.filter(code=stock_code, subject_name="포괄손익계산서", account_name="수익") \
+    financial_graph_data1 = FinancialStatement.objects.filter(code=stock_code, subject_name="포괄손익계산서", account_name="수익", this_term_name__gt=term_start_iso, this_term_name__lt=today_iso) \
         .order_by("this_term_name")  # 수익 데이터.
-    financial_graph_data2 = FinancialStatement.objects.filter(code=stock_code, subject_name="포괄손익계산서", account_name="영업이익(손실)") \
+    financial_graph_data2 = FinancialStatement.objects.filter(code=stock_code, subject_name="포괄손익계산서", account_name="영업이익(손실)", this_term_name__gt=term_start_iso, this_term_name__lt=today_iso) \
         .order_by("this_term_name")  # 영업이익(손실) 데이터.
-    financial_graph_data3 = FinancialStatement.objects.filter(code=stock_code, subject_name="포괄손익계산서", account_name="총당기순이익") \
+    financial_graph_data3 = FinancialStatement.objects.filter(code=stock_code, subject_name="포괄손익계산서", account_name="총당기순이익", this_term_name__gt=term_start_iso, this_term_name__lt=today_iso) \
         .order_by("this_term_name")  # 총당기순이익 데이터.
 
     timestamp_list = []
@@ -829,12 +842,17 @@ def company_info_income_statement_table_data(request):
     else:
         return
 
+    today_datetime = datetime.datetime.today()
+    today_iso = common_util.datetime_to_iso(today_datetime)
+    term_start_datetime = datetime.date(today_datetime.year - 5, today_datetime.month, today_datetime.day)
+    term_start_iso = common_util.datetime_to_iso(term_start_datetime)
+
     # 포괄손익계산서
-    income_statement = pd.DataFrame(list(FinancialStatement.objects.filter(code=stock_code, subject_name="포괄손익계산서").values()))
-    income_statement = income_statement.dropna()
+    income_statement = pd.DataFrame(list(FinancialStatement.objects.filter(code=stock_code, subject_name="포괄손익계산서", this_term_name__gt=term_start_iso, this_term_name__lt=today_iso).values()))
+    income_statement = income_statement.dropna(subset=["this_term_amount"])
     income_statement_account = income_statement.groupby(["account_id", "account_level", "account_name"], as_index=False).head(1)
 
-    term_list = FinancialStatement.objects.filter(code=stock_code).order_by("this_term_name") \
+    term_list = FinancialStatement.objects.filter(code=stock_code, this_term_name__gt=term_start_iso, this_term_name__lt=today_iso).order_by("this_term_name") \
         .values("this_term_name").annotate(Count("this_term_name"))
     term_list = [x["this_term_name"] for x in term_list]
 
@@ -858,6 +876,7 @@ def company_info_income_statement_table_data(request):
             # 해당 항목의 하위 항목들 추출.
             lv_0_low_list = pd.DataFrame(columns=part_df.columns)
             for index, r in part_df.iterrows():
+                # temp_df = r[(r["account_name"].split("_")[lv] == lv_0_account_name) & (r["account_level"] > lv)]
                 if (lv_0_account_name == r["account_name"].split("_")[lv]) & (r["account_level"] > lv):
                     lv_0_low_list = pd.DataFrame.append(lv_0_low_list, r)
             if len(lv_0_low_list) <= 0:
@@ -868,7 +887,52 @@ def company_info_income_statement_table_data(request):
 
         return result
 
-    income_statement_list = aaa(0, income_statement, income_statement_account, term_list)
+    def aaa2(lv, original_df, total_account_list, current_account_list, term_list, ):
+        result = {}
+        lv_0_list = current_account_list[current_account_list["account_level"] == lv]  # 항목 리스트 중 lv 0 리스트.
+        for index, lv_0 in lv_0_list.iterrows():
+            account_id = lv_0["account_id"]
+            # 해당 항목 row 추가
+            row = {}
+            row["level"] = list(range(lv))
+            row["data_list"] = {}
+            for term in term_list:
+                value = original_df[(original_df["this_term_name"] == term) & (original_df["account_id"] == lv_0["account_id"])]
+                if value.empty == True:
+                    row["data_list"][term] = ""
+                else:
+                    row["data_list"][term] = format(int(value.iloc[0]["this_term_amount"]), ",d")
+            lv_0_account_name = lv_0["account_name"].split("_")[lv]
+            result[lv_0_account_name] = row
+
+            low_list = total_account_list[total_account_list["parent_account_id"] == account_id]
+
+            result.update(aaa2(lv + 1, original_df, total_account_list, low_list, term_list))
+
+        return result
+
+    # # 테스트(테이블에서 순서 정보를 가지고 있는 경우)
+    # cashflow_statement = pd.DataFrame(list(FinancialStatement.objects.filter(code=stock_code, subject_name="포괄손익계산서")
+    #                                   .order_by("created_at").values()))
+    # cashflow_statement = cashflow_statement.dropna()
+    # cashflow_statement_account = cashflow_statement.groupby(["account_id", "account_level", "account_name"], as_index=False).head(1)
+    # data_list = {}
+    # for i in range(len(cashflow_statement_account)):
+    #     temp_row = cashflow_statement_account.iloc[i]
+    #
+    #     row = {}
+    #     row["level"] = list(range(temp_row["account_level"]))
+    #     row["data_list"] = {}
+    #     for term in term_list:
+    #         value = cashflow_statement[(cashflow_statement["this_term_name"] == term) & (cashflow_statement["account_id"] == temp_row["account_id"])]
+    #         if value.empty == True:
+    #             row["data_list"][term] = ""
+    #         else:
+    #             row["data_list"][term] = format(int(value.iloc[0]["this_term_amount"]), ",d")
+    #     temp_account_name = temp_row["account_name"].split("_")[temp_row["account_level"]]
+    #     data_list[temp_account_name] = row
+
+    income_statement_list = aaa2(0, income_statement, income_statement_account, income_statement_account, term_list)
 
     result["income_statement"] = income_statement_list
     result["income_statement_term_list"] = term_list
@@ -884,15 +948,44 @@ def company_info_balance_sheet_table_data(request):
     else:
         return
 
+    today_datetime = datetime.datetime.today()
+    today_iso = common_util.datetime_to_iso(today_datetime)
+    term_start_datetime = datetime.date(today_datetime.year - 5, today_datetime.month, today_datetime.day)
+    term_start_iso = common_util.datetime_to_iso(term_start_datetime)
+
     # 재무상태표
-    balance_sheet = pd.DataFrame(list(FinancialStatement.objects.filter(code=stock_code, subject_name="재무상태표").values()))
-    balance_sheet = balance_sheet.dropna()
+    balance_sheet = pd.DataFrame(list(FinancialStatement.objects.filter(code=stock_code, subject_name="재무상태표", this_term_name__gt=term_start_iso, this_term_name__lt=today_iso).order_by("account_id").values()))
+    balance_sheet = balance_sheet.dropna(subset=["this_term_amount"])
     # balance_sheet_account = balance_sheet.groupby(["account_id", "account_level", "account_name"], as_index=False).all()  # 항목 리스트.
     balance_sheet_account = balance_sheet.groupby(["account_id", "account_level", "account_name"], as_index=False).head(1)
 
-    term_list = FinancialStatement.objects.filter(code=stock_code).order_by("this_term_name") \
+    term_list = FinancialStatement.objects.filter(code=stock_code, this_term_name__gt=term_start_iso, this_term_name__lt=today_iso).order_by("this_term_name") \
         .values("this_term_name").annotate(Count("this_term_name"))
     term_list = [x["this_term_name"] for x in term_list]
+
+    def aaa2(lv, original_df, total_account_list, current_account_list, term_list, ):
+        result = {}
+        lv_0_list = current_account_list[current_account_list["account_level"] == lv]  # 항목 리스트 중 lv 0 리스트.
+        for index, lv_0 in lv_0_list.iterrows():
+            account_id = lv_0["account_id"]
+            # 해당 항목 row 추가
+            row = {}
+            row["level"] = list(range(lv))
+            row["data_list"] = {}
+            for term in term_list:
+                value = original_df[(original_df["this_term_name"] == term) & (original_df["account_id"] == lv_0["account_id"])]
+                if value.empty == True:
+                    row["data_list"][term] = ""
+                else:
+                    row["data_list"][term] = format(int(value.iloc[0]["this_term_amount"]), ",d")
+            lv_0_account_name = lv_0["account_name"].split("_")[lv]
+            result[lv_0_account_name] = row
+
+            low_list = total_account_list[total_account_list["parent_account_id"] == account_id]
+
+            result.update(aaa2(lv + 1, original_df, total_account_list, low_list, term_list))
+
+        return result
 
     def aaa(lv, original_df, part_df, term_list, ):
         result = {}
@@ -913,6 +1006,7 @@ def company_info_balance_sheet_table_data(request):
             # 해당 항목의 하위 항목들 추출.
             lv_0_low_list = pd.DataFrame(columns=part_df.columns)
             for index, r in part_df.iterrows():
+                # temp_df = r[(r["account_name"].split("_")[lv] == lv_0_account_name) & (r["account_level"] > lv)]
                 if (lv_0_account_name == r["account_name"].split("_")[lv]) & (r["account_level"] > lv):
                     lv_0_low_list = pd.DataFrame.append(lv_0_low_list, r)
             if len(lv_0_low_list) <= 0:
@@ -923,28 +1017,7 @@ def company_info_balance_sheet_table_data(request):
 
         return result
 
-    # 테스트(테이블에서 순서 정보를 가지고 있는 경우)
-    balance_sheet = pd.DataFrame(list(FinancialStatement.objects.filter(code=stock_code, subject_name="재무상태표")
-                                      .order_by("created_at").values()))
-    balance_sheet = balance_sheet.dropna()
-    balance_sheet_account = balance_sheet.groupby(["account_id", "account_level", "account_name"], as_index=False).head(1)
-    # result = {}
-    for i in range(len(balance_sheet_account)):
-        temp_row = balance_sheet_account.iloc[i]
-
-        row = {}
-        row["level"] = list(range(temp_row["account_level"]))
-        row["data_list"] = {}
-        for term in term_list:
-            value = balance_sheet[(balance_sheet["this_term_name"] == term) & (balance_sheet["account_id"] == temp_row["account_id"])]
-            if value.empty == True:
-                row["data_list"][term] = ""
-            else:
-                row["data_list"][term] = format(int(value.iloc[0]["this_term_amount"]), ",d")
-        temp_account_name = temp_row["account_name"].split("_")[temp_row["account_level"]]
-        # result[temp_account_name] = row
-
-    balance_sheet_list = aaa(0, balance_sheet, balance_sheet_account, term_list)
+    balance_sheet_list = aaa2(0, balance_sheet, balance_sheet_account, balance_sheet_account, term_list)
 
     result["balance_sheet"] = balance_sheet_list
     result["balance_sheet_term_list"] = term_list
@@ -952,7 +1025,7 @@ def company_info_balance_sheet_table_data(request):
     return JsonResponse(result)
 
 def company_info_cashflow_table_data(request):
-    stock_code = ""
+    stock_code = "A000020"
     result = {}
 
     if request.GET.get("stock_code") != None:
@@ -960,19 +1033,25 @@ def company_info_cashflow_table_data(request):
     else:
         return
 
+    today_datetime = datetime.datetime.today()
+    today_iso = common_util.datetime_to_iso(today_datetime)
+    term_start_datetime = datetime.date(today_datetime.year - 5, today_datetime.month, today_datetime.day)
+    term_start_iso = common_util.datetime_to_iso(term_start_datetime)
+
     # 현금흐름표
-    cashflow_statement = pd.DataFrame(list(FinancialStatement.objects.filter(code=stock_code, subject_name="현금흐름표").values()))
-    cashflow_statement = cashflow_statement.dropna()
+    cashflow_statement = pd.DataFrame(list(FinancialStatement.objects.filter(code=stock_code, subject_name="현금흐름표", this_term_name__gt=term_start_iso, this_term_name__lt=today_iso).order_by("account_id").values()))
+    cashflow_statement = cashflow_statement.dropna(subset=["this_term_amount"])
     cashflow_statement_account = cashflow_statement.groupby(["account_id", "account_level", "account_name"], as_index=False).head(1)
 
-    term_list = FinancialStatement.objects.filter(code=stock_code).order_by("this_term_name") \
+    term_list = FinancialStatement.objects.filter(code=stock_code, this_term_name__gt=term_start_iso, this_term_name__lt=today_iso).order_by("this_term_name") \
         .values("this_term_name").annotate(Count("this_term_name"))
     term_list = [x["this_term_name"] for x in term_list]
 
-    def aaa(lv, original_df, part_df, term_list, ):
+    def aaa(lv, original_df, total_account_list, current_account_list, term_list, ):
         result = {}
-        lv_0_list = part_df[part_df["account_level"] == lv]  # 항목 리스트 중 lv 0 리스트.
+        lv_0_list = current_account_list[current_account_list["account_level"] == lv]  # 항목 리스트 중 lv 0 리스트.
         for index, lv_0 in lv_0_list.iterrows():
+            account_id = lv_0["account_id"]
             # 해당 항목 row 추가
             row = {}
             row["level"] = list(range(lv))
@@ -985,20 +1064,44 @@ def company_info_cashflow_table_data(request):
                     row["data_list"][term] = format(int(value.iloc[0]["this_term_amount"]), ",d")
             lv_0_account_name = lv_0["account_name"].split("_")[lv]
             result[lv_0_account_name] = row
-            # 해당 항목의 하위 항목들 추출.
-            lv_0_low_list = pd.DataFrame(columns=part_df.columns)
-            for index, r in part_df.iterrows():
-                if (lv_0_account_name == r["account_name"].split("_")[lv]) & (r["account_level"] > lv):
-                    lv_0_low_list = pd.DataFrame.append(lv_0_low_list, r)
-            if len(lv_0_low_list) <= 0:
-                continue
-            # lv_1_list = lv_0_low_list[lv_0_low_list["account_level"] == (lv+1)]
 
-            result.update(aaa(lv + 1, original_df, lv_0_low_list, term_list))
+            low_list = total_account_list[total_account_list["parent_account_id"] == account_id]
+
+            # # 해당 항목의 하위 항목들 추출.
+            # lv_0_low_list = pd.DataFrame(columns=part_df.columns)
+            # for index, r in part_df.iterrows():
+            #     if (lv_0_account_name == r["account_name"].split("_")[lv]) & (r["account_level"] > lv):
+            #         lv_0_low_list = pd.DataFrame.append(lv_0_low_list, r)
+            # if len(lv_0_low_list) <= 0:
+            #     continue
+            # # lv_1_list = lv_0_low_list[lv_0_low_list["account_level"] == (lv+1)]
+
+            result.update(aaa(lv + 1, original_df, total_account_list, low_list, term_list))
 
         return result
 
-    cashflow_statement_list = aaa(0, cashflow_statement, cashflow_statement_account, term_list)
+    # # 테스트(테이블에서 순서 정보를 가지고 있는 경우)
+    # cashflow_statement = pd.DataFrame(list(FinancialStatement.objects.filter(code=stock_code, subject_name="현금흐름표")
+    #                                   .order_by("created_at").values()))
+    # cashflow_statement = cashflow_statement.dropna()
+    # cashflow_statement_account = cashflow_statement.groupby(["account_id", "account_level", "account_name"], as_index=False).head(1)
+    # data_list = {}
+    # for i in range(len(cashflow_statement_account)):
+    #     temp_row = cashflow_statement_account.iloc[i]
+    #
+    #     row = {}
+    #     row["level"] = list(range(temp_row["account_level"]))
+    #     row["data_list"] = {}
+    #     for term in term_list:
+    #         value = cashflow_statement[(cashflow_statement["this_term_name"] == term) & (cashflow_statement["account_id"] == temp_row["account_id"])]
+    #         if value.empty == True:
+    #             row["data_list"][term] = ""
+    #         else:
+    #             row["data_list"][term] = format(int(value.iloc[0]["this_term_amount"]), ",d")
+    #     temp_account_name = temp_row["account_name"].split("_")[temp_row["account_level"]]
+    #     data_list[temp_account_name] = row
+
+    cashflow_statement_list = aaa(0, cashflow_statement, cashflow_statement_account, cashflow_statement_account, term_list)
 
     result["cashflow_statement"] = cashflow_statement_list
     result["cashflow_statement_term_list"] = term_list
@@ -1031,25 +1134,30 @@ def company_info_shareholder(request):
     else:
         return
 
+    today_datetime = datetime.datetime.today()
+    today_iso = common_util.datetime_to_iso(today_datetime)
+    term_start_datetime = datetime.date(today_datetime.year-5, today_datetime.month, today_datetime.day)
+    term_start_iso = common_util.datetime_to_iso(term_start_datetime)
+
     # 주주정보
     shareholder_list_data = {}
     term_list = []
     shareholder_graph_data = {}
     shareholder_graph_timestamp_list = []
-    shareholder_list_df = pd.DataFrame(list(Shareholder.objects.filter(code_id=stock_code).values()))
+    shareholder_list_df = pd.DataFrame(list(Shareholder.objects.filter(code_id=stock_code, term_name__gt=term_start_iso, term_name__lt=today_iso).values()))
     shareholder_list_df = shareholder_list_df.dropna()
+    # last_term_name = shareholder_list_df.max(axis=0)["term_name"]
     shareholder_name_list = shareholder_list_df.groupby(["shareholder_name"], as_index=False).all()
+    # sorted_shareholder_name_list = pd.DataFrame(list((Shareholder.objects.filter(code_id=stock_code, term_name=last_term_name).order_by("-share_per").values())))
 
-    term_list = Shareholder.objects.filter(code=stock_code).order_by("term_name") \
+    term_list = Shareholder.objects.filter(code=stock_code, term_name__gt=term_start_iso, term_name__lt=today_iso).order_by("term_name") \
         .values("term_name").annotate(Count("term_name"))
     term_list = [x["term_name"] for x in term_list]
-
 
     for term_name in term_list:
         temp_term = term_name.split("-")
         temp_datetime = datetime.datetime(int(temp_term[0]), int(temp_term[1]), int(temp_term[2]))
         shareholder_graph_timestamp_list.append(calendar.timegm(temp_datetime.timetuple()) * 1000)
-
 
     for shareholder_name in shareholder_name_list["shareholder_name"]:
         shareholder_list_df[shareholder_list_df["shareholder_name"] == shareholder_name]
@@ -1093,17 +1201,22 @@ def company_info_dividend(request):
     else:
         return
 
+    today_datetime = datetime.datetime.today()
+    today_iso = common_util.datetime_to_iso(today_datetime)
+    term_start_datetime = datetime.date(today_datetime.year - 5, today_datetime.month, today_datetime.day)
+    term_start_iso = common_util.datetime_to_iso(term_start_datetime)
+
     # 배당 정보
     dividend_list_data = {}
     term_list = []
     dividend_graph_data = {}
     dividend_graph_timestamp_list = []
 
-    dividend_list_df = pd.DataFrame(list(Dividend.objects.filter(code_id=stock_code).values()))
+    dividend_list_df = pd.DataFrame(list(Dividend.objects.filter(code_id=stock_code, term_name__gt=term_start_iso, term_name__lt=today_iso).values()))
     dividend_list_df = dividend_list_df.dropna()
     dividend_name_list = dividend_list_df.groupby(["account_name"], as_index=False).all()
 
-    term_list = Dividend.objects.filter(code=stock_code).order_by("term_name") \
+    term_list = Dividend.objects.filter(code=stock_code, term_name__gt=term_start_iso, term_name__lt=today_iso).order_by("term_name") \
         .values("term_name").annotate(Count("term_name"))
     term_list = [x["term_name"] for x in term_list]
 
@@ -1153,11 +1266,16 @@ def company_info_wcp(request):
     else:
         return
 
+    today_datetime = datetime.datetime.today()
+    today_iso = common_util.datetime_to_iso(today_datetime)
+    term_start_datetime = datetime.date(today_datetime.year - 5, today_datetime.month, today_datetime.day)
+    term_start_iso = common_util.datetime_to_iso(term_start_datetime)
+
     # 평균급여 및 종업원수
     wcp_data = {}
     wcp_item_name_list = []
     wcp_term_list = []
-    wcp_df = pd.DataFrame(list(WorkerCountAndPay.objects.filter(code_id=stock_code).values()))
+    wcp_df = pd.DataFrame(list(WorkerCountAndPay.objects.filter(code_id=stock_code, term_name__gt=term_start_iso, term_name__lt=today_iso).values()))
     wcp_df = wcp_df.dropna()
 
     # if "worker_count_pay_term" in kwargs:
@@ -1213,17 +1331,22 @@ def company_info_staff_number(request):
     else:
         return
 
+    today_datetime = datetime.datetime.today()
+    today_iso = common_util.datetime_to_iso(today_datetime)
+    term_start_datetime = datetime.date(today_datetime.year - 5, today_datetime.month, today_datetime.day)
+    term_start_iso = common_util.datetime_to_iso(term_start_datetime)
+
     # 임직원 숫자 추이
     staff_number = {}
     term_list = []
     staff_number_graph_data = {}
     staff_number_graph_timestamp_list = []
 
-    staff_number_list_df = pd.DataFrame(list(StaffNumber.objects.filter(code_id=stock_code).values()))
+    staff_number_list_df = pd.DataFrame(list(StaffNumber.objects.filter(code_id=stock_code, term_name__gt=term_start_iso, term_name__lt=today_iso).values()))
     staff_number_list_df = staff_number_list_df.dropna()
     staff_number_name_list = staff_number_list_df.groupby(["staff_type"], as_index=False).all()
 
-    term_list = StaffNumber.objects.filter(code=stock_code).order_by("term_name") \
+    term_list = StaffNumber.objects.filter(code=stock_code, term_name__gt=term_start_iso, term_name__lt=today_iso).order_by("term_name") \
         .values("term_name").annotate(Count("term_name"))
     term_list = [x["term_name"] for x in term_list]
 
@@ -1274,17 +1397,22 @@ def company_info_bm_average_wage(request):
     else:
         return
 
+    today_datetime = datetime.datetime.today()
+    today_iso = common_util.datetime_to_iso(today_datetime)
+    term_start_datetime = datetime.date(today_datetime.year - 5, today_datetime.month, today_datetime.day)
+    term_start_iso = common_util.datetime_to_iso(term_start_datetime)
+
     # 이사회 임원 평균 보수
     staff_number = {}
     term_list = []
     bm_average_wage_graph_data = {}
     bm_average_wage_graph_timestamp_list = []
 
-    bm_average_wage_list_df = pd.DataFrame(list(BoardMemberAverageWage.objects.filter(code_id=stock_code).values()))
+    bm_average_wage_list_df = pd.DataFrame(list(BoardMemberAverageWage.objects.filter(code_id=stock_code, term_name__gt=term_start_iso, term_name__lt=today_iso).values()))
     bm_average_wage_list_df = bm_average_wage_list_df.dropna()
     # bm_average_wage_name_list = bm_average_wage_list_df.groupby(["staff_type"], as_index=False).all()
 
-    term_list = BoardMemberAverageWage.objects.filter(code=stock_code).order_by("term_name") \
+    term_list = BoardMemberAverageWage.objects.filter(code=stock_code, term_name__gt=term_start_iso, term_name__lt=today_iso).order_by("term_name") \
         .values("term_name").annotate(Count("term_name"))
     term_list = [x["term_name"] for x in term_list]
 
@@ -1341,8 +1469,13 @@ def company_info_board_member(request):
     else:
         return
 
+    today_datetime = datetime.datetime.today()
+    today_iso = common_util.datetime_to_iso(today_datetime)
+    term_start_datetime = datetime.date(today_datetime.year - 5, today_datetime.month, today_datetime.day)
+    term_start_iso = common_util.datetime_to_iso(term_start_datetime)
+
     # 이사회 임원 목록
-    board_member_df = pd.DataFrame(list(BoardMembers.objects.filter(code_id=stock_code).values()))
+    board_member_df = pd.DataFrame(list(BoardMembers.objects.filter(code_id=stock_code, term_name__gt=term_start_iso, term_name__lt=today_iso).values()))
     board_member_df = board_member_df.dropna()
 
     board_member_data = {}
@@ -1375,8 +1508,13 @@ def company_info_bm_personal_wage(request):
     else:
         return
 
+    today_datetime = datetime.datetime.today()
+    today_iso = common_util.datetime_to_iso(today_datetime)
+    term_start_datetime = datetime.date(today_datetime.year - 5, today_datetime.month, today_datetime.day)
+    term_start_iso = common_util.datetime_to_iso(term_start_datetime)
+
     # 이사회 임원 보수 정보
-    bm_personal_wage_df = pd.DataFrame(list(BoardMemberPersonalWage.objects.filter(code_id=stock_code).values()))
+    bm_personal_wage_df = pd.DataFrame(list(BoardMemberPersonalWage.objects.filter(code_id=stock_code, term_name__gt=term_start_iso, term_name__lt=today_iso).values()))
     bm_personal_wage_df = bm_personal_wage_df.dropna()
 
     bm_personal_wage_data = {}
@@ -1507,26 +1645,64 @@ class SocialAnalysisView(LoginRequiredMixin, TemplateView):
 
         # 전체 언급량.
         total_mention = {}
-        for keyword_key, value in temp_mention_count_dict.items():
-            total_mention[keyword_key] = []
-
-            # 데이터가 없다면 패스
-            if value.empty == True:
-                continue
-
-            # 하나의 키워드에 대해 기간 반복하여 데이터 정리.
-            target_date = datetime.date(start_date.year, start_date.month, start_date.day)
-            while target_date <= end_date:
-                row = []
-                row.append(calendar.timegm(target_date.timetuple()) * 1000)
-                mention_count = value[value["term_start"] == target_date.isoformat()]
-                if mention_count.empty == True:
-                    row.append("null")
-                else:
-                    row.append(value[value["term_start"] == target_date.isoformat()].iloc[0]["count_sum"])
-                total_mention[keyword_key].append(row)
-
-                target_date += datetime.timedelta(days=1)
+        community_mention = {}
+        insta_mention = {}
+        blog_mention = {}
+        news_mention = {}
+        twitter_mention = {}
+        # for keyword_key, value in temp_mention_count_dict.items():
+        #     total_mention[keyword_key] = []
+        #     community_mention[keyword_key] = []
+        #     insta_mention[keyword_key] = []
+        #     blog_mention[keyword_key] = []
+        #     news_mention[keyword_key] = []
+        #     twitter_mention[keyword_key] = []
+        #
+        #     # 데이터가 없다면 패스
+        #     if value.empty == True:
+        #         continue
+        #
+        #     # 하나의 키워드에 대해 기간 반복하여 데이터 정리.
+        #     target_date = datetime.date(start_date.year, start_date.month, start_date.day)
+        #     while target_date <= end_date:
+        #         total_row = []
+        #         community_row = []
+        #         insta_row = []
+        #         blog_row = []
+        #         news_row = []
+        #         twitter_row = []
+        #
+        #         total_row.append(calendar.timegm(target_date.timetuple()) * 1000)
+        #         community_row.append(calendar.timegm(target_date.timetuple()) * 1000)
+        #         insta_row.append(calendar.timegm(target_date.timetuple()) * 1000)
+        #         blog_row.append(calendar.timegm(target_date.timetuple()) * 1000)
+        #         news_row.append(calendar.timegm(target_date.timetuple()) * 1000)
+        #         twitter_row.append(calendar.timegm(target_date.timetuple()) * 1000)
+        #
+        #         mention_count = value[value["term_start"] == target_date.isoformat()]
+        #         if mention_count.empty == True:
+        #             total_row.append("null")
+        #             community_row.append("null")
+        #             insta_row.append("null")
+        #             blog_row.append("null")
+        #             news_row.append("null")
+        #             twitter_row.append("null")
+        #         else:
+        #             total_row.append(value[value["term_start"] == target_date.isoformat()].iloc[0]["count_sum"])
+        #             community_row.append(value[value["term_start"] == target_date.isoformat()].iloc[0]["community_count"])
+        #             insta_row.append(value[value["term_start"] == target_date.isoformat()].iloc[0]["insta_count"])
+        #             blog_row.append(value[value["term_start"] == target_date.isoformat()].iloc[0]["blog_count"])
+        #             news_row.append(value[value["term_start"] == target_date.isoformat()].iloc[0]["news_count"])
+        #             twitter_row.append(value[value["term_start"] == target_date.isoformat()].iloc[0]["twitter_count"])
+        #
+        #         total_mention[keyword_key].append(total_row)
+        #         community_mention[keyword_key].append(community_row)
+        #         insta_mention[keyword_key].append(insta_row)
+        #         blog_mention[keyword_key].append(blog_row)
+        #         news_mention[keyword_key].append(news_row)
+        #         twitter_mention[keyword_key].append(twitter_row)
+        #
+        #         target_date += datetime.timedelta(days=1)
 
         # # 전체 언급량 데이터 합 구하기
         # total_mention_sum = []
@@ -1741,7 +1917,7 @@ class SocialAnalysisView(LoginRequiredMixin, TemplateView):
 
         context["keyword_list"] = keyword_list
         context["mention_data"] = {
-            "total_mention": {"count_list": total_mention, "name": "전체 언급량 추이"},
+            "total_mention": { "name": "전체 언급량 추이"},
             "community_mention": {"name": "커뮤니티 언급량 추이"},
             "insta_mention": {"name": "인스타 언급량 추이"},
             "blog_mention": {"name": "블로그 언급량 추이"},
@@ -1844,7 +2020,7 @@ def mention_data(request):
 
     if (request.GET.get("lv1") != None) & (request.GET.get("lv2") != None) & (request.GET.get("mention_source") != None):
         lv1 = request.GET.get("lv1")
-        lv2 = request.GET.get("lv2")
+        lv2 = request.GET.get("lv2").split("?")[0]
         mention_source = request.GET.get("mention_source")
     else:
         return
@@ -1892,8 +2068,18 @@ def mention_data(request):
 
     # 전체 언급량.
     total_mention = {}
+    community_mention = {}
+    insta_mention = {}
+    blog_mention = {}
+    news_mention = {}
+    twitter_mention = {}
     for keyword_key, value in temp_mention_count_dict.items():
         total_mention[keyword_key] = []
+        community_mention[keyword_key] = []
+        insta_mention[keyword_key] = []
+        blog_mention[keyword_key] = []
+        news_mention[keyword_key] = []
+        twitter_mention[keyword_key] = []
 
         # 데이터가 없다면 패스
         if value.empty == True:
@@ -1902,14 +2088,43 @@ def mention_data(request):
         # 하나의 키워드에 대해 기간 반복하여 데이터 정리.
         target_date_datetime = datetime.date(start_date_datetime.year, start_date_datetime.month, start_date_datetime.day)
         while target_date_datetime <= end_date_datetime:
-            row = []
-            row.append(calendar.timegm(target_date_datetime.timetuple()) * 1000)
+            total_row = []
+            community_row = []
+            insta_row = []
+            blog_row = []
+            news_row = []
+            twitter_row = []
+
+            total_row.append(calendar.timegm(target_date_datetime.timetuple()) * 1000)
+            community_row.append(calendar.timegm(target_date_datetime.timetuple()) * 1000)
+            insta_row.append(calendar.timegm(target_date_datetime.timetuple()) * 1000)
+            blog_row.append(calendar.timegm(target_date_datetime.timetuple()) * 1000)
+            news_row.append(calendar.timegm(target_date_datetime.timetuple()) * 1000)
+            twitter_row.append(calendar.timegm(target_date_datetime.timetuple()) * 1000)
+
             mention_count = value[value["term_start"] == target_date_datetime.isoformat()]
             if mention_count.empty == True:
-                row.append("null")
+                total_row.append("null")
+                community_row.append("null")
+                insta_row.append("null")
+                blog_row.append("null")
+                news_row.append("null")
+                twitter_row.append("null")
             else:
-                row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0][mention_source_dict[mention_source]["column_name"]]))
-            total_mention[keyword_key].append(row)
+                # row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0][mention_source_dict[mention_source]["column_name"]]))
+                total_row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0]["count_sum"]))
+                community_row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0]["community_count"]))
+                insta_row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0]["insta_count"]))
+                blog_row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0]["blog_count"]))
+                news_row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0]["news_count"]))
+                twitter_row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0]["twitter_count"]))
+
+            total_mention[keyword_key].append(total_row)
+            community_mention[keyword_key].append(community_row)
+            insta_mention[keyword_key].append(insta_row)
+            blog_mention[keyword_key].append(blog_row)
+            news_mention[keyword_key].append(news_row)
+            twitter_mention[keyword_key].append(twitter_row)
 
             target_date_datetime += datetime.timedelta(days=1)
 
@@ -1928,11 +2143,30 @@ def mention_data(request):
     #     row.append(sum)
     #     total_mention_sum.append(row)
 
+    # context["keyword_list"] = keyword_list
+    # context["mention_data"] = {
+    #     "total_mention": {"count_list": total_mention, "name": "전체 언급량 추이"},
+    #     "community_mention": {"count_list": community_mention, "name": "커뮤니티 언급량 추이"},
+    #     "insta_mention": {"count_list": insta_mention, "name": "인스타 언급량 추이"},
+    #     "blog_mention": {"count_list": blog_mention, "name": "블로그 언급량 추이"},
+    #     "news_mention": {"count_list": news_mention, "name": "뉴스 언급량 추이"},
+    #     "twitter_mention": {"count_list": twitter_mention, "name": "트위터 언급량 추이"},
+    # }
+    # context["xaxis_day_list"] = xaxis_day_list
+
     result = {
         "keyword_list": keyword_list,
+        # "mention_data": {
+        #     "count_list": total_mention,
+        #     "name": mention_source_dict[mention_source]["ko_name"]+" 언급량 추이"
+        # },
         "mention_data": {
-            "count_list": total_mention,
-            "name": mention_source_dict[mention_source]["ko_name"]+" 언급량 추이"
+            "total_mention": {"count_list": total_mention, "name": "전체 언급량 추이"},
+            "community_mention": {"count_list": community_mention, "name": "커뮤니티 언급량 추이"},
+            "insta_mention": {"count_list": insta_mention, "name": "인스타 언급량 추이"},
+            "blog_mention": {"count_list": blog_mention, "name": "블로그 언급량 추이"},
+            "news_mention": {"count_list": news_mention, "name": "뉴스 언급량 추이"},
+            "twitter_mention": {"count_list": twitter_mention, "name": "트위터 언급량 추이"},
         },
         "xaxis_day_list": xaxis_day_list,
     }
@@ -1947,7 +2181,7 @@ def pos_neg_data(request):
 
     if (request.GET.get("lv1") != None) & (request.GET.get("lv2") != None):
         lv1 = request.GET.get("lv1")
-        lv2 = request.GET.get("lv2")
+        lv2 = request.GET.get("lv2").split("?")[0]
     else:
         return
 
@@ -2061,6 +2295,76 @@ def pos_neg_data(request):
 
 class PeopleIframe(LoginRequiredMixin, TemplateView):
     name=""
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        stock_list_df = pd.DataFrame(list(BasicInfo.objects.exclude(corp_code=' ').values()))
+
+        for stock_idx in stock_list_df.index:
+            stock_df = stock_list_df.loc[stock_idx]
+            stock_code = stock_df["code"]
+
+            print("stock_code : "+stock_code)
+
+            cashflow_statement = pd.DataFrame(list(FinancialStatement.objects.filter(code_id=stock_code, subject_name="현금흐름표").values()))
+            # cashflow_statement = cashflow_statement.dropna()
+            cashflow_statement_account = cashflow_statement.groupby(["account_id", "account_level", "account_name"], as_index=False).head(1)
+
+            income_statement = pd.DataFrame(list(FinancialStatement.objects.filter(code_id=stock_code, subject_name="포괄손익계산서").values()))
+            # cashflow_statement = cashflow_statement.dropna()
+            income_statement_account = income_statement.groupby(["account_id", "account_level", "account_name"], as_index=False).head(1)
+
+            balance_sheet = pd.DataFrame(list(FinancialStatement.objects.filter(code_id=stock_code, subject_name="재무상태표").values()))
+            # cashflow_statement = cashflow_statement.dropna()
+            balance_sheet_account = balance_sheet.groupby(["account_id", "account_level", "account_name"], as_index=False).head(1)
+
+            def aaa(lv, original_df, account_list_df, parent_account_id, subject_name):
+                result = {}
+                lv_0_list = account_list_df[account_list_df["account_level"] == lv]  # 항목 리스트 중 lv 0 리스트.
+                for index, lv_0 in lv_0_list.iterrows():
+                    account_id = lv_0["account_id"]
+
+                    # 항목들 parent_account_id 업데이트.
+                    # row_list = FinancialStatement.objects.filter(code=stock_code, subject_name="현금흐름표", account_id=lv_0["account_id"]).all()
+                    # for row in row_list:
+                    #     row.parent_account_id = parent_account_id
+                    #     row.save(update_fields=["parent_account_id"])
+
+                    db = psycopg2.connect(host="112.220.72.179", dbname="openmetric", user="openmetric",
+                                          password=")!metricAdmin01", port=2345)
+                    cur = db.cursor()
+                    cur.execute(
+                        "update stock_financial_statement set parent_account_id='" + parent_account_id + "' where code_id='" + stock_code + "' and subject_name='" + subject_name + "' and account_id='" +
+                        lv_0["account_id"] + "'")
+                    db.commit()
+
+                    # row_list.update(parent_account_id=parent_account_id)
+                    # row.parent_account_id = account_id
+                    # row.save()
+
+                    lv_0_account_name = lv_0["account_name"].split("_")[lv]
+
+                    # 해당 항목의 하위 항목들 추출.
+                    lv_0_low_list = pd.DataFrame(columns=account_list_df.columns)
+                    for index, r in account_list_df.iterrows():
+                        if (lv_0_account_name == r["account_name"].split("_")[lv]) & (r["account_level"] > lv):
+                            lv_0_low_list = pd.DataFrame.append(lv_0_low_list, r)
+                    if len(lv_0_low_list) <= 0:
+                        continue
+                    # lv_1_list = lv_0_low_list[lv_0_low_list["account_level"] == (lv+1)]
+
+                    result.update(aaa(lv + 1, original_df, lv_0_low_list, account_id, subject_name))
+
+                return result
+
+            aaa(0, income_statement, income_statement_account, "", "포괄손익계산서")
+            aaa(0, balance_sheet, balance_sheet_account, "", "재무상태표")
+            aaa(0, cashflow_statement, cashflow_statement_account, "", "현금흐름표")
+            pass
+
+        pass
+
 
 # auth pages
 custom_pages_coming_soon_view = CustomView.as_view(template_name="extra/coming-soon.html")

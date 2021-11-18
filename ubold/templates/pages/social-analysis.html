@@ -417,6 +417,9 @@ $(document).ready(function () {
                   else{return val;}
                 },{% endcomment %}
                 tickColor: "rgba(65, 80, 95, 0.07)",
+                tickFormatter: function (val, axis){
+                  return val.toLocaleString()
+                },
                 font: {color: "#8391a2"}
             },
             xaxis: {
@@ -578,6 +581,9 @@ $(document).ready(function () {
                   else{return val;}
                 },{% endcomment %}
                 tickColor: "rgba(65, 80, 95, 0.07)",
+                tickFormatter: function (val, axis){
+                  return val.toLocaleString()
+                },
                 font: {color: "#8391a2"}
             },
             xaxis: {
@@ -642,12 +648,12 @@ $(document).ready(function () {
         })
       })
 
-      $("#total_mentionItem .loading").css("display", "none")
-      $("#total_mentionItem .itemContent").css("display", "block")
-
+      {#$("#total_mentionItem .loading").css("display", "none")#}
+      {#$("#total_mentionItem .itemContent").css("display", "block")#}
+      {##}
       {#언급량 전체 추이 그래프. #}
-      var mention_total_count_graph_data = {{ mention_data.total_mention.count_list|safe|default:"{}" }};
-      this.setSocialAnalysisGraphOptAndCreate("total_mention-graph", "total_mention-checkbox", mention_total_count_graph_data, keyword_color);
+      {#var mention_total_count_graph_data = {{ mention_data.total_mention.count_list|safe|default:"{}" }};#}
+      {#this.setSocialAnalysisGraphOptAndCreate("total_mention-graph", "total_mention-checkbox", mention_total_count_graph_data, keyword_color);#}
 
       var mainObj = this
 
@@ -667,20 +673,61 @@ $(document).ready(function () {
 
       {#커뮤니티 추이 그래프. #}
       var community_mention_graph_data = {}
+      var insta_mention_graph_data = {}
+      var blog_mention_graph_data = {}
+      var news_mention_graph_data = {}
+      var twitter_mention_graph_data = {}
       $.ajax({
         url: "/pages/ajax/socialanalysis/mentionData?lv1="+lv1+"&lv2="+lv2+"&mention_source=community",
         success: function (data){
           console.log(data);
 
+          //전체 언급량 그래프.
+          $("#total_mentionItem .loading").css("display", "none")
+          $("#total_mentionItem .itemContent").css("display", "block")
+
+          {#var mention_total_count_graph_data = {{ mention_data.total_mention.count_list|safe|default:"{}" }};#}
+          var mention_total_count_graph_data = data["mention_data"]["total_mention"]["count_list"]
+          mainObj.setSocialAnalysisGraphOptAndCreate("total_mention-graph", "total_mention-checkbox", mention_total_count_graph_data, keyword_color);
+
+          //커뮤니티 언급량 그래프.
           $("#community_mentionItem .loading").css("display", "none")
           $("#community_mentionItem .itemContent").css("display", "block")
 
-          community_mention_graph_data = data["mention_data"]["count_list"]
+          community_mention_graph_data = data["mention_data"]["community_mention"]["count_list"]
           mainObj.setSocialAnalysisGraphOptAndCreate("community_mention-graph", "community_mention-checkbox", community_mention_graph_data, keyword_color);
+
+          //인스타 언급량 그래프.
+          $("#insta_mentionItem .loading").css("display", "none")
+          $("#insta_mentionItem .itemContent").css("display", "block")
+
+          insta_mention_graph_data = data["mention_data"]["insta_mention"]["count_list"]
+          mainObj.setSocialAnalysisGraphOptAndCreate("insta_mention-graph", "insta_mention-checkbox", insta_mention_graph_data, keyword_color);
+
+          //블로그 언급량 그래프.
+          $("#blog_mentionItem .loading").css("display", "none")
+          $("#blog_mentionItem .itemContent").css("display", "block")
+
+          blog_mention_graph_data = data["mention_data"]["blog_mention"]["count_list"]
+          mainObj.setSocialAnalysisGraphOptAndCreate("blog_mention-graph", "blog_mention-checkbox", blog_mention_graph_data, keyword_color);
+
+          //뉴스 언급량 그래프.
+          $("#news_mentionItem .loading").css("display", "none")
+          $("#news_mentionItem .itemContent").css("display", "block")
+
+          news_mention_graph_data = data["mention_data"]["news_mention"]["count_list"]
+          mainObj.setSocialAnalysisGraphOptAndCreate("news_mention-graph", "news_mention-checkbox", news_mention_graph_data, keyword_color);
+
+          //트위터 언급량 그래프.
+          $("#twitter_mentionItem .loading").css("display", "none")
+          $("#twitter_mentionItem .itemContent").css("display", "block")
+
+          twitter_mention_graph_data = data["mention_data"]["twitter_mention"]["count_list"]
+          mainObj.setSocialAnalysisGraphOptAndCreate("twitter_mention-graph", "twitter_mention-checkbox", twitter_mention_graph_data, keyword_color);
         }
       })
 
-      {#인스타 추이 그래프. #}
+      {% comment %}{#인스타 추이 그래프. #}
       var insta_mention_graph_data = {}
       $.ajax({
         url: "/pages/ajax/socialanalysis/mentionData?lv1="+lv1+"&lv2="+lv2+"&mention_source=insta",
@@ -738,7 +785,7 @@ $(document).ready(function () {
           twitter_mention_graph_data = data["mention_data"]["count_list"]
           mainObj.setSocialAnalysisGraphOptAndCreate("twitter_mention-graph", "twitter_mention-checkbox", twitter_mention_graph_data, keyword_color);
         }
-      })
+      }){% endcomment %}
 
       //긍부정어 그래프, 테이블, 워드클라우드.
       var pos_neg_data = {}
