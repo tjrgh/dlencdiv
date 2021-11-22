@@ -983,3 +983,26 @@ class BoardMemberPersonalWage(TimeStampMixin):
             models.Index(fields=['corp_code'], name='board_ps_wage_corp_code_idx'),
             models.Index(fields=['code'], name='board_ps_wage_code_idx'),
         ]
+
+class StockPricePredict(TimeStampMixin):
+    code = models.ForeignKey(
+        'BasicInfo'
+        , related_name='stock_price_predict'
+        , on_delete=models.PROTECT
+        , to_field='code'
+        , help_text='종목코드'
+    )
+    # corp_code = models.CharField(max_length=9, help_text="DART 고유번호")
+    date = models.DateField(help_text='날짜')
+
+    account_name = models.CharField(max_length=30, help_text="항목명 ex) 고저변동 - 당일고저변동폭 전 5일 이평, 1차 예상고저가 - 20일 예상고가")
+    account_code = models.CharField(max_length=20, help_text="항목 코드 ex) HLk5d, 20EHP1")
+    account_value = models.DecimalField(max_digits=19, decimal_places=2, help_text="항목값")
+
+    class Meta:
+        db_table = 'stock_price_predict'
+        unique_together = ["code", "date", "account_code"]
+        indexes = [
+            # models.Index(fields=['corp_code'], name='price_predict_corp_code_idx'),
+            models.Index(fields=['code', "date", "account_code"], name='price_predict_code_idx'),
+        ]

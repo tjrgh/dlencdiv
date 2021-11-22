@@ -6,7 +6,8 @@ from django.http import JsonResponse
 from django.views.generic import TemplateView
 from django.db.models import Count
 
-from ubold.pages import common_util
+from ubold.pages import common_util, price_predict
+from ubold.pages.price_predict import StockPricePredict, StockPricePredictService
 from ubold.stocks.models import StaffNumber, BoardMemberAverageWage, BoardMemberPersonalWage, SocialKeywords, ServiceMentionCounts, \
     ServicePosNegWords
 from ubold.dart.models import DartSearchData
@@ -2307,18 +2308,6 @@ class PeopleIframe(LoginRequiredMixin, TemplateView):
 
             print("stock_code : "+stock_code)
 
-            cashflow_statement = pd.DataFrame(list(FinancialStatement.objects.filter(code_id=stock_code, subject_name="현금흐름표").values()))
-            # cashflow_statement = cashflow_statement.dropna()
-            cashflow_statement_account = cashflow_statement.groupby(["account_id", "account_level", "account_name"], as_index=False).head(1)
-
-            income_statement = pd.DataFrame(list(FinancialStatement.objects.filter(code_id=stock_code, subject_name="포괄손익계산서").values()))
-            # cashflow_statement = cashflow_statement.dropna()
-            income_statement_account = income_statement.groupby(["account_id", "account_level", "account_name"], as_index=False).head(1)
-
-            balance_sheet = pd.DataFrame(list(FinancialStatement.objects.filter(code_id=stock_code, subject_name="재무상태표").values()))
-            # cashflow_statement = cashflow_statement.dropna()
-            balance_sheet_account = balance_sheet.groupby(["account_id", "account_level", "account_name"], as_index=False).head(1)
-
             def aaa(lv, original_df, account_list_df, parent_account_id, subject_name):
                 result = {}
                 lv_0_list = account_list_df[account_list_df["account_level"] == lv]  # 항목 리스트 중 lv 0 리스트.
@@ -2358,12 +2347,273 @@ class PeopleIframe(LoginRequiredMixin, TemplateView):
 
                 return result
 
-            aaa(0, income_statement, income_statement_account, "", "포괄손익계산서")
-            aaa(0, balance_sheet, balance_sheet_account, "", "재무상태표")
-            aaa(0, cashflow_statement, cashflow_statement_account, "", "현금흐름표")
+            # parent_account_id 할당이 이미 되었는지 확인.
+            temp_query_set = FinancialStatement.objects.filter(code_id=stock_code, subject_name="현금흐름표", parent_account_id__isnull=True)
+            if temp_query_set.count() != 0:
+                cashflow_statement = pd.DataFrame(list(FinancialStatement.objects.filter(code_id=stock_code, subject_name="현금흐름표").values()))
+                # cashflow_statement = cashflow_statement.dropna()
+                cashflow_statement_account = cashflow_statement.groupby(["account_id", "account_level", "account_name"], as_index=False).head(1)
+
+                aaa(0, cashflow_statement, cashflow_statement_account, "", "현금흐름표")
+
+            temp_query_set = FinancialStatement.objects.filter(code_id=stock_code, subject_name="포괄손익계산서", parent_account_id__isnull=True)
+            if temp_query_set.count() != 0:
+                income_statement = pd.DataFrame(list(FinancialStatement.objects.filter(code_id=stock_code, subject_name="포괄손익계산서").values()))
+                # cashflow_statement = cashflow_statement.dropna()
+                income_statement_account = income_statement.groupby(["account_id", "account_level", "account_name"], as_index=False).head(1)
+
+                aaa(0, income_statement, income_statement_account, "", "포괄손익계산서")
+
+            temp_query_set = FinancialStatement.objects.filter(code_id=stock_code, subject_name="재무상태표", parent_account_id__isnull=True)
+            if temp_query_set.count() != 0:
+                balance_sheet = pd.DataFrame(list(FinancialStatement.objects.filter(code_id=stock_code, subject_name="재무상태표").values()))
+                # cashflow_statement = cashflow_statement.dropna()
+                balance_sheet_account = balance_sheet.groupby(["account_id", "account_level", "account_name"], as_index=False).head(1)
+
+                aaa(0, balance_sheet, balance_sheet_account, "", "재무상태표")
+
             pass
 
         pass
+
+class PricePredict(LoginRequiredMixin, TemplateView):
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        stock_code = "A005930"
+        term = "week"
+        k = "2021-08-23"
+
+        pp = StockPricePredictService("A005930", "week")
+        pp.save_predict_data(k)
+
+        basicInfo = BasicInfo.objects.filter(code=stock_code).get()
+        # newObj = StockPricePredict(code=basicInfo, date=k,
+        #                   account_code="S", account_name="시가", account_value=pp.S(k))
+        # newObj.save()
+
+
+        # print("S : "+str(pp.S(k)))
+        # print("H : " + str(pp.H(k)))
+        # print("L : "+str(pp.L(k)))
+        # print("E : " + str(pp.E(k)))
+        # print("G : " + str(pp.G(k)))
+        # print("Gp : " + str(pp.Gp(k)))
+        # print("HLk : " + str(pp.HLk(k)))
+        # print("HLk3d : " + str(pp.HLk3d(k)))
+        # print("HLk5d : " + str(pp.HLk5d(k)))
+        # print("HLk10d : " + str(pp.HLk10d(k)))
+        # print("HLk20d : " + str(pp.HLk20d(k)))
+        # print("HLpk : " + str(pp.HLpk(k)))
+        # print("HLpk3d : " + str(pp.HLpk3d(k)))
+        # print("HLpk5d : " + str(pp.HLpk5d(k)))
+        # print("HLpk10 : " + str(pp.HLpk10(k)))
+        # print("HLpk20 : " + str(pp.HLpk20(k)))
+        # print("HSk : " + str(pp.HSk(k)))
+        # print("HSk3d : " + str(pp.HSk_n_d(k, 3)))
+        # print("HSk5d : " + str(pp.HSk_n_d(k, 5)))
+        # print("HSk10d : " + str(pp.HSk_n_d(k, 10)))
+        # print("HSk20d : " + str(pp.HSk_n_d(k, 20)))
+        #
+        # print("SLk : " + str(pp.SLk(k)))
+        # print("SLk3d : " + str(pp.SLk_n_d(k, 3)))
+        # print("SLk5d : " + str(pp.SLk_n_d(k, 5)))
+        # print("SLk10d : " + str(pp.SLk_n_d(k, 10)))
+        # print("SLk20d : " + str(pp.SLk_n_d(k, 20)))
+        #
+        # print("3EHP1 : " + str(pp.n_EHP1(k, 3)))
+        # print("3ELP1 : " + str(pp.n_ELP1(k, 3)))
+        # print("5EHP1 : " + str(pp.n_EHP1(k, 5)))
+        # print("5ELP1 : " + str(pp.n_ELP1(k, 5)))
+        # print("10EHP1 : " + str(pp.n_EHP1(k, 10)))
+        # print("10ELP1 : " + str(pp.n_ELP1(k, 10)))
+        # print("20EHP1 : " + str(pp.n_EHP1(k, 20)))
+        # print("20ELP1 : " + str(pp.n_ELP1(k, 20)))
+        #
+        # print("3HLW1 : " + str(pp.n_HLW1(k, 3)))
+        # print("5HLW1 : " + str(pp.n_HLW1(k, 5)))
+        # print("10HLW1 : " + str(pp.n_HLW1(k, 10)))
+        # print("20HLW1 : " + str(pp.n_HLW1(k, 20)))
+        #
+        # print("3HLMA1 : " + str(pp.n_HLMA1(k, 3)))
+        # print("5HLMA1 : " + str(pp.n_HLMA1(k, 5)))
+        # print("10HLMA1 : " + str(pp.n_HLMA1(k, 10)))
+        # print("20HLMA1 : " + str(pp.n_HLMA1(k, 20)))
+        #
+        # print("3HPEE1 : " + str(pp.n_HPEE1(k, 3)))
+        # print("3LPEE1 : " + str(pp.n_LPEE1(k, 3)))
+        # print("5HPEE1 : " + str(pp.n_HPEE1(k, 5)))
+        # print("5LPEE1 : " + str(pp.n_LPEE1(k, 5)))
+        # print("10HPEE1 : " + str(pp.n_HPEE1(k, 10)))
+        # print("10LPEE1 : " + str(pp.n_LPEE1(k, 10)))
+        # print("20HPEE1 : " + str(pp.n_HPEE1(k, 20)))
+        # print("20LPEE1 : " + str(pp.n_LPEE1(k, 20)))
+        #
+        # print("3HPEEA1 : " + str(pp._3HPEEA1(k)))
+        # print("3LPEEA1 : " + str(pp._3LPEEA1(k)))
+        # # 2차
+        # print("3EHP2 : " + str(pp.n_EHP2(k, 3)))
+        # print("3ELP2 : " + str(pp.n_ELP2(k, 3)))
+        # print("5EHP2 : " + str(pp.n_EHP2(k, 5)))
+        # print("5ELP2 : " + str(pp.n_ELP2(k, 5)))
+        # print("10EHP2 : " + str(pp.n_EHP2(k, 10)))
+        # print("10ELP2 : " + str(pp.n_ELP2(k, 10)))
+        # print("20EHP2 : " + str(pp.n_EHP2(k, 20)))
+        # print("20ELP2 : " + str(pp.n_ELP2(k, 20)))
+        #
+        # print("3HLW2 : " + str(pp.n_HLW2(k, 3)))
+        # print("5HLW2 : " + str(pp.n_HLW2(k, 5)))
+        # print("10HLW2 : " + str(pp.n_HLW2(k, 10)))
+        # print("20HLW2 : " + str(pp.n_HLW2(k, 20)))
+        #
+        # print("3HLMA2 : " + str(pp.n_HLMA2(k, 3)))
+        # print("5HLMA2 : " + str(pp.n_HLMA2(k, 5)))
+        # print("10HLMA2 : " + str(pp.n_HLMA2(k, 10)))
+        # print("20HLMA2 : " + str(pp.n_HLMA2(k, 20)))
+        #
+        # print("3HPEE2 : " + str(pp.n_HPEE2(k, 3)))
+        # print("3LPEE2 : " + str(pp.n_LPEE2(k, 3)))
+        # print("5HPEE2 : " + str(pp.n_HPEE2(k, 5)))
+        # print("5LPEE2 : " + str(pp.n_LPEE2(k, 5)))
+        # print("10HPEE2 : " + str(pp.n_HPEE2(k, 10)))
+        # print("10LPEE2 : " + str(pp.n_LPEE2(k, 10)))
+        # print("20HPEE2 : " + str(pp.n_HPEE2(k, 20)))
+        # print("20LPEE2 : " + str(pp.n_LPEE2(k, 20)))
+        #
+        # print("3HPEEA2 : " + str(pp._3HPEEA2(k)))
+        # print("3LPEEA2 : " + str(pp._3LPEEA2(k)))
+        #
+        # print("3EHP3 : " + str(pp.n_EHP3(k, 3)))
+        # print("3ELP3 : " + str(pp.n_ELP3(k, 3)))
+        # print("5EHP3 : " + str(pp.n_EHP3(k, 5)))
+        # print("5ELP3 : " + str(pp.n_ELP3(k, 5)))
+        # print("10EHP3 : " + str(pp.n_EHP3(k, 10)))
+        # print("10ELP3 : " + str(pp.n_ELP3(k, 10)))
+        # print("20EHP3 : " + str(pp.n_EHP3(k, 20)))
+        # print("20ELP3 : " + str(pp.n_ELP3(k, 20)))
+        #
+        # print("3HLW3 : " + str(pp.n_HLW3(k, 3)))
+        # print("5HLW3 : " + str(pp.n_HLW3(k, 5)))
+        # print("10HLW3 : " + str(pp.n_HLW3(k, 10)))
+        # print("20HLW3 : " + str(pp.n_HLW3(k, 20)))
+        #
+        # print("3HLMA3 : " + str(pp.n_HLMA3(k, 3)))
+        # print("5HLMA3 : " + str(pp.n_HLMA3(k, 5)))
+        # print("10HLMA3 : " + str(pp.n_HLMA3(k, 10)))
+        # print("20HLMA3 : " + str(pp.n_HLMA3(k, 20)))
+        #
+        # print("3HPEE3 : " + str(pp.n_HPEE3(k, 3)))
+        # print("3LPEE3 : " + str(pp.n_LPEE3(k, 3)))
+        # print("5HPEE3 : " + str(pp.n_HPEE3(k, 5)))
+        # print("5LPEE3 : " + str(pp.n_LPEE3(k, 5)))
+        # print("10HPEE3 : " + str(pp.n_HPEE3(k, 10)))
+        # print("10LPEE3 : " + str(pp.n_LPEE3(k, 10)))
+        # print("20HPEE3 : " + str(pp.n_HPEE3(k, 20)))
+        # print("20LPEE3 : " + str(pp.n_LPEE3(k, 20)))
+        #
+        # print("3HPEEA3 : " + str(pp._3HPEEA3(k)))
+        # print("3LPEEA3 : " + str(pp._3LPEEA3(k)))
+        #
+        # print("3EHP123 : " + str(pp.n_EHP123(k, 3)))
+        # print("3ELP123 : " + str(pp.n_ELP123(k, 3)))
+        # print("5EHP123 : " + str(pp.n_EHP123(k, 5)))
+        # print("5ELP123 : " + str(pp.n_ELP123(k, 5)))
+        # print("10EHP123 : " + str(pp.n_EHP123(k, 10)))
+        # print("10ELP123 : " + str(pp.n_ELP123(k, 10)))
+        # print("20EHP123 : " + str(pp.n_EHP123(k, 20)))
+        # print("20ELP123 : " + str(pp.n_ELP123(k, 20)))
+        #
+        # print("3HLW123 : " + str(pp.n_HLW123(k, 3)))
+        # print("5HLW123 : " + str(pp.n_HLW123(k, 5)))
+        # print("10HLW123 : " + str(pp.n_HLW123(k, 10)))
+        # print("20HLW123 : " + str(pp.n_HLW123(k, 20)))
+        #
+        # print("3HLMA123 : " + str(pp.n_HLMA123(k, 3)))
+        # print("5HLMA123 : " + str(pp.n_HLMA123(k, 5)))
+        # print("10HLMA123 : " + str(pp.n_HLMA123(k, 10)))
+        # print("20HLMA123 : " + str(pp.n_HLMA123(k, 20)))
+        #
+        # print("3HPEE123 : " + str(pp.n_HPEE123(k, 3)))
+        # print("3LPEE123 : " + str(pp.n_LPEE123(k, 3)))
+        # print("5HPEE123 : " + str(pp.n_HPEE123(k, 5)))
+        # print("5LPEE123 : " + str(pp.n_LPEE123(k, 5)))
+        # print("10HPEE123 : " + str(pp.n_HPEE123(k, 10)))
+        # print("10LPEE123 : " + str(pp.n_LPEE123(k, 10)))
+        # print("20HPEE123 : " + str(pp.n_HPEE123(k, 20)))
+        # print("20LPEE123 : " + str(pp.n_LPEE123(k, 20)))
+        #
+        # print("3HPEEA123 : " + str(pp._3HPEEA123(k)))
+        # print("3LPEEA123 : " + str(pp._3LPEEA123(k)))
+        #
+        # print("3EHP23 : " + str(pp.n_EHP23(k, 3)))
+        # print("3ELP23 : " + str(pp.n_ELP23(k, 3)))
+        # print("5EHP23 : " + str(pp.n_EHP23(k, 5)))
+        # print("5ELP23 : " + str(pp.n_ELP23(k, 5)))
+        # print("10EHP23 : " + str(pp.n_EHP23(k, 10)))
+        # print("10ELP23 : " + str(pp.n_ELP23(k, 10)))
+        # print("20EHP23 : " + str(pp.n_EHP23(k, 20)))
+        # print("20ELP23 : " + str(pp.n_ELP23(k, 20)))
+        #
+        # # 12차
+        # print("3HLW23 : " + str(pp.n_HLW23(k, 3)))
+        # print("5HLW23 : " + str(pp.n_HLW23(k, 5)))
+        # print("10HLW23 : " + str(pp.n_HLW23(k, 10)))
+        # print("20HLW23 : " + str(pp.n_HLW23(k, 20)))
+        #
+        # print("3HLMA23 : " + str(pp.n_HLMA23(k, 3)))
+        # print("5HLMA23 : " + str(pp.n_HLMA23(k, 5)))
+        # print("10HLMA23 : " + str(pp.n_HLMA23(k, 10)))
+        # print("20HLMA23 : " + str(pp.n_HLMA23(k, 20)))
+        #
+        # print("3HPEE23 : " + str(pp.n_HPEE23(k, 3)))
+        # print("3LPEE23 : " + str(pp.n_LPEE23(k, 3)))
+        # print("5HPEE23 : " + str(pp.n_HPEE23(k, 5)))
+        # print("5LPEE23 : " + str(pp.n_LPEE23(k, 5)))
+        # print("10HPEE23 : " + str(pp.n_HPEE23(k, 10)))
+        # print("10LPEE23 : " + str(pp.n_LPEE23(k, 10)))
+        # print("20HPEE23 : " + str(pp.n_HPEE23(k, 20)))
+        # print("20LPEE23 : " + str(pp.n_LPEE23(k, 20)))
+        #
+        # print("3HPEEA23 : " + str(pp._3HPEEA23(k)))
+        # print("3LPEEA23 : " + str(pp._3LPEEA23(k)))
+        #
+        # print("3EHP12 : " + str(pp.n_EHP12(k, 3)))
+        # print("3ELP12 : " + str(pp.n_ELP12(k, 3)))
+        # print("5EHP12 : " + str(pp.n_EHP12(k, 5)))
+        # print("5ELP12 : " + str(pp.n_ELP12(k, 5)))
+        # print("10EHP12 : " + str(pp.n_EHP12(k, 10)))
+        # print("10ELP12 : " + str(pp.n_ELP12(k, 10)))
+        # print("20EHP12 : " + str(pp.n_EHP12(k, 20)))
+        # print("20ELP12 : " + str(pp.n_ELP12(k, 20)))
+        #
+        # print("3HLW12 : " + str(pp.n_HLW12(k, 3)))
+        # print("5HLW12 : " + str(pp.n_HLW12(k, 5)))
+        # print("10HLW12 : " + str(pp.n_HLW12(k, 10)))
+        # print("20HLW12 : " + str(pp.n_HLW12(k, 20)))
+        #
+        # print("3HLMA12 : " + str(pp.n_HLMA12(k, 3)))
+        # print("5HLMA12 : " + str(pp.n_HLMA12(k, 5)))
+        # print("10HLMA12 : " + str(pp.n_HLMA12(k, 10)))
+        # print("20HLMA12 : " + str(pp.n_HLMA12(k, 20)))
+        #
+        # print("3HPEE12 : " + str(pp.n_HPEE12(k, 3)))
+        # print("3LPEE12 : " + str(pp.n_LPEE12(k, 3)))
+        # print("5HPEE12 : " + str(pp.n_HPEE12(k, 5)))
+        # print("5LPEE12 : " + str(pp.n_LPEE12(k, 5)))
+        # print("10HPEE12 : " + str(pp.n_HPEE12(k, 10)))
+        # print("10LPEE12 : " + str(pp.n_LPEE12(k, 10)))
+        # print("20HPEE12 : " + str(pp.n_HPEE12(k, 20)))
+        # print("20LPEE12 : " + str(pp.n_LPEE12(k, 20)))
+        #
+        # print("3HPEEA12 : " + str(pp._3HPEEA12(k)))
+        # print("3LPEEA12 : " + str(pp._3LPEEA12(k)))
+        # print(" : " + str(pp.))
+
+
+
+        return context
+
 
 
 # auth pages
@@ -2387,3 +2637,5 @@ company_info_view = CompanyInfoView.as_view(template_name='pages/company-info.ht
 price_analysis_view = PriceAnalysisView.as_view(template_name='pages/price-analysis.html')
 social_analysis_view = SocialAnalysisView.as_view(template_name='pages/social-analysis.html')
 people_iframe = PeopleIframe.as_view(template_name="pages/peopleIframe.html")
+
+price_predict_view = PricePredict.as_view(template_name="pages/peopleIframe.html")

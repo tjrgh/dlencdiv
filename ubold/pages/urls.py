@@ -36,6 +36,8 @@ from .views import (
     company_info_board_member,
     company_info_bm_personal_wage,
     people_iframe,
+    price_predict_view,
+
 )
 
 
@@ -87,5 +89,6 @@ urlpatterns = [
     path("ajax/socialanalysis/mentionData", mention_data, name="mention_data"),
     path("ajax/socialanalysis/posNegData", pos_neg_data, name="pos_neg_data"),
 
-
+    # 주가 예측
+    path("pricePredict", price_predict_view, name="price_predict")
 ]
