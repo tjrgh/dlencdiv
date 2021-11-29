@@ -89,6 +89,8 @@
 {#            </form>#}
   </div>
 
+  <button id="tempBtn">button</button>
+
   {% for mention_type, value in mention_data.items %}
     <div class="row">
       <div class="col-lg-12">
@@ -350,6 +352,8 @@ $(document).ready(function () {
 <script src="{% static 'libs/file-saver/dist/FileSaver.min.js' %}"></script>
 {#<script lang="javascript" src="dist/xlsx.full.min.js"></script>#}
 
+<script src="{% static 'libs/html2canvas/dist/html2canvas.js' %}"></script>
+
 <script>
   !function (b) {
     "use strict";
@@ -440,7 +444,8 @@ $(document).ready(function () {
             {#colors: t,#}
             tooltip: true,
             tooltipOpts: {content: "%s : %x, %y", shifts: {x: -30, y: -50}}//마우스 올려 놓았을 때 작은 설명 모달. %x가 x축 값, .2가 표시할 소수점 자리수.
-        }, b.plot(b(a), r, t)
+        }
+        return b.plot(b(a), r, t)
     },
 
     a.prototype.setSocialAnalysisGraphOptAndCreate = function (graph_el_id, checkbox_el_id, data, keyword_color){
@@ -477,7 +482,7 @@ $(document).ready(function () {
       graphData.unshift({label:"sum", data: sumSeries, bars: { show: true, fillColor:"#e3e5e5", },
                   lines:{show: false}, color: "#e3e5e5", })
 
-      this.createSocialAnalysisGraph("#"+graph_el_id, {}, [], graphData);
+      var plot = this.createSocialAnalysisGraph("#"+graph_el_id, {}, [], graphData);
 
       //항목 체크박스 선택시 이벤트 핸들러.
       function toggleKeyword(mainObj){
@@ -623,6 +628,13 @@ $(document).ready(function () {
           checkboxEl.attr("style", preStyle+" background-color: "+color_list[idx]+" !important; border-color: "+color_list[idx]+" !important; ")
         })
       }){% endcomment %}
+
+      $("#tempBtn").click(function (){
+        html2canvas(document.querySelector("#total_mention-graph")).then(canvas=>{
+          {#document.body.append(canvas)#}
+          document.location.href = canvas.toDataURL().replace("image/png", "image/octet-stream")
+        })
+      })
 
       //키워드 체크 박스 색 설정
       var keyword_list = {{ keyword_list|safe|default:"[]" }}
