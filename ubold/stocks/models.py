@@ -478,6 +478,15 @@ class SocialKeywords(TimeStampMixin):
         , help_text='종목코드'
         , null=True
     )
+    class SearchSite(models.TextChoices):
+        sometrend = "sometrend", "썸트랜드"
+        bigkinds = "bigkinds", "빅카인즈"
+        etc = "etc", "기타"
+    class UseSite(models.TextChoices):
+        bbd = "bbd", "BBD"
+        dlenc = "dlenc", "DLENC"
+        divlab = "divlab", "DIVLAB"
+        etc = "etc", "기타"
     corp_code = models.CharField(null=True, max_length=9, help_text='DART 고유번호')
     keyword = models.CharField(max_length=50, help_text='검색 키워드')
     equal_keyword_list = models.CharField(blank=True, default='', max_length=500, help_text='동의어 목록')
@@ -486,12 +495,39 @@ class SocialKeywords(TimeStampMixin):
     exclude_keyword_list = models.CharField(blank=True, default='', max_length=500, help_text='제외어 목록')
     is_followed = models.BooleanField(default=True, help_text="지속적 수집 여부")
     is_deleted = models.BooleanField(default=False, help_text="삭제 여부")
+    search_site = models.CharField(
+        max_length=20,
+        choices=SearchSite.choices,
+        default=SearchSite.etc,
+        help_text='검색에 사용되는 사이트 : sometrend(썸트랜드), bigkings(빅카인즈), etc(기타)'
+    )
+    use_site = models.CharField(
+        max_length=10,
+        choices=UseSite.choices,
+        default=UseSite.etc,
+        help_text='데이터를 사용하는 사이트 : bbd(BBD), dlenc(DLENC), divlab(DIVLAB), etc(기타)'
+    )
+    keyword_group = models.ForeignKey(
+        'SocialKeywordGroup'
+        , related_name='keyword_group'
+        , on_delete=models.PROTECT
+        , to_field='id'
+        , help_text='키워드 그룹'
+        , null=True
+    )
 
     class Meta:
         db_table = 'social_keywords'
         unique_together = ["code", "keyword", "equal_keyword_list", "or_include_keyword_list",
-                           "and_include_keyword_list", "exclude_keyword_list"]
+                           "and_include_keyword_list", "exclude_keyword_list", "search_site"]
 
+class SocialKeywordGroup(TimeStampMixin):
+    code = models.CharField(max_length=50, help_text="키워드 그룹 코드")
+    description = models.CharField(max_length=50, help_text="키워드 그룹 설명")
+
+    class Meta:
+        db_table = "social_keyword_group"
+        unique_together = ["code"]
 
 class SocialSearchList(TimeStampMixin):
     keyword = models.ForeignKey(

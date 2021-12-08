@@ -40,11 +40,16 @@
     <div class="col-12">
       <div class="page-title-box">
         <h4 class="page-title">
-          기업정보
-          {% if comp_name %}
-            - {{ comp_name }}
-          {% endif %}
+            {{ request.GET.lv1 }} - {{ request.GET.lv2 }}
         </h4>
+            포함 키워드 :
+            {% for include_keyword in include_keyword_set %}
+                {% if forloop.last == False %}
+                    {{ include_keyword }},&nbsp;
+                {% else %}
+                    {{ include_keyword }}
+                {% endif %}
+            {% endfor %}
       </div>
     </div>
   </div>
@@ -71,6 +76,20 @@
           value="{{ request.GET.endDate }}"
           style="display:inline-block; width:15%;"
         />
+        <input
+          class="form-control"
+          type="text"
+          name="lv1"
+          value="{{ request.GET.lv1 }}"
+          style="display:none;"
+        />
+        <input
+          class="form-control"
+          type="text"
+          name="lv2"
+          value="{{ request.GET.lv2 }}"
+          style="display:none;"
+        />
         <div id="date_term_btn" class="btn-group">
           <button type="button" class="btn btn-soft-primary" value="1">1개월</button>
           <button type="button" class="btn btn-soft-primary" value="3">3개월</button>
@@ -89,7 +108,1196 @@
 {#            </form>#}
   </div>
 
-  <button id="tempBtn">button</button>
+{#  평판 지수 그래프. #}
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div id="reputationIndexGraphDiv" class="card-body">
+            <h4 class="header-title" >평판 지수</h4>
+
+            <div class="loading">
+              <div class="spinner-border avatar-md"></div>
+            </div>
+
+            <div class="itemContent" style="margin-top:3vh; width:100%;">
+              <div style="display: flex; justify-content: right; margin:1vh 0vw">
+                <button class="btn-primary rounded" id="reputationIndexImgBtn" style="padding: 5px 10px; margin: 0 5px;">이미지 저장</button>
+                <button class="btn-primary rounded" id="reputationIndexExcelBtn" style="padding: 5px 10px; margin: 0 5px;">엑셀 다운</button>
+              </div>
+
+              <div
+                id="reputationIndexGraph"
+                style="
+                  height: 450px;
+                  width: 100%;
+                  {#width: 600px;#}
+                "
+                data-colors="#4fc6e1,#f7b84b,#4a81d4"
+              ></div>
+
+              <div class="keyword-checkbox" id="reputationIndex-checkbox" style="
+                width: 100%;
+                margin-top:2vh;
+              ">
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter <= 10 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="reputationIndex-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="reputationIndex-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="reputationIndex-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter > 10 and forloop.counter <= 20 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="reputationIndex-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="reputationIndex-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="reputationIndex-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter > 20 and forloop.counter <= 30 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="reputationIndex-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="reputationIndex-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="reputationIndex-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter > 30 and forloop.counter <= 40 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="reputationIndex-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="reputationIndex-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="reputationIndex-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                    ">
+                        <button class="btn-secondary btn-rounded checkAll">전체선택</button>
+                    </li>
+                    <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                    ">
+                        <button class="btn-light btn-rounded unCheckAll">전체해제</button>
+                    </li>
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                    ">
+                        <select id="selectPopulation" class="">
+                            <option value="total">모집단 전체</option>
+                            <option value="choice">선택 키워드 모집단</option>
+                        </select>
+                    </li>
+                    <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                    ">
+                        <button id="calculateIndexBtn" class="btn-light btn-rounded">지수 계산</button>
+                    </li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <!-- end card -->
+      </div>
+    </div>
+    <!-- 퍼블리싱 지수 그래프-->
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div id="publishingIndexGraphDiv" class="card-body">
+            <h4 class="header-title" >퍼블리싱 지수</h4>
+
+            <div class="loading">
+              <div class="spinner-border avatar-md"></div>
+            </div>
+
+            <div class="itemContent" style="margin-top:3vh; width:100%;">
+              <div style="display: flex; justify-content: right; margin:1vh 0vw">
+                <button class="btn-primary rounded" id="publishingIndexImgBtn" style="padding: 5px 10px; margin: 0 5px;">이미지 저장</button>
+{#                <button class="btn-primary rounded" id="publishingIndexExcelBtn" style="padding: 5px 10px; margin: 0 5px;">엑셀 다운</button>#}
+              </div>
+
+              <div
+                id="publishingIndexGraph"
+                style="
+                  height: 450px;
+                  width: 100%;
+                  {#width: 600px;#}
+                "
+                data-colors="#4fc6e1,#f7b84b,#4a81d4"
+              ></div>
+
+              {% comment %}<div class="keyword-checkbox" id="{{ mention_type }}-checkbox" style="
+                width: 100%;
+                margin-top:2vh;
+              ">
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter <= 10 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter > 10 and forloop.counter <= 20 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter > 20 and forloop.counter <= 30 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter > 30 and forloop.counter <= 40 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                    ">
+                        <button class="btn-secondary btn-rounded checkAll">전체선택</button>
+                    </li>
+                    <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                    ">
+                        <button class="btn-light btn-rounded unCheckAll">전체해제</button>
+                    </li>
+                </ul>
+              </div>{% endcomment %}
+            </div>
+
+          </div>
+        </div>
+        <!-- end card -->
+      </div>
+    </div>
+    <!-- 상호작용 지수 그래프-->
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div id="interactionIndexGraphDiv" class="card-body">
+            <h4 class="header-title" >상호작용 지수</h4>
+
+            <div class="loading">
+              <div class="spinner-border avatar-md"></div>
+            </div>
+
+            <div class="itemContent" style="margin-top:3vh; width:100%;">
+              <div style="display: flex; justify-content: right; margin:1vh 0vw">
+                <button class="btn-primary rounded" id="interactionIndexImgBtn" style="padding: 5px 10px; margin: 0 5px;">이미지 저장</button>
+{#                <button class="btn-primary rounded" id="interactionIndexExcelBtn" style="padding: 5px 10px; margin: 0 5px;">엑셀 다운</button>#}
+              </div>
+
+              <div
+                id="interactionIndexGraph"
+                style="
+                  height: 450px;
+                  width: 100%;
+                  {#width: 600px;#}
+                "
+                data-colors="#4fc6e1,#f7b84b,#4a81d4"
+              ></div>
+
+              {% comment %}<div class="keyword-checkbox" id="{{ mention_type }}-checkbox" style="
+                width: 100%;
+                margin-top:2vh;
+              ">
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter <= 10 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter > 10 and forloop.counter <= 20 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter > 20 and forloop.counter <= 30 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter > 30 and forloop.counter <= 40 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                    ">
+                        <button class="btn-secondary btn-rounded checkAll">전체선택</button>
+                    </li>
+                    <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                    ">
+                        <button class="btn-light btn-rounded unCheckAll">전체해제</button>
+                    </li>
+                </ul>
+              </div>{% endcomment %}
+            </div>
+
+          </div>
+        </div>
+        <!-- end card -->
+      </div>
+    </div>
+    <!-- 공감 지수 그래프-->
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div id="sympathyIndexGraphDiv" class="card-body">
+            <h4 class="header-title" >공감 지수</h4>
+
+            <div class="loading">
+              <div class="spinner-border avatar-md"></div>
+            </div>
+
+            <div class="itemContent" style="margin-top:3vh; width:100%;">
+              <div style="display: flex; justify-content: right; margin:1vh 0vw">
+                <button class="btn-primary rounded" id="sympathyIndexImgBtn" style="padding: 5px 10px; margin: 0 5px;">이미지 저장</button>
+{#                <button class="btn-primary rounded" id="sympathyIndexExcelBtn" style="padding: 5px 10px; margin: 0 5px;">엑셀 다운</button>#}
+              </div>
+
+              <div
+                id="sympathyIndexGraph"
+                style="
+                  height: 450px;
+                  width: 100%;
+                  {#width: 600px;#}
+                "
+                data-colors="#4fc6e1,#f7b84b,#4a81d4"
+              ></div>
+
+              {% comment %}<div class="keyword-checkbox" id="{{ mention_type }}-checkbox" style="
+                width: 100%;
+                margin-top:2vh;
+              ">
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter <= 10 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter > 10 and forloop.counter <= 20 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter > 20 and forloop.counter <= 30 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter > 30 and forloop.counter <= 40 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                    ">
+                        <button class="btn-secondary btn-rounded checkAll">전체선택</button>
+                    </li>
+                    <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                    ">
+                        <button class="btn-light btn-rounded unCheckAll">전체해제</button>
+                    </li>
+                </ul>
+              </div>{% endcomment %}
+            </div>
+
+          </div>
+        </div>
+        <!-- end card -->
+      </div>
+    </div>
+    <!-- 긍정 지수 그래프-->
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div id="posIndexGraphDiv" class="card-body">
+            <h4 class="header-title" >긍정 지수</h4>
+
+            <div class="loading">
+              <div class="spinner-border avatar-md"></div>
+            </div>
+
+            <div class="itemContent" style="margin-top:3vh; width:100%;">
+              <div style="display: flex; justify-content: right; margin:1vh 0vw">
+                <button class="btn-primary rounded" id="posIndexImgBtn" style="padding: 5px 10px; margin: 0 5px;">이미지 저장</button>
+{#                <button class="btn-primary rounded" id="posIndexExcelBtn" style="padding: 5px 10px; margin: 0 5px;">엑셀 다운</button>#}
+              </div>
+
+              <div
+                id="posIndexGraph"
+                style="
+                  height: 450px;
+                  width: 100%;
+                  {#width: 600px;#}
+                "
+                data-colors="#4fc6e1,#f7b84b,#4a81d4"
+              ></div>
+
+              {% comment %}<div class="keyword-checkbox" id="{{ mention_type }}-checkbox" style="
+                width: 100%;
+                margin-top:2vh;
+              ">
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter <= 10 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter > 10 and forloop.counter <= 20 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter > 20 and forloop.counter <= 30 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter > 30 and forloop.counter <= 40 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                    ">
+                        <button class="btn-secondary btn-rounded checkAll">전체선택</button>
+                    </li>
+                    <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                    ">
+                        <button class="btn-light btn-rounded unCheckAll">전체해제</button>
+                    </li>
+                </ul>
+              </div>{% endcomment %}
+            </div>
+
+          </div>
+        </div>
+        <!-- end card -->
+      </div>
+    </div>
 
   {% for mention_type, value in mention_data.items %}
     <div class="row">
@@ -104,7 +1312,8 @@
 
             <div class="itemContent" style="margin-top:3vh; width:100%;">
               <div style="display: flex; justify-content: right; margin:1vh 0vw">
-                <button class="btn-primary rounded" id="{{ mention_type }}ExcelBtn" style="padding: 5px 10px;">엑셀 다운</button>
+                <button class="btn-primary rounded" id="{{ mention_type }}ImgBtn" style="padding: 5px 10px; margin: 0 5px;">이미지 저장</button>
+                <button class="btn-primary rounded" id="{{ mention_type }}ExcelBtn" style="padding: 5px 10px; margin: 0 5px;">엑셀 다운</button>
               </div>
 
               <div
@@ -116,53 +1325,239 @@
                 data-colors="#4fc6e1,#f7b84b,#4a81d4"
               ></div>
 
-              <div class="keyword-checkbox" style="
+              <div class="keyword-checkbox" id="{{ mention_type }}-checkbox" style="
                 width: 100%;
+                margin-top:2vh;
               ">
-                <ul id="{{ mention_type }}-checkbox" style="margin-top: 2vh; display: flex; justify-content: center;">
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
                     {% for keyword in keyword_list %}
-                      <li style="
+                        {% if forloop.counter <= 10 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
                         display: inline;
                         padding: 0.2vh 0.5vw;
                       ">
-                        <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
-                          display: inline-block;
-                          border: 1px solid #6658dd ;
-                          border-radius: 2em;
-                          padding: 0.5vh 0.6vw;
-                        ">
-                          <input
-                            class="form-check-input"
-                            type="checkbox"
-                            value={{ keyword }}
-                            id="{{ mention_type }}-{{ keyword }}-checkbox"
-                            checked="checked"
-                            style="display: inline-block; margin-left: 0;"
-                          />
-                          <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
-                        </div>
-                      </li>
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
                     {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter > 10 and forloop.counter <= 20 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter > 20 and forloop.counter <= 30 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    {% for keyword in keyword_list %}
+                        {% if forloop.counter > 30 and forloop.counter <= 40 %}
+                            <li style="
+                                display: inline;
+                                padding: 0.2vh 0.5vw;
+                            ">
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                  display: inline-block;
+                                  border: 1px solid #6658dd ;
+                                  border-radius: 2em;
+                                  padding: 0.5vh 0.6vw;
+                                ">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value={{ keyword }}
+                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
+                                    checked="checked"
+                                    style="display: inline-block; margin-left: 0;"
+                                  />
+                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
+                                </div>
+                            </li>
+                            {% if forloop.last == True %}
+                                <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                      ">
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    display: inline-block;
+                                    border: 1px solid #6658dd ;
+                                    border-radius: 2em;
+                                    padding: 0.5vh 0.6vw;
+                                    ">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          value="sum"
+                                          id="{{ mention_type }}-sum-checkbox"
+                                          checked="checked"
+                                          style="display: inline-block; margin-left: 0;"
+                                        />
+                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
                     <li style="
                         display: inline;
                         padding: 0.2vh 0.5vw;
-                      ">
-                      <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
-                        display: inline-block;
-                        border: 1px solid #6658dd ;
-                        border-radius: 2em;
-                        padding: 0.5vh 0.6vw;
-                      ">
-                        <input
-                          class="form-check-input"
-                          type="checkbox"
-                          value="sum"
-                          id="{{ mention_type }}-sum-checkbox"
-                          checked="checked"
-                          style="display: inline-block; margin-left: 0;"
-                        />
-                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
-                      </div>
+                    ">
+                        <button class="btn-secondary btn-rounded checkAll">전체선택</button>
+                    </li>
+                    <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                    ">
+                        <button class="btn-light btn-rounded unCheckAll">전체해제</button>
+                    </li>
+                </ul>
+                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                    ">
+                        <select id="{{ mention_type }}GraphShapeLineBarSelect" class="">
+                            <option value="line" selected>선 그래프</option>
+                            <option value="bar">막대 그래프</option>
+                        </select>
+                    </li>
+                    <li style="
+                        display: inline;
+                        padding: 0.2vh 0.5vw;
+                    ">
+                        <button id="{{ mention_type }}GraphShapeOptBtn" class="btn-light btn-rounded">변경</button>
                     </li>
                 </ul>
               </div>
@@ -187,22 +1582,83 @@
             </div>
 
             <div class="itemContent">
-              <div id="posNegKeywordRadio" style="display:flex; justify-content: center; ">
-              {% for keyword in keyword_list %}
-                <div class="form-check mb-2" style="margin: 1vh 1vw; ">
-                  <input
-                    class="form-check-input"
-                    type="radio"
-                    name="flexRadioDefault"
-                    value="{{ keyword }}"
-                    id="posNegRadio-{{ keyword }}"
-                    checked
-                  />
-                  <label class="form-check-label" for="posNegRadio-{{ keyword }}"
-                    >{{keyword}}</label
-                  >
+              <div id="posNegKeywordRadio" >
+                <div style="display:flex; justify-content: center; ">
+                    {% for keyword in keyword_list %}
+                      {% if forloop.counter <= 10 %}
+                            <div class="form-check mb-2" style="margin: 1vh 1vw; ">
+                              <input
+                                class="form-check-input"
+                                type="radio"
+                                name="flexRadioDefault"
+                                value="{{ keyword }}"
+                                id="posNegRadio-{{ keyword }}"
+                                checked
+                              />
+                              <label class="form-check-label" for="posNegRadio-{{ keyword }}"
+                                >{{keyword}}</label
+                              >
+                            </div>
+                      {% endif %}
+                  {% endfor %}
                 </div>
-              {% endfor %}
+                <div style="display:flex; justify-content: center; ">
+                    {% for keyword in keyword_list %}
+                      {% if forloop.counter > 10 and forloop.counter <= 20 %}
+                            <div class="form-check mb-2" style="margin: 1vh 1vw; ">
+                              <input
+                                class="form-check-input"
+                                type="radio"
+                                name="flexRadioDefault"
+                                value="{{ keyword }}"
+                                id="posNegRadio-{{ keyword }}"
+                                checked
+                              />
+                              <label class="form-check-label" for="posNegRadio-{{ keyword }}"
+                                >{{keyword}}</label
+                              >
+                            </div>
+                      {% endif %}
+                    {% endfor %}
+                </div>
+                <div style="display:flex; justify-content: center; ">
+                    {% for keyword in keyword_list %}
+                      {% if forloop.counter > 20 and forloop.counter <= 30 %}
+                            <div class="form-check mb-2" style="margin: 1vh 1vw; ">
+                              <input
+                                class="form-check-input"
+                                type="radio"
+                                name="flexRadioDefault"
+                                value="{{ keyword }}"
+                                id="posNegRadio-{{ keyword }}"
+                                checked
+                              />
+                              <label class="form-check-label" for="posNegRadio-{{ keyword }}"
+                                >{{keyword}}</label
+                              >
+                            </div>
+                      {% endif %}
+                    {% endfor %}
+                </div>
+                <div style="display:flex; justify-content: center; ">
+                    {% for keyword in keyword_list %}
+                      {% if forloop.counter > 30 and forloop.counter <= 40 %}
+                            <div class="form-check mb-2" style="margin: 1vh 1vw; ">
+                              <input
+                                class="form-check-input"
+                                type="radio"
+                                name="flexRadioDefault"
+                                value="{{ keyword }}"
+                                id="posNegRadio-{{ keyword }}"
+                                checked
+                              />
+                              <label class="form-check-label" for="posNegRadio-{{ keyword }}"
+                                >{{keyword}}</label
+                              >
+                            </div>
+                      {% endif %}
+                    {% endfor %}
+                </div>
             </div>
 
               <div style="display: flex; justify-content: center; width: 100%;">
@@ -372,13 +1828,14 @@ $(document).ready(function () {
     },
 
     {#언급량 전체 추이 그래프. #}
-    a.prototype.createSocialAnalysisGraph = function (a, o, t, r) {
+    a.prototype.createSocialAnalysisGraph = function (id, o, t, data) {
         t = {
             bars: {
               show: false,
               barWidth: 60*60*24*1*1000,//x축(수평그래프라면 y축)의 단위 기준. 현재 y축이 시간 단위이므로, millisecond단위로 값을 주어야 y축에서 그만큼에 해당하는 넓이를 부여함.
               horizontal:false,
               align: "center",
+                fill: 1,
             },
             lines:{
               show:true,
@@ -445,15 +1902,24 @@ $(document).ready(function () {
             tooltip: true,
             tooltipOpts: {content: "%s : %x, %y", shifts: {x: -30, y: -50}}//마우스 올려 놓았을 때 작은 설명 모달. %x가 x축 값, .2가 표시할 소수점 자리수.
         }
-        return b.plot(b(a), r, t)
+        return b.plot(b(id), data, t)
     },
 
-    a.prototype.setSocialAnalysisGraphOptAndCreate = function (graph_el_id, checkbox_el_id, data, keyword_color){
+    a.prototype.setSocialAnalysisGraphOptAndCreate = function (graph_el_id, checkbox_el_id, data, keyword_color, mentionType){
+        var graphShapeOpt = {}
+        graphShapeOpt["barLine"] = $("#"+mentionType+"GraphShapeLineBarSelect").val();
+
       //처음 그래프 그리기.
       var graphData = new Array;//flot char 함수에 전달할 데이터 리스트.
       //모든 키워드 데이터 리스트에 추가.
       Object.keys(data).forEach(function (keyword, i){
-        graphData.push({label:keyword, data: data[keyword], color: keyword_color[keyword]})
+          if(graphShapeOpt["barLine"] === "bar"){
+              graphData.push({label:keyword, data: data[keyword], color: keyword_color[keyword], bars:{show: true}, lines: {show: false}})
+          }
+          else if(graphShapeOpt["barLine"] === "line"){
+              graphData.push({label:keyword, data: data[keyword], color: keyword_color[keyword], })
+          }
+
         //flotchar의 stacked graph를 이용하여 그래프 상에 보여지는 값들의 합 bar 생성.
         //그래프 그려지는 순서 옵션 찾지 못해 graphData의 첫 번째 위치에 stacked graph데이터가 위치해야하여 unshift 사용.
         {#graphData.unshift({label:"sum", data: data[keyword], bars: { show: true, fillColor:"#e3e5e5", },#}
@@ -486,6 +1952,9 @@ $(document).ready(function () {
 
       //항목 체크박스 선택시 이벤트 핸들러.
       function toggleKeyword(mainObj){
+          var graphShapeOpt = {}
+        graphShapeOpt["barLine"] = $("#"+mentionType+"GraphShapeLineBarSelect").val();
+
         var graphData = new Array;
 
         //체크된 키워드들의 데이터만 추가하여 그래프 생성.
@@ -493,7 +1962,12 @@ $(document).ready(function () {
           if ($(this).is(":checked")) {
               var keyword = $(this).attr("value")
               if(keyword!=="sum"){
-                graphData.push({label:keyword, data: data[keyword], color: keyword_color[keyword]})
+                  if(graphShapeOpt["barLine"] === "bar"){
+                      graphData.push({label:keyword, data: data[keyword], color: keyword_color[keyword], bars:{show: true}, lines: {show: false}})
+                  }
+                  else if(graphShapeOpt["barLine"] === "line"){
+                      graphData.push({label:keyword, data: data[keyword], color: keyword_color[keyword], })
+                  }
               }
 
               //위 '처음 그래프 그리기'와 동일한 설명.
@@ -534,6 +2008,18 @@ $(document).ready(function () {
       $("#"+checkbox_el_id).find("input[type='checkbox']").click(function () {//체크박스에 클릭이벤트 핸들러 정의.
           toggleKeyword(mainObj);
       });
+      $("#"+checkbox_el_id).find(".checkAll").click(function (){
+          $("#"+checkbox_el_id).find("input[type='checkbox']").prop("checked", true)
+          toggleKeyword(mainObj)
+      })
+        $("#"+checkbox_el_id).find(".unCheckAll").click(function (){
+            $("#"+checkbox_el_id).find("input[type='checkbox']").prop("checked", false)
+            toggleKeyword(mainObj)
+        })
+
+        $("#"+mentionType+"GraphShapeOptBtn").click(function (){
+            toggleKeyword(mainObj)
+        })
     },
 
     {#긍부정어 그래프. #}
@@ -612,487 +2098,961 @@ $(document).ready(function () {
         }, b.plot(b(a), r, t)
     },
 
-    a.prototype.init = function () {
-      var o
-      //그래프 색.
-      var color_list = ["#4fc6e1", "#1abc9c", "#4a81d4", "#f7b84b", "#f1556c", "#754100", "#444c57", "#ffcbcb", "#ff6347", "#ee82ee", "#fa8072", "#8000080", "#ffff00", "#ff0000"]
-
-      //키워드 체크 박스 색 변경.
-      {% comment %}$(".keyword-checkbox").each(function (){
-        $(this).find("ul > li > div").each(function (idx){
-          //div테두리 색 변경.
-          $(this).css("border", "1px solid "+color_list[idx])
-          //체크 박스 색 변경.
-          var checkboxEl = $(this).find("input[type='checkbox']")
-          var preStyle = checkboxEl.attr("style")
-          checkboxEl.attr("style", preStyle+" background-color: "+color_list[idx]+" !important; border-color: "+color_list[idx]+" !important; ")
-        })
-      }){% endcomment %}
-
-      $("#tempBtn").click(function (){
-        html2canvas(document.querySelector("#total_mention-graph")).then(canvas=>{
-          {#document.body.append(canvas)#}
-          document.location.href = canvas.toDataURL().replace("image/png", "image/octet-stream")
-        })
-      })
-
-      //키워드 체크 박스 색 설정
-      var keyword_list = {{ keyword_list|safe|default:"[]" }}
-      var keyword_color = {}
-      for(var i=0; i<keyword_list.length; i++){
-        keyword_color[keyword_list[i]] = color_list[i]
-      }
-
-      $(".keyword-checkbox").each(function (){
-        $(this).find("ul > li > div").each(function (idx){
-          var keyword = $(this).attr("id").split("-")[1]
-          var checkBoxColor = ""
-
-          if(keyword === "sum"){checkBoxColor = "#bfbfbf"}
-          else{checkBoxColor = keyword_color[keyword]}
-
-          //div테두리 색 변경.
-          $(this).css("border", "1px solid "+checkBoxColor)
-          //체크 박스 색 변경.
-          var checkboxEl = $(this).find("input[type='checkbox']")
-          var preStyle = checkboxEl.attr("style")
-          checkboxEl.attr("style", preStyle+" background-color: "+checkBoxColor+" !important; border-color: "+checkBoxColor+" !important; ")
-        })
-      })
-
-      {#$("#total_mentionItem .loading").css("display", "none")#}
-      {#$("#total_mentionItem .itemContent").css("display", "block")#}
-      {##}
-      {#언급량 전체 추이 그래프. #}
-      {#var mention_total_count_graph_data = {{ mention_data.total_mention.count_list|safe|default:"{}" }};#}
-      {#this.setSocialAnalysisGraphOptAndCreate("total_mention-graph", "total_mention-checkbox", mention_total_count_graph_data, keyword_color);#}
-
-      var mainObj = this
-
-      {#전체 추이 그래프. #}
-      {% comment %}$.ajax({
-        url: "/pages/ajax/socialanalysis/mentionData?lv1=financial&lv2=local_bank&mention_source=total",
-        success: function (data){
-          console.log(data);
-
-          var mention_graph_data = data["mention_data"]["count_list"]
-          mainObj.setSocialAnalysisGraphOptAndCreate("total_mention-graph", "total_mention-checkbox", mention_graph_data, keyword_color);
-        }
-      }){% endcomment %}
-
-      var lv1 = window.location.href.split("socialanalysis/")[1].split("/")[0]
-      var lv2 = window.location.href.split("socialanalysis/")[1].split("/")[1]
-
-      {#커뮤니티 추이 그래프. #}
-      var community_mention_graph_data = {}
-      var insta_mention_graph_data = {}
-      var blog_mention_graph_data = {}
-      var news_mention_graph_data = {}
-      var twitter_mention_graph_data = {}
-      $.ajax({
-        url: "/pages/ajax/socialanalysis/mentionData?lv1="+lv1+"&lv2="+lv2+"&mention_source=community",
-        success: function (data){
-          console.log(data);
-
-          //전체 언급량 그래프.
-          $("#total_mentionItem .loading").css("display", "none")
-          $("#total_mentionItem .itemContent").css("display", "block")
-
-          {#var mention_total_count_graph_data = {{ mention_data.total_mention.count_list|safe|default:"{}" }};#}
-          var mention_total_count_graph_data = data["mention_data"]["total_mention"]["count_list"]
-          mainObj.setSocialAnalysisGraphOptAndCreate("total_mention-graph", "total_mention-checkbox", mention_total_count_graph_data, keyword_color);
-
-          //커뮤니티 언급량 그래프.
-          $("#community_mentionItem .loading").css("display", "none")
-          $("#community_mentionItem .itemContent").css("display", "block")
-
-          community_mention_graph_data = data["mention_data"]["community_mention"]["count_list"]
-          mainObj.setSocialAnalysisGraphOptAndCreate("community_mention-graph", "community_mention-checkbox", community_mention_graph_data, keyword_color);
-
-          //인스타 언급량 그래프.
-          $("#insta_mentionItem .loading").css("display", "none")
-          $("#insta_mentionItem .itemContent").css("display", "block")
-
-          insta_mention_graph_data = data["mention_data"]["insta_mention"]["count_list"]
-          mainObj.setSocialAnalysisGraphOptAndCreate("insta_mention-graph", "insta_mention-checkbox", insta_mention_graph_data, keyword_color);
-
-          //블로그 언급량 그래프.
-          $("#blog_mentionItem .loading").css("display", "none")
-          $("#blog_mentionItem .itemContent").css("display", "block")
-
-          blog_mention_graph_data = data["mention_data"]["blog_mention"]["count_list"]
-          mainObj.setSocialAnalysisGraphOptAndCreate("blog_mention-graph", "blog_mention-checkbox", blog_mention_graph_data, keyword_color);
-
-          //뉴스 언급량 그래프.
-          $("#news_mentionItem .loading").css("display", "none")
-          $("#news_mentionItem .itemContent").css("display", "block")
-
-          news_mention_graph_data = data["mention_data"]["news_mention"]["count_list"]
-          mainObj.setSocialAnalysisGraphOptAndCreate("news_mention-graph", "news_mention-checkbox", news_mention_graph_data, keyword_color);
-
-          //트위터 언급량 그래프.
-          $("#twitter_mentionItem .loading").css("display", "none")
-          $("#twitter_mentionItem .itemContent").css("display", "block")
-
-          twitter_mention_graph_data = data["mention_data"]["twitter_mention"]["count_list"]
-          mainObj.setSocialAnalysisGraphOptAndCreate("twitter_mention-graph", "twitter_mention-checkbox", twitter_mention_graph_data, keyword_color);
-        }
-      })
-
-      {% comment %}{#인스타 추이 그래프. #}
-      var insta_mention_graph_data = {}
-      $.ajax({
-        url: "/pages/ajax/socialanalysis/mentionData?lv1="+lv1+"&lv2="+lv2+"&mention_source=insta",
-        success: function (data){
-          console.log(data);
-
-          $("#insta_mentionItem .loading").css("display", "none")
-          $("#insta_mentionItem .itemContent").css("display", "block")
-
-          insta_mention_graph_data = data["mention_data"]["count_list"]
-          mainObj.setSocialAnalysisGraphOptAndCreate("insta_mention-graph", "insta_mention-checkbox", insta_mention_graph_data, keyword_color);
-        }
-      })
-
-      {#블로그 추이 그래프. #}
-      var blog_mention_graph_data = {}
-      $.ajax({
-        url: "/pages/ajax/socialanalysis/mentionData?lv1="+lv1+"&lv2="+lv2+"&mention_source=blog",
-        success: function (data){
-          console.log(data);
-
-          $("#blog_mentionItem .loading").css("display", "none")
-          $("#blog_mentionItem .itemContent").css("display", "block")
-
-          blog_mention_graph_data = data["mention_data"]["count_list"]
-          mainObj.setSocialAnalysisGraphOptAndCreate("blog_mention-graph", "blog_mention-checkbox", blog_mention_graph_data, keyword_color);
-        }
-      })
-
-      {#뉴스 추이 그래프. #}
-      var news_mention_graph_data = {}
-      $.ajax({
-        url: "/pages/ajax/socialanalysis/mentionData?lv1="+lv1+"&lv2="+lv2+"&mention_source=news",
-        success: function (data){
-          console.log(data);
-
-          $("#news_mentionItem .loading").css("display", "none")
-          $("#news_mentionItem .itemContent").css("display", "block")
-
-          news_mention_graph_data = data["mention_data"]["count_list"]
-          mainObj.setSocialAnalysisGraphOptAndCreate("news_mention-graph", "news_mention-checkbox", news_mention_graph_data, keyword_color);
-        }
-      })
-
-      {#트위터 추이 그래프. #}
-      var twitter_mention_graph_data = {}
-      $.ajax({
-        url: "/pages/ajax/socialanalysis/mentionData?lv1="+lv1+"&lv2="+lv2+"&mention_source=twitter",
-        success: function (data){
-          console.log(data);
-
-          $("#twitter_mentionItem .loading").css("display", "none")
-          $("#twitter_mentionItem .itemContent").css("display", "block")
-
-          twitter_mention_graph_data = data["mention_data"]["count_list"]
-          mainObj.setSocialAnalysisGraphOptAndCreate("twitter_mention-graph", "twitter_mention-checkbox", twitter_mention_graph_data, keyword_color);
-        }
-      }){% endcomment %}
-
-      //긍부정어 그래프, 테이블, 워드클라우드.
-      var pos_neg_data = {}
-      $.ajax({
-        url: "/pages/ajax/socialanalysis/posNegData?lv1="+lv1+"&lv2="+lv2+"",
-        success: function (data){
-          console.log(data);
-          pos_neg_data = data
-
-          $("#posNegItem .loading").css("display", "none")
-          $("#posNegItem .itemContent").css("display", "block")
-
-          //워드 클라우드 글자 크기 조정을 위한 데이터 값 조절.
-          for(var keyword in pos_neg_data){
-            var keywordWordCloudData = pos_neg_data[keyword]["wordCloud"]
-
-            //평균값 계산
-            var average = 0
-            var sum = 0
-            for(var i=0; i<keywordWordCloudData.length; i++){
-              var cloudKeyword = keywordWordCloudData[i]
-              sum += cloudKeyword[3]
-
-              {#cloudKeyword[1] = parseInt((cloudKeyword[1] / (keywordWordCloudData[0][3]/1500))/10)#}
-            }
-            average = parseInt(sum/30)
-
-            //데이터 조절.
-            for(var i=0; i<keywordWordCloudData.length; i++){
-              var cloudKeyword = keywordWordCloudData[i]
-
-              {#cloudKeyword[1] = parseInt((cloudKeyword[1] / (average/400))/10)#}
-              cloudKeyword[1] = parseInt((cloudKeyword[1] / (keywordWordCloudData[0][3]/1500))/10)
-            }
-          }
-
-
-          {#긍부정어 이벤츠 처리. #}
-          function changePosNegKeyword(target, mainObj){
-            var keyword = ""
-            if(target===null){keyword = $("#posNegKeywordRadio input[type='radio']:last").val()}
-            else{keyword = $(target).val()}
-            {#var pos_neg_data = {{ pos_neg_data|safe|default:"{}" }}#}
-            var keywordData = pos_neg_data[keyword]
-
-            //워드 클라우드 변경.
-            var wordCloudOpt = {
-              list : keywordData["wordCloud"],
-              color: function (word, weight, fontSize, distance, theta, data1){
-                if(data1[0] === "POS"){return "blue";}
-                else if(data1[0] === "NEG"){return "red";}
-                else if(data1[0] === "NEU"){return "gray";}
-                else{return "gray";}
+    a.prototype.createReputationIndexGraph = function (id, o, t, data, xaxisKeywordList) {
+        t = {
+            bars: {
+              show: true,
+              barWidth: 0.5,//x축(수평그래프라면 y축)의 단위 기준. 현재 y축이 시간 단위이므로, millisecond단위로 값을 주어야 y축에서 그만큼에 해당하는 넓이를 부여함.
+                fill: 1,
+              horizontal:false,
+              align: "center",
+            },
+            lines:{
+              show:false,
+            },
+            grid: {
+                show: true,
+                aboveData: false,
+                labelMargin: 5,
+                axisMargin: 0,
+                borderWidth: 1,
+                minBorderMargin: 5,
+                clickable: !0,
+                hoverable: !0,
+                autoHighlight: !1,
+                mouseActiveRadius: 20,
+                borderColor: "rgba(65, 80, 95, 0.07)"
+            },
+            series: {
+              stack: false,
+            },
+            legend: {
+                show: true,
+                position: "sw",
+                margin: [0, -40],
+                noColumns: 0,
+                labelBoxBorderColor: null,
+                labelFormatter: function (a, o) {
+                    return a + "&nbsp;&nbsp;"
+                },
+                width: 30,
+                height: 2,
+            },
+            {#yaxis: o.y,#}
+            yaxis: {
+                {#ticks: [0,100,100000],#}
+                {% comment %}tickFormatter: function formatter(val, axis, precision){
+                  if(Math.abs(val) > 1000000000){return (val/10000000000)+"B";}
+                  else if(Math.abs(val) > 1000000){return(val/1000000)+"M";}
+                  else if(Math.abs(val) > 1000){return (val/1000)+"T";}
+                  else{return val;}
+                },{% endcomment %}
+                tickColor: "rgba(65, 80, 95, 0.07)",
+                tickFormatter: function (val, axis){
+                  return val.toLocaleString()
+                },
+                font: {color: "#8391a2"}
+            },
+            xaxis: {
+              ticks: Array.from({length: xaxisKeywordList.length}, (_,index)=>index),
+              tickFormatter: function (val, axis) {
+                  return xaxisKeywordList[val];
+                  {#console.log(val);#}
+                  {#console.log(axis)#}
+                  {#var d = new Date(val);#}
+                  {#return d.getUTCFullYear() + "/" + (d.getUTCMonth()+1);#}
               },
-              backgroundColor: null,
-              drawOutOfBound: false,
-              shrinkToFit: true,
-              gridSize: 40,
-              {#minSize: 15,//최종적으로 렌더링 전에 걸러낼 글자 크기값. (15px 이하인 단어는 보이지 않음)#}
-              maxRotation: 0,
-              minRotation: 0,//minRotation, maxRotation을 동일하게 하여 모든 단어 회전률 동일하게.
-              {% comment %}hover: function (item, dimension, event){
-                //단어 언급량 작은 모달?
-                return
-              }{% endcomment %}
+              tickColor: "rgba(65, 80, 95, 0.07)",
+              font: {color: "#8391a2"},
+              {#timeformat: "%Y-%m-%d",//시간 타입 형태.#}
+              {#minTickSize: [1, "month"],#}
+            },
+            {#xaxis: o.x,#}
+            {#colors: t,#}
+            tooltip: true,
+            tooltipOpts: {content: "%s : %x, %y", shifts: {x: -30, y: -50}}//마우스 올려 놓았을 때 작은 설명 모달. %x가 x축 값, .2가 표시할 소수점 자리수.
+        }
+
+        return b.plot(b(id), data, t)
+    },
+
+    a.prototype.init = function () {
+        var o
+        //그래프 색.
+        {#var color_list = ["#4fc6e1", "#1abc9c", "#4a81d4", "#f7b84b", "#f1556c", "#754100", "#444c57", "#ffcbcb", "#ff6347", "#ee82ee", "#fa8072", "#8000080", "#ffff00", "#ff0000"]#}
+        var color_list = ["#FF0000", "#B22222", "#A0522D", "#8B4513", "#CD5C5C", "#BC8F8F", "#FFDAB9", "#B8860B", "#FFD700", "#BDB76B", "#00FF00", "#32CD32", "#9ACD32","#556B2F","#2E8B57","#006400","#98FB98","#008080","#20B2AA","#4682B4","#7FFFD4","#AFEEEE","#1E90FF","#6495ED","#0000FF","#8A2BE2","#BA55D3","#EE82EE","#4B0082","#C71585","#FF00FF","#FF69B4", "#DB7093", "#473E8B" ]
+        var keyword_color = {}
+        //키워드 체크 박스 색 설정
+        setKeywordColor();
+        function setKeywordColor(){
+            var keyword_list = {{ keyword_list|safe|default:"[]" }}
+            for(var i=0; i<keyword_list.length; i++){
+                var keyword = keyword_list[i]
+
+                if(keyword === "아크로"){ keyword_color[keyword] = "#000000"}
+                else if(keyword === "e편한세상"){ keyword_color[keyword] = "#FF8C00"}
+                else{keyword_color[keyword] = color_list[i]}
             }
-            WordCloud.minFontSize = 1
-            WordCloud(document.getElementById("wordCloud"), wordCloudOpt)
+        }
 
-            //테이블 변경.
-            var posNegTable
-            if(target === null){
-              posNegTable = $("#posNegTable").DataTable({
-                scrollX: "100%",
-                scrollY: "600px",
-                scrollCollapse: true,
-                paging: false,
-                ordering: true,
-                order: [[2, "dec"]],
-                {#rowGroup: false,#}
-                {#responsive: false,#}
-                {#fixedHeader:false,#}
-                fixedColumns: { left: "1" },
-                language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
-                {#drawCallback: function () { $(".dataTables_paginate > .pagination").addClass("pagination-rounded") }#}
-              });
+        function getKeywordColor(keyword){
+          if(keyword === "sum"){return "#bfbfbf"; }
+          else{ return keyword_color[keyword]; }
+        }
+
+        setAllMentionTypeKeywordCheckBoxColor()
+        function setAllMentionTypeKeywordCheckBoxColor(){
+            $(".keyword-checkbox").each(function (){
+                $(this).find("ul > li > div").each(function (){
+                    setKeywordCheckBoxColor(this)
+                })
+            })
+        }
+        function setKeywordCheckBoxColor(checkBox){
+            var keyword = getCheckBoxKeyword(checkBox)
+            var checkBoxColor = getKeywordColor(keyword)
+
+            //div테두리 색 변경.
+            $(checkBox).css("border", "1px solid "+checkBoxColor)
+            //체크 박스 색 변경.
+            var checkboxInputDOM = $(checkBox).find("input[type='checkbox']")
+            var style = "background-color: "+checkBoxColor+" !important; border-color: "+checkBoxColor+" !important; "
+            addInlineStyleToDom(checkboxInputDOM, style)
+        }
+        function getCheckBoxKeyword(checkBoxDom){
+            return $(checkBoxDom).attr("id").split("-")[1]
+        }
+        function addInlineStyleToDom(dom, style){
+          var preStyle = dom.attr("style")
+          dom.attr("style", preStyle+" "+style)
+        }
+
+        addAllSelectBtnEventHandlerForKeywordCheckBox()
+        function addAllSelectBtnEventHandlerForKeywordCheckBox(){
+            $("#reputationIndex-checkbox").find(".checkAll").click(function (){
+                $("#reputationIndex-checkbox").find("input[type='checkbox']").prop("checked", true)
+            })
+            $("#reputationIndex-checkbox").find(".unCheckAll").click(function (){
+                $("#reputationIndex-checkbox").find("input[type='checkbox']").prop("checked", false)
+            })
+        }
+
+        var mainObj = this
+
+        var queryParam = getQueryParamDict()
+        var lv1 = ""
+        var lv2 = ""
+        setLv1AndLv2()
+
+        function getQueryParamDict(){
+            var queryParamDict = {}
+            var url = window.location.href;
+            var queryParamString = url.split("?")[1];
+            var queryParamList = queryParamString.split("&")
+
+            for(var i=0; i<queryParamList.length; i++){
+                var queryParamKeyword = queryParamList[i].split("=")[0]
+                var queryParamValue = decodeURI(queryParamList[i].split("=")[1])
+                queryParamDict[queryParamKeyword] = queryParamValue
             }
-            else{posNegTable = $("#posNegTable").DataTable()}
 
-            var tableData = keywordData["table"]//선택된 기간에 해당하는 wcp데이터 추출.
-            var newRows = []
-            for(var temp_i=0; temp_i<tableData.length; temp_i++){//추출한 데이터(dict형)를 테이블에 삽입할 Array형태로 정제.
-              var row = tableData[temp_i]
-              newRows.push([row[0], row[1], row[3]])
+            return queryParamDict;
+        }
+        function isExistQueryParam(paramKey){
+          if(Object.keys(queryParam).includes(paramKey)){return true;}
+          else return false;
+        }
+        function setLv1AndLv2(){
+            if(isExistQueryParam("lv1")===false || isExistQueryParam("lv2")===false){
+                lv1 = "지향점", lv2 = "기술력"
             }
-
-            posNegTable.clear()//기존 데이터 row들 삭제.
-            posNegTable.rows.add(newRows).draw()//정제된 데이터 삽입.
-
-            //그래프 변경.
-            var graphData = new Array;
-
-            var graphData = keywordData["graph"]
-            var graphData2 = []
-            graphData2.push({label:"긍정", data: graphData["pos"], color:"blue", stack:"posNeg"})
-            graphData2.push({label:"부정", data: graphData["neg"], color:"red", stack:"posNeg"})
-            graphData2.push({label:"중립", data: graphData["neu"], color:"yellow", stack:"posNeg"})
-
-            mainObj.createPosNegGraph("#posNegGraph", {}, color_list, graphData2);
-          }
-
-          $("#posNegKeywordRadio input[type='radio']").click(function (){
-            changePosNegKeyword($(this), mainObj)
-          })
-          changePosNegKeyword(null, mainObj)
-
-        }
-      })
-
-
-
-      //엑셀 다운
-      function dataToExcel(excelTitle, excelColumn, excelData){
-        // ArrayBuffer 만들어주는 함수
-        function s2ab(s) {
-            var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-            var view = new Uint8Array(buf);  //create uint8array as viewer
-            for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
-            return buf;
-        }
-
-        // workbook 생성
-        var wb = XLSX.utils.book_new();
-
-        // 문서 속성세팅 ( 윈도우에서 엑셀 오른쪽 클릭 속성 -> 자세히에 있는 값들
-        // 필요 없으면 안써도 괜찮다.
-        wb.Props = {
-            Title: "title",
-            Subject: "subject",
-            Author: "programmer93",
-            Manager: "Manager",
-            Company: "Company",
-            Category: "Category",
-            Keywords: "Keywords",
-            Comments: "Comments",
-            LastAuthor: "programmer93",
-            CreatedDate: new Date(2021,1,13)
-        };
-
-        // sheet명 생성
-        wb.SheetNames.push("sheet 1");
-        // wb.SheetNames.push("sheet 2"); // 시트가 여러개인 경우
-
-        var excelRowList = []
-        excelColumn.unshift(null)
-        excelRowList.push(excelColumn)
-
-        for(var i=0; i<excelData.length; i++){
-          excelRowList.push(excelData[i])
-        }
-
-        var wsData = excelRowList;
-      // var wsData2 = [['가1' , '가2', '가3'],['나1','나2','나3']];	// 시트가 여러개인 경우
-
-        // 배열 데이터로 시트 데이터 생성
-        var ws = XLSX.utils.aoa_to_sheet(wsData);
-      // var ws2 = XLSX.utils.aoa_to_sheet(wsData2); 	//시트가 여러개인 경우
-
-        // 시트 데이터를 시트에 넣기 ( 시트 명이 없는 시트인경우 첫번째 시트에 데이터가 들어감 )
-        wb.Sheets["sheet 1"] = ws;
-        // wb.Sheets["sheet 2"] = ws2;	//시트가 여러개인 경우
-
-        // 엑셀 파일 쓰기
-        var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
-
-        // 파일 다운로드
-        saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), excelTitle+'.xlsx');
-      }
-
-      function transDataForm(socialData, title){
-        // 이중 배열 형태로 데이터가 들어간다.
-        var excelData = socialData
-        var baseDate = []
-        var keywordList = []
-        var excelRowList = []
-        var keywordDataList = []
-        for(var key in excelData){
-          keywordList.push(key)
-          keywordDataList.push(excelData[key])
-          if(excelData[key].length !== 0){baseDate = excelData[key]}
-        }
-
-        for(var i=0; i<baseDate.length; i++){
-          var excelRow = []
-
-          var date = baseDate[i][0]
-          excelRow.push((new Date(date)).toISOString().split("T")[0])
-
-          for(var j=0; j<keywordDataList.length; j++){
-            if(keywordDataList[j].length-1 < i){excelRow.push(null)}
             else{
-              var value = keywordDataList[j][i][1]
-              if(value === "null"){value = null}
+                lv1 = queryParam["lv1"], lv2 = queryParam["lv2"]
+            }
+        }
 
-              excelRow.push(value)
+        //각 언급량 그래프 데이터.
+        var mention_total_count_graph_data = {}
+        var community_mention_graph_data = {}
+        var insta_mention_graph_data = {}
+        var blog_mention_graph_data = {}
+        var news_mention_graph_data = {}
+        var twitter_mention_graph_data = {}
+
+        var pos_neg_data = {}
+        $.ajax({
+            url: "/pages/ajax/socialanalysis/mentionData?lv1="+lv1+"&lv2="+lv2+"&mention_source=community",
+            success: function (data) {
+                console.log(data);
+                var mentionData = data;
+
+                //긍부정어 그래프, 테이블, 워드클라우드.
+                $.ajax({
+                    url: "/pages/ajax/socialanalysis/posNegData?lv1=" + lv1 + "&lv2=" + lv2,
+                    success: function (data) {
+                        pos_neg_data = data
+                        console.log(data);
+
+                        var keywordList = mentionData["keyword_list"]
+                        var totalMentionSumListByKeyword = mentionData["mention_data"]["total_mention"]["count_sum"]
+                        var communityMentionSumListByKeyword = mentionData["mention_data"]["community_mention"]["count_sum"]
+                        //계산할 지수들.
+                        var publishingIndexListByKeyword = {}//퍼블리싱 지수. 총 언급량으로 계산.
+                        var interactionIndexListByKeyword = {}//상호작용 지수. 커뮤니티 언급량으로 계산.
+                        var sympathyIndexList = {}//공감지수. 긍부정 단어 횟수로 계산.
+                        var posIndexList = {}//긍정지수. 긍정 단어 횟수로 계산.
+                        var reputationIndexList = {}//평판지수.
+                        //각 지수값을 내림차순한 키워드 정렬.
+                        var reputationSortedKeywordList = []//평판지수 내림차순 키워드 정렬.
+                        var publishingSortedKeywordList = []
+                        var interactionSortedKeywordList = []
+                        var sympathySortedKeywordList = []
+                        var posSortedKeywordList = []
+
+                        {% comment %}var totalMentionAvg = getAvg(Object.values(totalMentionSumListByKeyword))
+                        var communityMentionAvg = getAvg(Object.values(communityMentionSumListByKeyword))
+
+                        //퍼블리싱, 상호작용 지수 계산.
+                        var publishingIndexListByKeyword = {}//퍼블리싱 지수. 총 언급량으로 계산.
+                        var interactionIndexListByKeyword = {}//상호작용 지수. 커뮤니티 언급량으로 계산.
+
+
+                        for (var i = 0; i < keywordList.length; i++) {
+                            var keyword = keywordList[i];
+
+                            publishingIndexListByKeyword[keyword] = totalMentionSumListByKeyword[keyword] / totalMentionAvg * 1000;
+                            interactionIndexListByKeyword[keyword] = communityMentionSumListByKeyword[keyword] / communityMentionAvg * 1000;
+                        }
+
+                        //공감, 긍정 지수 계산.
+                        var posNegDataKeywordList = Object.keys(pos_neg_data);
+                        function getPosNegSumAvg(){
+                            var sumList = []
+                            for(var i=0; i<posNegDataKeywordList.length; i++){
+                                sumList.push(getPosNegSum(posNegDataKeywordList[i]))
+                            }
+
+                            return getAvg(sumList)
+                        }
+                        function getPosNegSum(keyword){
+                            var posNegSum = pos_neg_data[keyword]["count_sum"];
+                            return posNegSum["pos"] + posNegSum["neg"] + posNegSum["neu"];
+                        }
+                        function getPosSumAvg(){
+                            var sumList = []
+                            for(var i=0; i<posNegDataKeywordList.length; i++){
+                                sumList.push(getPosSum(posNegDataKeywordList[i]))
+                            }
+                            return getAvg(sumList);
+                        }
+                        function getPosSum(keyword){
+                            return pos_neg_data[keyword]["count_sum"]["pos"];
+                        }
+                        var posNegSumAvg = getPosNegSumAvg();
+                        var posSumAvg = getPosSumAvg();
+
+                        var sympathyIndexList = {}//공감지수. 긍부정 단어 횟수로 계산.
+                        var posIndexList = {}//긍정지수. 긍정 단어 횟수로 계산.
+                        for(var i=0; i<posNegDataKeywordList.length; i++){
+                            var keyword = posNegDataKeywordList[i];
+
+                            sympathyIndexList[keyword] = getPosNegSum(keyword) / posNegSumAvg * 1000;
+                            posIndexList[keyword] = getPosSum(keyword) / posSumAvg * 1000;
+                        }
+
+                        function getAvg(valueList) {
+                            if (valueList.length === 0) {
+                                return;
+                            }
+                            var sum = 0
+                            for (var i = 0; i < valueList.length; i++) {
+                                sum += valueList[i]
+                            }
+                            return sum / valueList.length;
+                        }
+
+                        //평판 지수 계산.
+                        var reputationIndexList = {}
+                        function getReputationIndexList(){
+                            for(var i=0; i<keywordList.length; i++){
+                                var keyword = keywordList[i];
+                                reputationIndexList[keyword] = publishingIndexListByKeyword[keyword] + interactionIndexListByKeyword[keyword] + sympathyIndexList[keyword] + posIndexList[keyword]
+                            }
+                        }
+
+                        getReputationIndexList()
+
+                        function getSortedArrayFromObj(obj){
+                            var keyList = Object.keys(obj);
+                            keyList.sort(function (a, b){
+                                if(obj[a] >= obj[b]){return -1;}
+                                else{return 1;}
+                            })
+                            return keyList;
+                        }
+
+                        var reputationSortedKeywordList = getSortedArrayFromObj(reputationIndexList)
+                        var publishingSortedKeywordList = getSortedArrayFromObj(publishingIndexListByKeyword)
+                        var interactionSortedKeywordList = getSortedArrayFromObj(interactionIndexListByKeyword)
+                        var sympathySortedKeywordList = getSortedArrayFromObj(sympathyIndexList)
+                        var posSortedKeywordList = getSortedArrayFromObj(posIndexList){% endcomment %}
+
+                        calculateIndex(keywordList, keywordList)
+
+                        createReputationIndexGraph()
+
+                        function createReputationIndexGraph(){
+                            var publishingIndexGraphDataList = [];
+                            var interactionIndexGraphDataList = [];
+                            var sympathyIndexGraphDataList = [];
+                            var posIndexGraphDataList = [];
+                            var reputationGraphDataList = [];
+
+                            for(var i=0; i<reputationSortedKeywordList.length; i++){
+                                var keyword = reputationSortedKeywordList[i]
+
+                                publishingIndexGraphDataList.push([i, publishingIndexListByKeyword[keyword]]);
+                                interactionIndexGraphDataList.push([i, interactionIndexListByKeyword[keyword]]);
+                                sympathyIndexGraphDataList.push([i, sympathyIndexList[keyword]]);
+                                posIndexGraphDataList.push([i, posIndexList[keyword]]);
+                                reputationGraphDataList.push( [i, reputationIndexList[keyword]] )
+                            }
+
+                            var reputationGraphData = [
+                                {label: "평판", data: reputationGraphDataList, color:"black", bars: { show: false, }, lines:{show: true, }, points: {show:true, radius: 5, symbol: "circle"}},
+                                {label:"퍼블리싱", data: publishingIndexGraphDataList, bars: {order: 1, barWidth: 0.05, fill: 1}},
+                                {label: "상호작용", data: interactionIndexGraphDataList, bars: {order: 2, barWidth: 0.05, fill: 1}},
+                                {label: "공감", data: sympathyIndexGraphDataList, bars: {order: 3, barWidth: 0.05, fill: 1}},
+                                {label: "긍정", data: posIndexGraphDataList, bars: {order: 4, barWidth: 0.05, fill: 1}},
+                            ]
+
+                            $("#reputationIndexGraphDiv .loading").css("display", "none")
+                            $("#reputationIndexGraphDiv .itemContent").css("display", "block")
+                            mainObj.createReputationIndexGraph("#reputationIndexGraph", {}, [], reputationGraphData, reputationSortedKeywordList)
+
+                            var reputationGraphData = getConvertedDataToGraphDataForReputationIndex()
+                            function getConvertedDataToGraphDataForReputationIndex(){
+                                var publishingIndexGraphDataList = [];
+                                var interactionIndexGraphDataList = [];
+                                var sympathyIndexGraphDataList = [];
+                                var posIndexGraphDataList = [];
+                                var reputationGraphDataList = [];
+
+                                for(var i=0; i<reputationSortedKeywordList.length; i++){
+                                    var keyword = reputationSortedKeywordList[i]
+
+                                    publishingIndexGraphDataList.push([i, publishingIndexListByKeyword[keyword]]);
+                                    interactionIndexGraphDataList.push([i, interactionIndexListByKeyword[keyword]]);
+                                    sympathyIndexGraphDataList.push([i, sympathyIndexList[keyword]]);
+                                    posIndexGraphDataList.push([i, posIndexList[keyword]]);
+                                    reputationGraphDataList.push( [i, reputationIndexList[keyword]] )
+                                }
+
+                                var reputationGraphData = [
+                                    {label: "평판", data: reputationGraphDataList, color:"black", bars: { show: false, }, lines:{show: true, }, points: {show:true, radius: 5, symbol: "circle"}},
+                                    {label:"퍼블리싱", data: publishingIndexGraphDataList, bars: {order: 1, barWidth: 0.05, fill: 1}},
+                                    {label: "상호작용", data: interactionIndexGraphDataList, bars: {order: 2, barWidth: 0.05, fill: 1}},
+                                    {label: "공감", data: sympathyIndexGraphDataList, bars: {order: 3, barWidth: 0.05, fill: 1}},
+                                    {label: "긍정", data: posIndexGraphDataList, bars: {order: 4, barWidth: 0.05, fill: 1}},
+                                ]
+                                return reputationGraphData;
+                            }
+
+                            convertDataToGraphDataAndCreateReputationIndexGraph()
+                            function convertDataToGraphDataAndCreateReputationIndexGraph(){
+                                var publishingIndexGraphDataList = [];
+                                var interactionIndexGraphDataList = [];
+                                var sympathyIndexGraphDataList = [];
+                                var posIndexGraphDataList = [];
+                                var reputationGraphDataList = [];
+
+                                for(var i=0; i<reputationSortedKeywordList.length; i++){
+                                    var keyword = reputationSortedKeywordList[i]
+
+                                    publishingIndexGraphDataList.push([i, publishingIndexListByKeyword[keyword]]);
+                                    interactionIndexGraphDataList.push([i, interactionIndexListByKeyword[keyword]]);
+                                    sympathyIndexGraphDataList.push([i, sympathyIndexList[keyword]]);
+                                    posIndexGraphDataList.push([i, posIndexList[keyword]]);
+                                    reputationGraphDataList.push( [i, reputationIndexList[keyword]] )
+                                }
+
+                                var reputationGraphData = [
+                                    {label: "평판", data: reputationGraphDataList, color:"black", bars: { show: false, }, lines:{show: true, }, points: {show:true, radius: 5, symbol: "circle"}},
+                                    {label:"퍼블리싱", data: publishingIndexGraphDataList, bars: {order: 1, barWidth: 0.05, fill: 1}},
+                                    {label: "상호작용", data: interactionIndexGraphDataList, bars: {order: 2, barWidth: 0.05, fill: 1}},
+                                    {label: "공감", data: sympathyIndexGraphDataList, bars: {order: 3, barWidth: 0.05, fill: 1}},
+                                    {label: "긍정", data: posIndexGraphDataList, bars: {order: 4, barWidth: 0.05, fill: 1}},
+                                ]
+
+                                $("#reputationIndexGraphDiv .loading").css("display", "none")
+                                $("#reputationIndexGraphDiv .itemContent").css("display", "block")
+                                mainObj.createReputationIndexGraph("#reputationIndexGraph", {}, [], reputationGraphData, reputationSortedKeywordList)
+                            }
+
+
+                            publishingIndexGraphDataList = []
+                            for(var i=0; i<publishingSortedKeywordList.length; i++){
+                                var keyword = publishingSortedKeywordList[i]
+
+                                publishingIndexGraphDataList.push([i, publishingIndexListByKeyword[keyword]]);
+                            }
+
+                            $("#publishingIndexGraphDiv .loading").css("display", "none")
+                            $("#publishingIndexGraphDiv .itemContent").css("display", "block")
+                            mainObj.createReputationIndexGraph("#publishingIndexGraph", {}, [], [{label:"퍼블리싱", data: publishingIndexGraphDataList}], publishingSortedKeywordList)
+
+                            interactionIndexGraphDataList = []
+                            for(var i=0; i<interactionSortedKeywordList.length; i++){
+                                var keyword = interactionSortedKeywordList[i]
+
+                                interactionIndexGraphDataList.push([i, interactionIndexListByKeyword[keyword]]);
+                            }
+
+                            $("#interactionIndexGraphDiv .loading").css("display", "none")
+                            $("#interactionIndexGraphDiv .itemContent").css("display", "block")
+                            mainObj.createReputationIndexGraph("#interactionIndexGraph", {}, [], [{label:"상호작용", data: interactionIndexGraphDataList}], interactionSortedKeywordList)
+
+                            sympathyIndexGraphDataList = []
+                            for(var i=0; i<sympathySortedKeywordList.length; i++){
+                                var keyword = sympathySortedKeywordList[i]
+
+                                sympathyIndexGraphDataList.push([i, sympathyIndexList[keyword]]);
+                            }
+
+                            $("#sympathyIndexGraphDiv .loading").css("display", "none")
+                            $("#sympathyIndexGraphDiv .itemContent").css("display", "block")
+                            mainObj.createReputationIndexGraph("#sympathyIndexGraph", {}, [], [{label:"공감", data: sympathyIndexGraphDataList}], sympathySortedKeywordList)
+
+                            posIndexGraphDataList = []
+                            for(var i=0; i<posSortedKeywordList.length; i++){
+                                var keyword = posSortedKeywordList[i]
+
+                                posIndexGraphDataList.push([i, posIndexList[keyword]]);
+                            }
+
+                            $("#posIndexGraphDiv .loading").css("display", "none")
+                            $("#posIndexGraphDiv .itemContent").css("display", "block")
+                            mainObj.createReputationIndexGraph("#posIndexGraph", {}, [], [{label:"긍정", data: posIndexGraphDataList}], posSortedKeywordList)
+                        }
+                        function calculateIndex(keywordList, populationList){
+                            var selectedTotalMentionSumListByKeyword = {}
+                            var populationTotalMentionSumListByKeyword = {}
+                            for(var i=0; i<keywordList.length; i++){
+                                var keyword = keywordList[i]
+                                selectedTotalMentionSumListByKeyword[keyword] = totalMentionSumListByKeyword[keyword]
+                            }
+                            for(var i=0; i<populationList.length; i++){
+                                var keyword = populationList[i]
+                                populationTotalMentionSumListByKeyword[keyword] = totalMentionSumListByKeyword[keyword]
+                            }
+
+                            var selectedCommunityMentionSumListByKeyword = {}
+                            var populationCommunityMentionSumListByKeyword = {}
+                            for(var i=0; i<keywordList.length; i++){
+                                var keyword = keywordList[i]
+                                selectedCommunityMentionSumListByKeyword[keyword] = communityMentionSumListByKeyword[keyword]
+                            }
+                            for(var i=0; i<populationList.length; i++){
+                                var keyword = populationList[i]
+                                populationCommunityMentionSumListByKeyword[keyword] = communityMentionSumListByKeyword[keyword]
+                            }
+
+                            var totalMentionAvg = getAvg(Object.values(populationTotalMentionSumListByKeyword))
+                            var communityMentionAvg = getAvg(Object.values(populationCommunityMentionSumListByKeyword))
+
+                            //퍼블리싱, 상호작용 지수 계산.
+                            publishingIndexListByKeyword = {}
+                            interactionIndexListByKeyword = {}
+                            for (var i = 0; i < keywordList.length; i++) {
+                                var keyword = keywordList[i];
+
+                                publishingIndexListByKeyword[keyword] = selectedTotalMentionSumListByKeyword[keyword] / totalMentionAvg * 1000;
+                                interactionIndexListByKeyword[keyword] = selectedCommunityMentionSumListByKeyword[keyword] / communityMentionAvg * 1000;
+                            }
+
+                            //공감, 긍정 지수 계산.
+                            var posNegDataKeywordList = Object.keys(pos_neg_data);
+                            function getPosNegSumAvg(){
+                                var sumList = []
+                                for(var i=0; i<keywordList.length; i++){
+                                    sumList.push(getPosNegSum(keywordList[i]))
+                                }
+
+                                return getAvg(sumList)
+                            }
+                            function getPosNegSum(keyword){
+                                var posNegSum = pos_neg_data[keyword]["count_sum"];
+                                return posNegSum["pos"] + posNegSum["neg"] + posNegSum["neu"];
+                            }
+                            function getPosSumAvg(){
+                                var sumList = []
+                                for(var i=0; i<keywordList.length; i++){
+                                    sumList.push(getPosSum(keywordList[i]))
+                                }
+                                return getAvg(sumList);
+                            }
+                            function getPosSum(keyword){
+                                return pos_neg_data[keyword]["count_sum"]["pos"];
+                            }
+                            var posNegSumAvg = getPosNegSumAvg();
+                            var posSumAvg = getPosSumAvg();
+
+                            sympathyIndexList = {}
+                            posIndexList = {}
+                            for(var i=0; i<keywordList.length; i++){
+                                var keyword = keywordList[i];
+
+                                sympathyIndexList[keyword] = getPosNegSum(keyword) / posNegSumAvg * 1000;
+                                posIndexList[keyword] = getPosSum(keyword) / posSumAvg * 1000;
+                            }
+
+                            function getAvg(valueList) {
+                                if (valueList.length === 0) {
+                                    return;
+                                }
+                                var sum = 0
+                                for (var i = 0; i < valueList.length; i++) {
+                                    sum += valueList[i]
+                                }
+                                return sum / valueList.length;
+                            }
+
+                            //평판 지수 계산.
+                            reputationIndexList = {}
+                            function getSortedArrayFromObj(obj){
+                                var keyList = Object.keys(obj);
+                                keyList.sort(function (a, b){
+                                    if(obj[a] >= obj[b]){return -1;}
+                                    else{return 1;}
+                                })
+                                return keyList;
+                            }
+                            function getReputationIndexList(){
+                                for(var i=0; i<keywordList.length; i++){
+                                    var keyword = keywordList[i];
+                                    reputationIndexList[keyword] = publishingIndexListByKeyword[keyword] + interactionIndexListByKeyword[keyword] + sympathyIndexList[keyword] + posIndexList[keyword]
+                                }
+                            }
+
+                            getReputationIndexList()
+
+                            reputationSortedKeywordList = getSortedArrayFromObj(reputationIndexList)
+                            publishingSortedKeywordList = getSortedArrayFromObj(publishingIndexListByKeyword)
+                            interactionSortedKeywordList = getSortedArrayFromObj(interactionIndexListByKeyword)
+                            sympathySortedKeywordList = getSortedArrayFromObj(sympathyIndexList)
+                            posSortedKeywordList = getSortedArrayFromObj(posIndexList)
+                        }
+
+                        //지수 계산 버튼 이벤트 핸들러.
+                        $("#calculateIndexBtn").click(function (){
+                            //모집단 선택값 추출. 'population' : 모집단.
+                            var selectedPopulationOpt = $("#selectPopulation").val()
+
+                            var selectedKeywordList = getSelectedKeywordList()
+
+                            //다시 지수 계산.
+                            if(selectedPopulationOpt === "choice"){
+                                calculateIndex(selectedKeywordList, selectedKeywordList);
+                            }
+                            else if(selectedPopulationOpt === "total"){
+                                calculateIndex(selectedKeywordList, keywordList)
+                            }
+
+                            createReputationIndexGraph()
+
+                            function getSelectedKeywordList(){
+                                var selectedKeywordList = []
+                                $("#reputationIndex-checkbox").find("input[type='checkbox']").each(function (){
+                                    if($(this).is(":checked") == true){
+                                        var keyword = $(this).val();
+                                        selectedKeywordList.push(keyword)
+                                    }
+                                })
+                                return selectedKeywordList;
+                            }
+                        })
+                        //지수 그래프 엑셀 다운 이벤트 핸들러.
+                        $("#reputationIndexExcelBtn").click(function (){
+                            downloadReputationIndexGraphData();
+                        })
+                        function downloadReputationIndexGraphData(){
+                            var excelColumnList = ["평판", "퍼블리싱", "상호작용", "공감", "긍정"]
+                            var excelRowList = transDataFormForIndexData()
+
+                            dataToExcel("지수_그래프_데이터", excelColumnList, excelRowList);
+
+                            function transDataFormForIndexData(){
+                                var rowList = []
+
+                                for(var i=0; i<reputationSortedKeywordList.length; i++){
+                                    var keyword = reputationSortedKeywordList[i];
+
+                                    var reputationIndexForKeyword = reputationIndexList[keyword];
+                                    var publishingIndexForKeyword = publishingIndexListByKeyword[keyword]
+                                    var interactionIndexForKeyword = interactionIndexListByKeyword[keyword];
+                                    var sympathyIndexForKeyword = sympathyIndexList[keyword];
+                                    var posIndexForKeyword = posIndexList[keyword];
+
+                                    rowList.push([keyword, reputationIndexForKeyword, publishingIndexForKeyword, interactionIndexForKeyword, sympathyIndexForKeyword, posIndexForKeyword])
+                                }
+                                return rowList;
+                            }
+                        }
+
+
+                        //언급량 그래프.
+                        //전체 언급량 그래프.
+                        $("#total_mentionItem .loading").css("display", "none")
+                        $("#total_mentionItem .itemContent").css("display", "block")
+
+                        {#var mention_total_count_graph_data = {{ mention_data.total_mention.count_list|safe|default:"{}" }};#}
+                        mention_total_count_graph_data = mentionData["mention_data"]["total_mention"]["count_list"]
+                        mainObj.setSocialAnalysisGraphOptAndCreate("total_mention-graph", "total_mention-checkbox", mention_total_count_graph_data, keyword_color, "total_mention");
+
+                        //커뮤니티 언급량 그래프.
+                        $("#community_mentionItem .loading").css("display", "none")
+                        $("#community_mentionItem .itemContent").css("display", "block")
+
+                        community_mention_graph_data = mentionData["mention_data"]["community_mention"]["count_list"]
+                        mainObj.setSocialAnalysisGraphOptAndCreate("community_mention-graph", "community_mention-checkbox", community_mention_graph_data, keyword_color, "community_mention");
+
+                        //인스타 언급량 그래프.
+                        $("#insta_mentionItem .loading").css("display", "none")
+                        $("#insta_mentionItem .itemContent").css("display", "block")
+
+                        insta_mention_graph_data = mentionData["mention_data"]["insta_mention"]["count_list"]
+                        mainObj.setSocialAnalysisGraphOptAndCreate("insta_mention-graph", "insta_mention-checkbox", insta_mention_graph_data, keyword_color, "insta_mention");
+
+                        //블로그 언급량 그래프.
+                        $("#blog_mentionItem .loading").css("display", "none")
+                        $("#blog_mentionItem .itemContent").css("display", "block")
+
+                        blog_mention_graph_data = mentionData["mention_data"]["blog_mention"]["count_list"]
+                        mainObj.setSocialAnalysisGraphOptAndCreate("blog_mention-graph", "blog_mention-checkbox", blog_mention_graph_data, keyword_color, "blog_mention");
+
+                        //뉴스 언급량 그래프.
+                        $("#news_mentionItem .loading").css("display", "none")
+                        $("#news_mentionItem .itemContent").css("display", "block")
+
+                        news_mention_graph_data = mentionData["mention_data"]["news_mention"]["count_list"]
+                        mainObj.setSocialAnalysisGraphOptAndCreate("news_mention-graph", "news_mention-checkbox", news_mention_graph_data, keyword_color, "news_mention");
+
+                        //트위터 언급량 그래프.
+                        $("#twitter_mentionItem .loading").css("display", "none")
+                        $("#twitter_mentionItem .itemContent").css("display", "block")
+
+                        twitter_mention_graph_data = mentionData["mention_data"]["twitter_mention"]["count_list"]
+                        mainObj.setSocialAnalysisGraphOptAndCreate("twitter_mention-graph", "twitter_mention-checkbox", twitter_mention_graph_data, keyword_color, "twitter_mention");
+
+
+                        $("#posNegItem .loading").css("display", "none")
+                        $("#posNegItem .itemContent").css("display", "block")
+
+                        //워드 클라우드 글자 크기 조정을 위한 데이터 값 조절.
+                        for (var keyword in pos_neg_data) {
+                            var keywordWordCloudData = pos_neg_data[keyword]["wordCloud"]
+
+                            //평균값 계산
+                            var average = 0
+                            var sum = 0
+                            for (var i = 0; i < keywordWordCloudData.length; i++) {
+                                var cloudKeyword = keywordWordCloudData[i]
+                                sum += cloudKeyword[3]
+
+                                {#cloudKeyword[1] = parseInt((cloudKeyword[1] / (keywordWordCloudData[0][3]/1500))/10)#}
+                            }
+                            average = parseInt(sum / 30)
+
+                            //데이터 조절.
+                            for (var i = 0; i < keywordWordCloudData.length; i++) {
+                                var cloudKeyword = keywordWordCloudData[i]
+
+                                {#cloudKeyword[1] = parseInt((cloudKeyword[1] / (average/400))/10)#}
+                                cloudKeyword[1] = parseInt((cloudKeyword[1] / (keywordWordCloudData[0][3] / 1500)) / 10)
+                            }
+                        }
+
+                        {#긍부정어 이벤츠 처리. #}
+                        function changePosNegKeyword(target, mainObj) {
+                            var keyword = ""
+                            if (target === null) {
+                                keyword = $("#posNegKeywordRadio input[type='radio']:last").val()
+                            } else {
+                                keyword = $(target).val()
+                            }
+                            {#var pos_neg_data = {{ pos_neg_data|safe|default:"{}" }}#}
+                            var keywordData = pos_neg_data[keyword]
+
+                            //워드 클라우드 변경.
+                            var wordCloudOpt = {
+                                list: keywordData["wordCloud"],
+                                color: function (word, weight, fontSize, distance, theta, data1) {
+                                    if (data1[0] === "POS") {
+                                        return "blue";
+                                    } else if (data1[0] === "NEG") {
+                                        return "red";
+                                    } else if (data1[0] === "NEU") {
+                                        return "gray";
+                                    } else {
+                                        return "gray";
+                                    }
+                                },
+                                backgroundColor: null,
+                                drawOutOfBound: false,
+                                shrinkToFit: true,
+                                gridSize: 40,
+                                {#minSize: 15,//최종적으로 렌더링 전에 걸러낼 글자 크기값. (15px 이하인 단어는 보이지 않음)#}
+                                maxRotation: 0,
+                                minRotation: 0,//minRotation, maxRotation을 동일하게 하여 모든 단어 회전률 동일하게.
+                                {% comment %}hover: function (item, dimension, event){
+                            //단어 언급량 작은 모달?
+                            return
+                          }{% endcomment %}
+                            }
+                            WordCloud.minFontSize = 1
+                            WordCloud(document.getElementById("wordCloud"), wordCloudOpt)
+
+                            //테이블 변경.
+                            var posNegTable
+                            if (target === null) {
+                                posNegTable = $("#posNegTable").DataTable({
+                                    scrollX: "100%",
+                                    scrollY: "600px",
+                                    scrollCollapse: true,
+                                    paging: false,
+                                    ordering: true,
+                                    order: [[2, "dec"]],
+                                    {#rowGroup: false,#}
+                                    {#responsive: false,#}
+                                    {#fixedHeader:false,#}
+                                    fixedColumns: {left: "1"},
+                                    language: {paginate: {previous: "<i class='mdi mdi-chevron-left'>", next: "<i class='mdi mdi-chevron-right'>"}},
+                                    {#drawCallback: function () { $(".dataTables_paginate > .pagination").addClass("pagination-rounded") }#}
+                                });
+                            } else {
+                                posNegTable = $("#posNegTable").DataTable()
+                            }
+
+                            var tableData = keywordData["table"]//선택된 기간에 해당하는 wcp데이터 추출.
+                            var newRows = []
+                            for (var temp_i = 0; temp_i < tableData.length; temp_i++) {//추출한 데이터(dict형)를 테이블에 삽입할 Array형태로 정제.
+                                var row = tableData[temp_i]
+                                newRows.push([row[0], row[1], row[3]])
+                            }
+
+                            posNegTable.clear()//기존 데이터 row들 삭제.
+                            posNegTable.rows.add(newRows).draw()//정제된 데이터 삽입.
+
+                            //그래프 변경.
+                            var graphData = new Array;
+
+                            var graphData = keywordData["graph"]
+                            var graphData2 = []
+                            graphData2.push({label: "긍정", data: graphData["pos"], color: "blue", stack: "posNeg"})
+                            graphData2.push({label: "부정", data: graphData["neg"], color: "red", stack: "posNeg"})
+                            graphData2.push({label: "중립", data: graphData["neu"], color: "yellow", stack: "posNeg"})
+
+                            mainObj.createPosNegGraph("#posNegGraph", {}, color_list, graphData2);
+                        }
+
+                        $("#posNegKeywordRadio input[type='radio']").click(function () {
+                            changePosNegKeyword($(this), mainObj)
+                        })
+                        changePosNegKeyword(null, mainObj)
+
+                    }
+                })
+            }
+        })
+
+
+        //그래프 이미지 저장.
+        function saveGraphImg(graphCssSelector, imgFileName){
+            html2canvas(document.querySelector(graphCssSelector)).then(canvas=>{
+                var aTag = document.createElement("a")
+                aTag.href = canvas.toDataURL().replace("image/jpg", "image/octet-stream")
+                aTag.download = imgFileName
+                aTag.click();
+            })
+        }
+        $("#reputationIndexImgBtn").click(function (){saveGraphImg("#reputationIndexGraph", "평판지수_그래프.jpg")})
+        $("#publishingIndexImgBtn").click(function (){saveGraphImg("#publishingIndexGraph", "펴블리싱지수_그래프.jpg")})
+        $("#interactionIndexImgBtn").click(function (){saveGraphImg("#interactionIndexGraph", "상호작용지수_그래프.jpg")})
+        $("#sympathyIndexImgBtn").click(function (){saveGraphImg("#sympathyIndexGraph", "공감지수_그래프.jpg")})
+        $("#posIndexImgBtn").click(function (){saveGraphImg("#posIndexGraph", "긍정지수_그래프.jpg")})
+
+        $("#total_mentionImgBtn").click(function (){saveGraphImg("#total_mention-graph", "전체_언급량_그래프.jpg")})
+        $("#community_mentionImgBtn").click(function (){saveGraphImg("#community_mention-graph", "커뮤니티_언급량_그래프.jpg")})
+        $("#insta_mentionImgBtn").click(function (){
+            saveGraphImg("#insta_mention-graph", "인스타_언급량_그래프.jpg")
+        })
+        $("#blog_mentionImgBtn").click(function (){
+            saveGraphImg("#blog_mention-graph", "블로그_언급량_그래프.jpg")
+        })
+        $("#news_mentionImgBtn").click(function (){
+            saveGraphImg("#news_mention-graph", "뉴스_언급량_그래프.jpg")
+        })
+        $("#twitter_mentionImgBtn").click(function (){
+            saveGraphImg("#twitter_mention-graph", "트위터_언급량_그래프.jpg")
+        })
+
+        //엑셀 다운
+        function dataToExcel(excelTitle, excelColumn, excelData){
+            // ArrayBuffer 만들어주는 함수
+            function s2ab(s) {
+                var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+                var view = new Uint8Array(buf);  //create uint8array as viewer
+                for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+                return buf;
             }
 
-          }
-          excelRowList.push(excelRow)
+            // workbook 생성
+            var wb = XLSX.utils.book_new();
+
+            // 문서 속성세팅 ( 윈도우에서 엑셀 오른쪽 클릭 속성 -> 자세히에 있는 값들
+            // 필요 없으면 안써도 괜찮다.
+            wb.Props = {
+                Title: "title",
+                Subject: "subject",
+                Author: "programmer93",
+                Manager: "Manager",
+                Company: "Company",
+                Category: "Category",
+                Keywords: "Keywords",
+                Comments: "Comments",
+                LastAuthor: "programmer93",
+                CreatedDate: new Date(2021,1,13)
+            };
+
+            // sheet명 생성
+            wb.SheetNames.push("sheet 1");
+            // wb.SheetNames.push("sheet 2"); // 시트가 여러개인 경우
+
+            var excelRowList = []
+            excelColumn.unshift(null)
+            excelRowList.push(excelColumn)
+
+            for(var i=0; i<excelData.length; i++){
+              excelRowList.push(excelData[i])
+            }
+
+            var wsData = excelRowList;
+            // var wsData2 = [['가1' , '가2', '가3'],['나1','나2','나3']];	// 시트가 여러개인 경우
+
+            // 배열 데이터로 시트 데이터 생성
+            var ws = XLSX.utils.aoa_to_sheet(wsData);
+            // var ws2 = XLSX.utils.aoa_to_sheet(wsData2); 	//시트가 여러개인 경우
+
+            // 시트 데이터를 시트에 넣기 ( 시트 명이 없는 시트인경우 첫번째 시트에 데이터가 들어감 )
+            wb.Sheets["sheet 1"] = ws;
+            // wb.Sheets["sheet 2"] = ws2;	//시트가 여러개인 경우
+
+            // 엑셀 파일 쓰기
+            var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+
+            // 파일 다운로드
+            saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), excelTitle+'.xlsx');
         }
-        dataToExcel(title, keywordList, excelRowList)
-      }
 
-      $("#total_mentionExcelBtn").click(function (){
-        transDataForm(mention_total_count_graph_data, "전체_언급량")
-      })
+        function transDataForm(socialData, title){
+            // 이중 배열 형태로 데이터가 들어간다.
+            var excelData = socialData
+            var baseDate = []
+            var keywordList = []
+            var excelRowList = []
+            var keywordDataList = []
+            for(var key in excelData){
+              keywordList.push(key)
+              keywordDataList.push(excelData[key])
+              if(excelData[key].length !== 0){baseDate = excelData[key]}
+            }
 
-      $("#community_mentionExcelBtn").click(function (){
-        transDataForm(community_mention_graph_data, "커뮤니티_언급량")
-      })
+            for(var i=0; i<baseDate.length; i++){
+              var excelRow = []
 
-      $("#insta_mentionExcelBtn").click(function (){
-        transDataForm(insta_mention_graph_data, "인스타_언급량")
-      })
+              var date = baseDate[i][0]
+              excelRow.push((new Date(date)).toISOString().split("T")[0])
 
-      $("#blog_mentionExcelBtn").click(function (){
-        transDataForm(blog_mention_graph_data, "블로그_언급량")
-      })
+              for(var j=0; j<keywordDataList.length; j++){
+                if(keywordDataList[j].length-1 < i){excelRow.push(null)}
+                else{
+                  var value = keywordDataList[j][i][1]
+                  if(value === "null"){value = null}
 
-      $("#news_mentionExcelBtn").click(function (){
-        transDataForm(news_mention_graph_data, "뉴스_언급량")
-      })
+                  excelRow.push(value)
+                }
 
-      $("#twitter_mentionExcelBtn").click(function (){
-        transDataForm(twitter_mention_graph_data, "트위터_언급량")
-      })
-
-      $("#posNegTableExcelBtn").click(function (){
-        var keyword = $("#posNegKeywordRadio input[type='radio']:checked").val()
-        var targetData = pos_neg_data[keyword]["table"]
-        var excelTitle = "긍부정_단어_리스트"
-        var excelColumnList = ["단어", "긍부정", "건수"]
-        var excelDataList = []
-
-        for(var i=0; i<targetData.length; i++){
-          var data = targetData[i]
-          var posNeg = ""
-
-          if(data[1] === "POS"){posNeg = "긍정"}
-          else if(data[1] === "NEG"){posNeg = "부정"}
-          else if(data[1] === "NEU"){posNeg = "중립"}
-
-          excelDataList.push([i+1, data[0], posNeg, data[3]])
+              }
+              excelRowList.push(excelRow)
+            }
+            dataToExcel(title, keywordList, excelRowList)
         }
 
-        dataToExcel(excelTitle, excelColumnList, excelDataList)
-      })
+        $("#total_mentionExcelBtn").click(function (){ transDataForm(mention_total_count_graph_data, "전체_언급량") })
+        $("#community_mentionExcelBtn").click(function (){transDataForm(community_mention_graph_data, "커뮤니티_언급량")})
+        $("#insta_mentionExcelBtn").click(function (){transDataForm(insta_mention_graph_data, "인스타_언급량")})
+        $("#blog_mentionExcelBtn").click(function (){transDataForm(blog_mention_graph_data, "블로그_언급량")})
+        $("#news_mentionExcelBtn").click(function (){transDataForm(news_mention_graph_data, "뉴스_언급량")})
+        $("#twitter_mentionExcelBtn").click(function (){transDataForm(twitter_mention_graph_data, "트위터_언급량")})
 
-      $("#posNegGraphExcelBtn").click(function (){
-        var keyword = $("#posNegKeywordRadio input[type='radio']:checked").val()
-        var term_list = pos_neg_data[keyword]["graph"]["term_list"]
-        var posList = pos_neg_data[keyword]["graph"]["pos"]
-        var negList = pos_neg_data[keyword]["graph"]["neg"]
-        var neuList = pos_neg_data[keyword]["graph"]["neu"]
+        $("#posNegTableExcelBtn").click(function (){
+            var keyword = $("#posNegKeywordRadio input[type='radio']:checked").val()
+            var targetData = pos_neg_data[keyword]["table"]
+            var excelTitle = "긍부정_단어_리스트"
+            var excelColumnList = ["단어", "긍부정", "건수"]
+            var excelDataList = []
 
-        var excelRowList = []
+            for(var i=0; i<targetData.length; i++){
+              var data = targetData[i]
+              var posNeg = ""
 
-        for(var i=0; i<term_list.length; i++){
-          var excelRow = []
-          var currentTerm = term_list[i]
-          var termDate = new Date(currentTerm)
-          var termDateEnd = new Date(currentTerm)
-          termDateEnd = new Date(termDateEnd.setDate(termDate.getDate() + 7))
+              if(data[1] === "POS"){posNeg = "긍정"}
+              else if(data[1] === "NEG"){posNeg = "부정"}
+              else if(data[1] === "NEU"){posNeg = "중립"}
 
-          excelRow.push(termDate.toISOString().split("T")[0] + "~" + termDateEnd.toISOString().split("T")[0])
+              excelDataList.push([i+1, data[0], posNeg, data[3]])
+            }
 
-          if(posList[0][0]===currentTerm){
-            var currentPos = posList.shift()
-            excelRow.push(currentPos[1])
-          }
-          else{excelRow.push(0)}
+            dataToExcel(excelTitle, excelColumnList, excelDataList)
+        })
 
-          if(negList[0][0]===currentTerm){
-            var currentPos = negList.shift()
-            excelRow.push(currentPos[1])
-          }
-          else{excelRow.push(0)}
+        $("#posNegGraphExcelBtn").click(function (){
+            var keyword = $("#posNegKeywordRadio input[type='radio']:checked").val()
+            var term_list = pos_neg_data[keyword]["graph"]["term_list"]
+            var posList = pos_neg_data[keyword]["graph"]["pos"]
+            var negList = pos_neg_data[keyword]["graph"]["neg"]
+            var neuList = pos_neg_data[keyword]["graph"]["neu"]
 
-          if(neuList[0][0]===currentTerm){
-            var currentPos = neuList.shift()
-            excelRow.push(currentPos[1])
-          }
-          else{excelRow.push(0)}
+            var excelRowList = []
 
-          excelRowList.push(excelRow)
+            for(var i=0; i<term_list.length; i++){
+              var excelRow = []
+              var currentTerm = term_list[i]
+              var termDate = new Date(currentTerm)
+              var termDateEnd = new Date(currentTerm)
+              termDateEnd = new Date(termDateEnd.setDate(termDate.getDate() + 7))
+
+              excelRow.push(termDate.toISOString().split("T")[0] + "~" + termDateEnd.toISOString().split("T")[0])
+
+              if(posList[0][0]===currentTerm){
+                var currentPos = posList.shift()
+                excelRow.push(currentPos[1])
+              }
+              else{excelRow.push(0)}
+
+              if(negList[0][0]===currentTerm){
+                var currentPos = negList.shift()
+                excelRow.push(currentPos[1])
+              }
+              else{excelRow.push(0)}
+
+              if(neuList[0][0]===currentTerm){
+                var currentPos = neuList.shift()
+                excelRow.push(currentPos[1])
+              }
+              else{excelRow.push(0)}
+
+              excelRowList.push(excelRow)
         }
 
         dataToExcel("긍부정_개수", ["긍정", "부정", "중립"], excelRowList)
