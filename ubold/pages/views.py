@@ -184,10 +184,10 @@ include_keyword_set_list = {
 }
 # include_keyword_set_list2 = {
 #     "브랜드":{
-#        "브랜드": {"and_or": "and", "include_list": {""}},
+#        "브랜드": {"and_or": "and", "include_list": {"아파트"}},
 #     },
 #     "지향점":{
-#         "기술력":{"and_or": "and", "include_list": {"기술력"}},
+#         "기술력":{"and_or": "and", "include_list": {"기술력", "아파트"}},
 #         "디자인": {"and_or": "and", "include_list": {"디자인"}},
 #         "살기좋은": {"and_or": "and", "include_list": {"살기좋은"}},
 #         "선호하는": {"and_or": "and", "include_list": {"선호하는"}},
@@ -442,6 +442,9 @@ class SocialAnalysisView(LoginRequiredMixin, TemplateView):
         context["xaxis_day_list"] = xaxis_day_list
         # context["include_keyword_set"] = include_keyword_set_list[self.lv1][self.lv2]["include_list"]
         context["include_keyword_set"] = include_keyword_set_list[self.lv1][self.lv2]
+        # and,or에 따라 적용 수정 후
+        # context["include_keyword_and_or"] = include_keyword_set_list[self.lv1][self.lv2]["and_or"]
+        # context["include_keyword_set"] = include_keyword_set_list[self.lv1][self.lv2]["include_list"]
 
         return context
 
@@ -547,14 +550,7 @@ def mention_data(request):
     twitter_mention_sum = {}
 
     for keyword_key, value in temp_mention_count_dict.items():
-        total_mention[keyword_key] = []
-        community_mention[keyword_key] = []
-        insta_mention[keyword_key] = []
-        blog_mention[keyword_key] = []
-        news_mention[keyword_key] = []
-        twitter_mention[keyword_key] = []
 
-        # 데이터가 없다면 패스
         if value.empty == True:
             total_mention_sum[keyword_key] = 0
             community_mention_sum[keyword_key] = 0
@@ -571,50 +567,110 @@ def mention_data(request):
         news_mention_sum[keyword_key] = int(value["news_count"].sum())
         twitter_mention_sum[keyword_key] = int(value["twitter_count"].sum())
 
-        # 하나의 키워드에 대해 기간 반복하여 데이터 정리.
-        target_date_datetime = datetime.date(start_date_datetime.year, start_date_datetime.month, start_date_datetime.day)
-        while target_date_datetime <= end_date_datetime:
-            total_row = []
-            community_row = []
-            insta_row = []
-            blog_row = []
-            news_row = []
-            twitter_row = []
+        # timestamp값, 각 타입에 대한 언급량으로 이루어진 df만들기.
+        convertedDf = None
+        def convertIsoToTimestamp(iso):
+            iso_datetime = common_util.iso_to_datetime(iso)
+            return calendar.timegm(iso_datetime.timetuple()) * 1000
+        timestamp_series = value["term_start"].apply(convertIsoToTimestamp)
 
-            total_row.append(calendar.timegm(target_date_datetime.timetuple()) * 1000)
-            community_row.append(calendar.timegm(target_date_datetime.timetuple()) * 1000)
-            insta_row.append(calendar.timegm(target_date_datetime.timetuple()) * 1000)
-            blog_row.append(calendar.timegm(target_date_datetime.timetuple()) * 1000)
-            news_row.append(calendar.timegm(target_date_datetime.timetuple()) * 1000)
-            twitter_row.append(calendar.timegm(target_date_datetime.timetuple()) * 1000)
+        def convertInt(x):
+            return int(x)
+        total_mention_series = value["count_sum"].apply(convertInt)
+        community_mention_series = value["community_count"].apply(convertInt)
+        insta_mention_series = value["insta_count"].apply(convertInt)
+        blog_mention_series = value["blog_count"].apply(convertInt)
+        news_mention_series = value["news_count"].apply(convertInt)
+        twitter_mention_series = value["twitter_count"].apply(convertInt)
 
-            mention_count = value[value["term_start"] == target_date_datetime.isoformat()]
-            if mention_count.empty == True:
-                total_row.append("null")
-                community_row.append("null")
-                insta_row.append("null")
-                blog_row.append("null")
-                news_row.append("null")
-                twitter_row.append("null")
-            else:
-                # row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0][mention_source_dict[mention_source]["column_name"]]))
-                total_row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0]["count_sum"]))
-                community_row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0]["community_count"]))
-                insta_row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0]["insta_count"]))
-                blog_row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0]["blog_count"]))
-                news_row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0]["news_count"]))
-                twitter_row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0]["twitter_count"]))
+        pd.concat([timestamp_series, total_mention_series, community_mention_series, insta_mention_series, blog_mention_series, news_mention_series, twitter_mention_series], axis=1)
 
-                total_mention_sum = total_mention_sum
 
-            total_mention[keyword_key].append(total_row)
-            community_mention[keyword_key].append(community_row)
-            insta_mention[keyword_key].append(insta_row)
-            blog_mention[keyword_key].append(blog_row)
-            news_mention[keyword_key].append(news_row)
-            twitter_mention[keyword_key].append(twitter_row)
+        # 만든 df로부터 반환해야하는 형식에 맞게 자료형 생성.
+        total_mention_list = pd.concat([timestamp_series, total_mention_series], axis=1).values.tolist()
+        community_mention_list = pd.concat([timestamp_series, community_mention_series], axis=1).values.tolist()
+        insta_mention_list = pd.concat([timestamp_series, insta_mention_series], axis=1).values.tolist()
+        blog_mention_list = pd.concat([timestamp_series, blog_mention_series], axis=1).values.tolist()
+        news_mention_list = pd.concat([timestamp_series, news_mention_series], axis=1).values.tolist()
+        twitter_mention_list = pd.concat([timestamp_series, twitter_mention_series], axis=1).values.tolist()
 
-            target_date_datetime += datetime.timedelta(days=1)
+        total_mention[keyword_key] = total_mention_list
+        community_mention[keyword_key] = community_mention_list
+        insta_mention[keyword_key] = insta_mention_list
+        blog_mention[keyword_key] = blog_mention_list
+        news_mention[keyword_key] = news_mention_list
+        twitter_mention[keyword_key] = twitter_mention_list
+
+
+
+        # total_mention[keyword_key] = []
+        # community_mention[keyword_key] = []
+        # insta_mention[keyword_key] = []
+        # blog_mention[keyword_key] = []
+        # news_mention[keyword_key] = []
+        # twitter_mention[keyword_key] = []
+        #
+        # # 데이터가 없다면 패스
+        # if value.empty == True:
+        #     total_mention_sum[keyword_key] = 0
+        #     community_mention_sum[keyword_key] = 0
+        #     insta_mention_sum[keyword_key] = 0
+        #     blog_mention_sum[keyword_key] = 0
+        #     news_mention_sum[keyword_key] = 0
+        #     twitter_mention_sum[keyword_key] = 0
+        #     continue
+        #
+        # total_mention_sum[keyword_key] = int(value["count_sum"].sum())
+        # community_mention_sum[keyword_key] = int(value["community_count"].sum())
+        # insta_mention_sum[keyword_key] = int(value["insta_count"].sum())
+        # blog_mention_sum[keyword_key] = int(value["blog_count"].sum())
+        # news_mention_sum[keyword_key] = int(value["news_count"].sum())
+        # twitter_mention_sum[keyword_key] = int(value["twitter_count"].sum())
+        #
+        # # 하나의 키워드에 대해 기간 반복하여 데이터 정리.
+        # target_date_datetime = datetime.date(start_date_datetime.year, start_date_datetime.month, start_date_datetime.day)
+        # while target_date_datetime <= end_date_datetime:
+        #     total_row = []
+        #     community_row = []
+        #     insta_row = []
+        #     blog_row = []
+        #     news_row = []
+        #     twitter_row = []
+        #
+        #     total_row.append(calendar.timegm(target_date_datetime.timetuple()) * 1000)
+        #     community_row.append(calendar.timegm(target_date_datetime.timetuple()) * 1000)
+        #     insta_row.append(calendar.timegm(target_date_datetime.timetuple()) * 1000)
+        #     blog_row.append(calendar.timegm(target_date_datetime.timetuple()) * 1000)
+        #     news_row.append(calendar.timegm(target_date_datetime.timetuple()) * 1000)
+        #     twitter_row.append(calendar.timegm(target_date_datetime.timetuple()) * 1000)
+        #
+        #     mention_count = value[value["term_start"] == target_date_datetime.isoformat()]
+        #     if mention_count.empty == True:
+        #         total_row.append("null")
+        #         community_row.append("null")
+        #         insta_row.append("null")
+        #         blog_row.append("null")
+        #         news_row.append("null")
+        #         twitter_row.append("null")
+        #     else:
+        #         # row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0][mention_source_dict[mention_source]["column_name"]]))
+        #         total_row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0]["count_sum"]))
+        #         community_row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0]["community_count"]))
+        #         insta_row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0]["insta_count"]))
+        #         blog_row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0]["blog_count"]))
+        #         news_row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0]["news_count"]))
+        #         twitter_row.append(int(value[value["term_start"] == target_date_datetime.isoformat()].iloc[0]["twitter_count"]))
+        #
+        #         total_mention_sum = total_mention_sum
+        #
+        #     total_mention[keyword_key].append(total_row)
+        #     community_mention[keyword_key].append(community_row)
+        #     insta_mention[keyword_key].append(insta_row)
+        #     blog_mention[keyword_key].append(blog_row)
+        #     news_mention[keyword_key].append(news_row)
+        #     twitter_mention[keyword_key].append(twitter_row)
+        #
+        #     target_date_datetime += datetime.timedelta(days=1)
 
     # # 전체 언급량 데이터 합 구하기
     # total_mention_sum = []
@@ -790,7 +846,8 @@ def pos_neg_data(request):
             wordCloud_data.append([row[0], row[3], row[1], row[3]])
 
         # 그래프 데이터 처리.
-        term_list_df = temp_df.groupby(["term_start", "term_end", "pos_neg"], as_index=False).sum("word_count").sort_values(by="term_start")
+        term_list_by_posneg_df = temp_df.groupby(["term_start", "term_end", "pos_neg"], as_index=False).sum("word_count").sort_values(by="term_start")
+        term_list_df = temp_df.groupby(["term_start", "term_end"], as_index=False).sum("word_count").sort_values(by="term_start")
         term_list_temp = temp_df.groupby(["term_start"], as_index=False).sum("word_count").sort_values(by="term_start")
         term_list = []
         for term in term_list_temp["term_start"].values.tolist():
@@ -798,20 +855,81 @@ def pos_neg_data(request):
             term_list.append(calendar.timegm(term_datetime.timetuple()) * 1000)
         graph_data["term_list"] = term_list
 
-        for term_list_df_idx in term_list_df.index:
-            term_start = term_list_df["term_start"][term_list_df_idx]
-            term_end = term_list_df["term_end"][term_list_df_idx]
-            pos_neg = term_list_df["pos_neg"][term_list_df_idx]
-            count = int(term_list_df["word_count"][term_list_df_idx])
+        # 수정본
+        def convertIsoToTimestamp(iso):
+            iso_datetime = common_util.iso_to_datetime(iso)
+            return calendar.timegm(iso_datetime.timetuple()) * 1000
+        timestamp_list = term_list_df["term_start"].apply(convertIsoToTimestamp)
 
-            term_start_datetime = datetime.date(int(term_start.split("-")[0]), int(term_start.split("-")[1]), int(term_start.split("-")[2]))
+        pos_neg_data_df = temp_df.groupby(["term_start", "term_end", "pos_neg"], ).sum("word_count").unstack(fill_value=0)
+        def convertInt(x):
+            return int(x)
+        if "POS" in pos_neg_data_df["word_count"].columns :
+           pos_series = pos_neg_data_df["word_count"]["POS"].apply(convertInt)
+           pos_series.index = range(pos_series.size)
+           pos_list = pd.concat([timestamp_list, pos_series], axis=1).values.tolist()
+           graph_data["pos"] = pos_list
+        if "NEG" in pos_neg_data_df["word_count"].columns :
+           neg_series = pos_neg_data_df["word_count"]["NEG"].apply(convertInt)
+           neg_series.index = range(neg_series.size)
+           neg_list = pd.concat([timestamp_list, neg_series], axis=1).values.tolist()
+           graph_data["neg"] = neg_list
+        if "NEU" in pos_neg_data_df["word_count"].columns :
+           neu_series = pos_neg_data_df["word_count"]["NEU"].apply(convertInt)
+           neu_series.index = range(neu_series.size)
+           neu_list = pd.concat([timestamp_list, neu_series], axis=1).values.tolist()
+           graph_data["neu"] = neu_list
 
-            if pos_neg == "POS":
-                graph_data["pos"].append([calendar.timegm(term_start_datetime.timetuple()) * 1000, count])
-            elif pos_neg == "NEG":
-                graph_data["neg"].append([calendar.timegm(term_start_datetime.timetuple()) * 1000, count])
-            elif pos_neg == "NEU":
-                graph_data["neu"].append([calendar.timegm(term_start_datetime.timetuple()) * 1000, count])
+        # neg_series = pos_neg_data_df["word_count"]["NEG"].apply(convertInt)
+        # neu_series = pos_neg_data_df["word_count"]["NEU"].apply(convertInt)
+        #
+        # pos_series.index = range(pos_series.size)
+        # neg_series.index = range(neg_series.size)
+        # neu_series.index = range(neu_series.size)
+        #
+        # pos_list = pd.concat([timestamp_list, pos_series], axis=1).values.tolist()
+        # neg_list = pd.concat([timestamp_list, neg_series], axis=1).values.tolist()
+        # neu_list = pd.concat([timestamp_list, neu_series], axis=1).values.tolist()
+        #
+        # graph_data["pos"] = pos_list
+        # graph_data["neg"] = neg_list
+        # graph_data["neu"] = neu_list
+
+
+        # for term_list_df_idx in term_list_df.index:
+        #     term_start = term_list_df["term_start"][term_list_df_idx]
+        #     term_end = term_list_df["term_end"][term_list_df_idx]
+        #     # pos_neg = term_list_df["pos_neg"][term_list_df_idx]
+        #     # count = int(term_list_df["word_count"][term_list_df_idx])
+        #
+        #     term_start_datetime = datetime.date(int(term_start.split("-")[0]), int(term_start.split("-")[1]), int(term_start.split("-")[2]))
+        #
+        #     target_term_posneg_sum = term_list_by_posneg_df[term_list_by_posneg_df["term_start"] == term_start]
+        #     pos_sum_df = target_term_posneg_sum[target_term_posneg_sum["pos_neg"] == "POS"]
+        #     neg_sum_df = target_term_posneg_sum[target_term_posneg_sum["pos_neg"] == "NEG"]
+        #     neu_sum_df = target_term_posneg_sum[target_term_posneg_sum["pos_neg"] == "NEU"]
+        #
+        #     pos_sum = 0
+        #     neg_sum = 0
+        #     neu_sum = 0
+        #
+        #     if pos_sum_df.empty == False:
+        #         pos_sum = int(pos_sum_df.iloc[0]["word_count"])
+        #     if neg_sum_df.empty == False:
+        #         neg_sum = int(neg_sum_df.iloc[0]["word_count"])
+        #     if neu_sum_df.empty == False:
+        #         neu_sum = int(neu_sum_df.iloc[0]["word_count"])
+        #
+        #     graph_data["pos"].append([calendar.timegm(term_start_datetime.timetuple()) * 1000, pos_sum])
+        #     graph_data["neg"].append([calendar.timegm(term_start_datetime.timetuple()) * 1000, neg_sum])
+        #     graph_data["neu"].append([calendar.timegm(term_start_datetime.timetuple()) * 1000, neu_sum])
+        #
+        #     # if pos_neg == "POS":
+        #     #     graph_data["pos"].append([calendar.timegm(term_start_datetime.timetuple()) * 1000, count])
+        #     # elif pos_neg == "NEG":
+        #     #     graph_data["neg"].append([calendar.timegm(term_start_datetime.timetuple()) * 1000, count])
+        #     # elif pos_neg == "NEU":
+        #     #     graph_data["neu"].append([calendar.timegm(term_start_datetime.timetuple()) * 1000, count])
 
         pos_neg_data[keyword] = {
             "table": table_data,

@@ -42,6 +42,8 @@
         <h4 class="page-title">
             {{ request.GET.lv1 }} - {{ request.GET.lv2 }}
         </h4>
+{#            포함 조건 : {{ include_keyword_and_or }}#}
+            <span style="width: 20px"></span>
             포함 키워드 :
             {% for include_keyword in include_keyword_set %}
                 {% if forloop.last == False %}
@@ -91,38 +93,38 @@
           style="display:none;"
         />
         <div id="date_term_btn" class="btn-group">
-          <button type="button" class="btn btn-soft-primary" value="1">1개월</button>
-          <button type="button" class="btn btn-soft-primary" value="3">3개월</button>
-          <button type="button" class="btn btn-soft-primary" value="6">6개월</button>
-          <button type="button" class="btn btn-soft-primary" value="12">12개월</button>
+          <button type="button" class="btn btn-soft-blue" value="1">1개월</button>
+          <button type="button" class="btn btn-soft-blue" value="3">3개월</button>
+          <button type="button" class="btn btn-soft-blue" value="6">6개월</button>
+          <button type="button" class="btn btn-soft-blue" value="12">12개월</button>
         </div>
-        <button type="submit" class="btn btn-primary waves-effect waves-light">
+        <button type="submit" class="btn btn-blue waves-effect waves-light">
           검색
         </button>
       </form>
 
     </div>
-{#              <button type="submit" class="btn btn-primary waves-effect waves-light mb-2">#}
+{#              <button type="submit" class="btn btn-blue waves-effect waves-light mb-2">#}
 {#                Submit#}
 {#              </button>#}
 {#            </form>#}
   </div>
 
-{#  평판 지수 그래프. #}
+    {#  평판 지수 그래프. #}
     <div class="row">
       <div class="col-lg-12">
         <div class="card">
           <div id="reputationIndexGraphDiv" class="card-body">
-            <h4 class="header-title" >평판 지수</h4>
+            <h4 class="header-title colTitle">평판 지수</h4>
 
             <div class="loading">
               <div class="spinner-border avatar-md"></div>
             </div>
 
-            <div class="itemContent" style="margin-top:3vh; width:100%;">
+            <div class="itemContent" style="margin-top:3vh; width:85vw;">
               <div style="display: flex; justify-content: right; margin:1vh 0vw">
-                <button class="btn-primary rounded" id="reputationIndexImgBtn" style="padding: 5px 10px; margin: 0 5px;">이미지 저장</button>
-                <button class="btn-primary rounded" id="reputationIndexExcelBtn" style="padding: 5px 10px; margin: 0 5px;">엑셀 다운</button>
+                <button class="btn-blue rounded" id="reputationIndexImgBtn" style="padding: 5px 10px; margin: 0 5px;">이미지 저장</button>
+                <button class="btn-blue rounded" id="reputationIndexExcelBtn" style="padding: 5px 10px; margin: 0 5px;">엑셀 다운</button>
               </div>
 
               <div
@@ -135,18 +137,18 @@
                 data-colors="#4fc6e1,#f7b84b,#4a81d4"
               ></div>
 
-              <div class="keyword-checkbox" id="reputationIndex-checkbox" style="
+              <div class="keyword-checkbox" data-selector="keywordCheckbox" id="reputationIndex-checkbox" style="
                 width: 100%;
                 margin-top:2vh;
               ">
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                {% comment %}<ul style="margin-bottom: 0; display: flex; justify-content: center;">
                     {% for keyword in keyword_list %}
-                        {% if forloop.counter <= 10 %}
+                        {% if forloop.counter <= 12 %}
                             <li style="
                                 display: inline;
                                 padding: 0.2vh 0.5vw;
                             ">
-                                <div id="reputationIndex-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                <div id="reputationIndex-{{ keyword }}" class="form-check mb-2 form-check-blue" style="
                                   display: inline-block;
                                   border: 1px solid #6658dd ;
                                   border-radius: 2em;
@@ -168,12 +170,12 @@
                 </ul>
                 <ul style="margin-bottom: 0; display: flex; justify-content: center;">
                     {% for keyword in keyword_list %}
-                        {% if forloop.counter > 10 and forloop.counter <= 20 %}
+                        {% if forloop.counter > 12 and forloop.counter <= 24 %}
                             <li style="
                                 display: inline;
                                 padding: 0.2vh 0.5vw;
                             ">
-                                <div id="reputationIndex-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                <div id="reputationIndex-{{ keyword }}" class="form-check mb-2 form-check-blue" style="
                                   display: inline-block;
                                   border: 1px solid #6658dd ;
                                   border-radius: 2em;
@@ -195,12 +197,12 @@
                 </ul>
                 <ul style="margin-bottom: 0; display: flex; justify-content: center;">
                     {% for keyword in keyword_list %}
-                        {% if forloop.counter > 20 and forloop.counter <= 30 %}
+                        {% if forloop.counter > 24 and forloop.counter <= 36 %}
                             <li style="
                                 display: inline;
                                 padding: 0.2vh 0.5vw;
                             ">
-                                <div id="reputationIndex-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                <div id="reputationIndex-{{ keyword }}" class="form-check mb-2 form-check-blue" style="
                                   display: inline-block;
                                   border: 1px solid #6658dd ;
                                   border-radius: 2em;
@@ -222,12 +224,12 @@
                 </ul>
                 <ul style="margin-bottom: 0; display: flex; justify-content: center;">
                     {% for keyword in keyword_list %}
-                        {% if forloop.counter > 30 and forloop.counter <= 40 %}
+                        {% if forloop.counter > 36 and forloop.counter <= 48 %}
                             <li style="
                                 display: inline;
                                 padding: 0.2vh 0.5vw;
                             ">
-                                <div id="reputationIndex-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                <div id="reputationIndex-{{ keyword }}" class="form-check mb-2 form-check-blue" style="
                                   display: inline-block;
                                   border: 1px solid #6658dd ;
                                   border-radius: 2em;
@@ -246,7 +248,7 @@
                             </li>
                         {% endif %}
                     {% endfor %}
-                </ul>
+                </ul>{% endcomment %}
                 <ul style="margin-bottom: 0; display: flex; justify-content: center;">
                     <li style="
                         display: inline;
@@ -260,8 +262,7 @@
                     ">
                         <button class="btn-light btn-rounded unCheckAll">전체해제</button>
                     </li>
-                </ul>
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    <span style="width:40px"> </span>
                     <li style="
                         display: inline;
                         padding: 0.2vh 0.5vw;
@@ -291,20 +292,21 @@
       <div class="col-lg-12">
         <div class="card">
           <div id="publishingIndexGraphDiv" class="card-body">
-            <h4 class="header-title" >퍼블리싱 지수</h4>
+            <h4 class="header-title colTitle" >퍼블리싱 지수</h4>
 
             <div class="loading">
               <div class="spinner-border avatar-md"></div>
             </div>
 
-            <div class="itemContent" style="margin-top:3vh; width:100%;">
+            <div class="itemContent" style="margin-top:3vh; width:85vw;">
               <div style="display: flex; justify-content: right; margin:1vh 0vw">
-                <button class="btn-primary rounded" id="publishingIndexImgBtn" style="padding: 5px 10px; margin: 0 5px;">이미지 저장</button>
-{#                <button class="btn-primary rounded" id="publishingIndexExcelBtn" style="padding: 5px 10px; margin: 0 5px;">엑셀 다운</button>#}
+                <button class="btn-blue rounded" data-selector="downloadImgBtn" id="publishingIndexImgBtn" style="padding: 5px 10px; margin: 0 5px;">이미지 저장</button>
+{#                <button class="btn-blue rounded" id="publishingIndexExcelBtn" style="padding: 5px 10px; margin: 0 5px;">엑셀 다운</button>#}
               </div>
 
               <div
                 id="publishingIndexGraph"
+                data-selector="graph"
                 style="
                   height: 450px;
                   width: 100%;
@@ -313,225 +315,29 @@
                 data-colors="#4fc6e1,#f7b84b,#4a81d4"
               ></div>
 
-              {% comment %}<div class="keyword-checkbox" id="{{ mention_type }}-checkbox" style="
+                <div class="keyword-checkbox" data-selector="keywordCheckbox" id="publishingIndex-checkbox" style="
                 width: 100%;
                 margin-top:2vh;
               ">
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    {% for keyword in keyword_list %}
-                        {% if forloop.counter <= 10 %}
-                            <li style="
-                                display: inline;
-                                padding: 0.2vh 0.5vw;
-                            ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
-                                  display: inline-block;
-                                  border: 1px solid #6658dd ;
-                                  border-radius: 2em;
-                                  padding: 0.5vh 0.6vw;
-                                ">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    value={{ keyword }}
-                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
-                                    checked="checked"
-                                    style="display: inline-block; margin-left: 0;"
-                                  />
-                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
-                                </div>
-                            </li>
-                            {% if forloop.last == True %}
-                                <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                      ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
-                                    display: inline-block;
-                                    border: 1px solid #6658dd ;
-                                    border-radius: 2em;
-                                    padding: 0.5vh 0.6vw;
-                                    ">
-                                        <input
-                                          class="form-check-input"
-                                          type="checkbox"
-                                          value="sum"
-                                          id="{{ mention_type }}-sum-checkbox"
-                                          checked="checked"
-                                          style="display: inline-block; margin-left: 0;"
-                                        />
-                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    {% for keyword in keyword_list %}
-                        {% if forloop.counter > 10 and forloop.counter <= 20 %}
-                            <li style="
-                                display: inline;
-                                padding: 0.2vh 0.5vw;
-                            ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
-                                  display: inline-block;
-                                  border: 1px solid #6658dd ;
-                                  border-radius: 2em;
-                                  padding: 0.5vh 0.6vw;
-                                ">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    value={{ keyword }}
-                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
-                                    checked="checked"
-                                    style="display: inline-block; margin-left: 0;"
-                                  />
-                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
-                                </div>
-                            </li>
-                            {% if forloop.last == True %}
-                                <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                      ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
-                                    display: inline-block;
-                                    border: 1px solid #6658dd ;
-                                    border-radius: 2em;
-                                    padding: 0.5vh 0.6vw;
-                                    ">
-                                        <input
-                                          class="form-check-input"
-                                          type="checkbox"
-                                          value="sum"
-                                          id="{{ mention_type }}-sum-checkbox"
-                                          checked="checked"
-                                          style="display: inline-block; margin-left: 0;"
-                                        />
-                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    {% for keyword in keyword_list %}
-                        {% if forloop.counter > 20 and forloop.counter <= 30 %}
-                            <li style="
-                                display: inline;
-                                padding: 0.2vh 0.5vw;
-                            ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
-                                  display: inline-block;
-                                  border: 1px solid #6658dd ;
-                                  border-radius: 2em;
-                                  padding: 0.5vh 0.6vw;
-                                ">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    value={{ keyword }}
-                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
-                                    checked="checked"
-                                    style="display: inline-block; margin-left: 0;"
-                                  />
-                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
-                                </div>
-                            </li>
-                            {% if forloop.last == True %}
-                                <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                      ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
-                                    display: inline-block;
-                                    border: 1px solid #6658dd ;
-                                    border-radius: 2em;
-                                    padding: 0.5vh 0.6vw;
-                                    ">
-                                        <input
-                                          class="form-check-input"
-                                          type="checkbox"
-                                          value="sum"
-                                          id="{{ mention_type }}-sum-checkbox"
-                                          checked="checked"
-                                          style="display: inline-block; margin-left: 0;"
-                                        />
-                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    {% for keyword in keyword_list %}
-                        {% if forloop.counter > 30 and forloop.counter <= 40 %}
-                            <li style="
-                                display: inline;
-                                padding: 0.2vh 0.5vw;
-                            ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
-                                  display: inline-block;
-                                  border: 1px solid #6658dd ;
-                                  border-radius: 2em;
-                                  padding: 0.5vh 0.6vw;
-                                ">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    value={{ keyword }}
-                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
-                                    checked="checked"
-                                    style="display: inline-block; margin-left: 0;"
-                                  />
-                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
-                                </div>
-                            </li>
-                            {% if forloop.last == True %}
-                                <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                      ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
-                                    display: inline-block;
-                                    border: 1px solid #6658dd ;
-                                    border-radius: 2em;
-                                    padding: 0.5vh 0.6vw;
-                                    ">
-                                        <input
-                                          class="form-check-input"
-                                          type="checkbox"
-                                          value="sum"
-                                          id="{{ mention_type }}-sum-checkbox"
-                                          checked="checked"
-                                          style="display: inline-block; margin-left: 0;"
-                                        />
-                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                    ">
-                        <button class="btn-secondary btn-rounded checkAll">전체선택</button>
-                    </li>
-                    <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                    ">
-                        <button class="btn-light btn-rounded unCheckAll">전체해제</button>
-                    </li>
-                </ul>
-              </div>{% endcomment %}
+                    <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                        <li style="
+                            display: inline;
+                            padding: 0.2vh 0.5vw;
+                        ">
+                            <select class="" data-selector="graphShapeLineBarSelect">
+                                <option value="line" >선 그래프</option>
+                                <option value="bar" selected>막대 그래프</option>
+                            </select>
+                        </li>
+                        <li style="
+                            display: inline;
+                            padding: 0.2vh 0.5vw;
+                        ">
+                            <button class="btn-light btn-rounded" data-selector="graphShapeOptBtn">변경</button>
+                        </li>
+                    </ul>
+                </div>
+
             </div>
 
           </div>
@@ -544,20 +350,21 @@
       <div class="col-lg-12">
         <div class="card">
           <div id="interactionIndexGraphDiv" class="card-body">
-            <h4 class="header-title" >상호작용 지수</h4>
+            <h4 class="header-title colTitle" >상호작용 지수</h4>
 
             <div class="loading">
               <div class="spinner-border avatar-md"></div>
             </div>
 
-            <div class="itemContent" style="margin-top:3vh; width:100%;">
+            <div class="itemContent" style="margin-top:3vh; width:85vw;">
               <div style="display: flex; justify-content: right; margin:1vh 0vw">
-                <button class="btn-primary rounded" id="interactionIndexImgBtn" style="padding: 5px 10px; margin: 0 5px;">이미지 저장</button>
-{#                <button class="btn-primary rounded" id="interactionIndexExcelBtn" style="padding: 5px 10px; margin: 0 5px;">엑셀 다운</button>#}
+                <button class="btn-blue rounded" data-selector="downloadImgBtn" id="interactionIndexImgBtn" style="padding: 5px 10px; margin: 0 5px;">이미지 저장</button>
+{#                <button class="btn-blue rounded" id="interactionIndexExcelBtn" style="padding: 5px 10px; margin: 0 5px;">엑셀 다운</button>#}
               </div>
 
               <div
                 id="interactionIndexGraph"
+                data-selector="graph"
                 style="
                   height: 450px;
                   width: 100%;
@@ -566,225 +373,29 @@
                 data-colors="#4fc6e1,#f7b84b,#4a81d4"
               ></div>
 
-              {% comment %}<div class="keyword-checkbox" id="{{ mention_type }}-checkbox" style="
+                <div class="keyword-checkbox" data-selector="keywordCheckbox" id="publishingIndex-checkbox" style="
                 width: 100%;
                 margin-top:2vh;
               ">
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    {% for keyword in keyword_list %}
-                        {% if forloop.counter <= 10 %}
-                            <li style="
-                                display: inline;
-                                padding: 0.2vh 0.5vw;
-                            ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
-                                  display: inline-block;
-                                  border: 1px solid #6658dd ;
-                                  border-radius: 2em;
-                                  padding: 0.5vh 0.6vw;
-                                ">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    value={{ keyword }}
-                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
-                                    checked="checked"
-                                    style="display: inline-block; margin-left: 0;"
-                                  />
-                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
-                                </div>
-                            </li>
-                            {% if forloop.last == True %}
-                                <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                      ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
-                                    display: inline-block;
-                                    border: 1px solid #6658dd ;
-                                    border-radius: 2em;
-                                    padding: 0.5vh 0.6vw;
-                                    ">
-                                        <input
-                                          class="form-check-input"
-                                          type="checkbox"
-                                          value="sum"
-                                          id="{{ mention_type }}-sum-checkbox"
-                                          checked="checked"
-                                          style="display: inline-block; margin-left: 0;"
-                                        />
-                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    {% for keyword in keyword_list %}
-                        {% if forloop.counter > 10 and forloop.counter <= 20 %}
-                            <li style="
-                                display: inline;
-                                padding: 0.2vh 0.5vw;
-                            ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
-                                  display: inline-block;
-                                  border: 1px solid #6658dd ;
-                                  border-radius: 2em;
-                                  padding: 0.5vh 0.6vw;
-                                ">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    value={{ keyword }}
-                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
-                                    checked="checked"
-                                    style="display: inline-block; margin-left: 0;"
-                                  />
-                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
-                                </div>
-                            </li>
-                            {% if forloop.last == True %}
-                                <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                      ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
-                                    display: inline-block;
-                                    border: 1px solid #6658dd ;
-                                    border-radius: 2em;
-                                    padding: 0.5vh 0.6vw;
-                                    ">
-                                        <input
-                                          class="form-check-input"
-                                          type="checkbox"
-                                          value="sum"
-                                          id="{{ mention_type }}-sum-checkbox"
-                                          checked="checked"
-                                          style="display: inline-block; margin-left: 0;"
-                                        />
-                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    {% for keyword in keyword_list %}
-                        {% if forloop.counter > 20 and forloop.counter <= 30 %}
-                            <li style="
-                                display: inline;
-                                padding: 0.2vh 0.5vw;
-                            ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
-                                  display: inline-block;
-                                  border: 1px solid #6658dd ;
-                                  border-radius: 2em;
-                                  padding: 0.5vh 0.6vw;
-                                ">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    value={{ keyword }}
-                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
-                                    checked="checked"
-                                    style="display: inline-block; margin-left: 0;"
-                                  />
-                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
-                                </div>
-                            </li>
-                            {% if forloop.last == True %}
-                                <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                      ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
-                                    display: inline-block;
-                                    border: 1px solid #6658dd ;
-                                    border-radius: 2em;
-                                    padding: 0.5vh 0.6vw;
-                                    ">
-                                        <input
-                                          class="form-check-input"
-                                          type="checkbox"
-                                          value="sum"
-                                          id="{{ mention_type }}-sum-checkbox"
-                                          checked="checked"
-                                          style="display: inline-block; margin-left: 0;"
-                                        />
-                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    {% for keyword in keyword_list %}
-                        {% if forloop.counter > 30 and forloop.counter <= 40 %}
-                            <li style="
-                                display: inline;
-                                padding: 0.2vh 0.5vw;
-                            ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
-                                  display: inline-block;
-                                  border: 1px solid #6658dd ;
-                                  border-radius: 2em;
-                                  padding: 0.5vh 0.6vw;
-                                ">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    value={{ keyword }}
-                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
-                                    checked="checked"
-                                    style="display: inline-block; margin-left: 0;"
-                                  />
-                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
-                                </div>
-                            </li>
-                            {% if forloop.last == True %}
-                                <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                      ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
-                                    display: inline-block;
-                                    border: 1px solid #6658dd ;
-                                    border-radius: 2em;
-                                    padding: 0.5vh 0.6vw;
-                                    ">
-                                        <input
-                                          class="form-check-input"
-                                          type="checkbox"
-                                          value="sum"
-                                          id="{{ mention_type }}-sum-checkbox"
-                                          checked="checked"
-                                          style="display: inline-block; margin-left: 0;"
-                                        />
-                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                    ">
-                        <button class="btn-secondary btn-rounded checkAll">전체선택</button>
-                    </li>
-                    <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                    ">
-                        <button class="btn-light btn-rounded unCheckAll">전체해제</button>
-                    </li>
-                </ul>
-              </div>{% endcomment %}
+                    <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                        <li style="
+                            display: inline;
+                            padding: 0.2vh 0.5vw;
+                        ">
+                            <select class="" data-selector="graphShapeLineBarSelect">
+                                <option value="line" >선 그래프</option>
+                                <option value="bar" selected>막대 그래프</option>
+                            </select>
+                        </li>
+                        <li style="
+                            display: inline;
+                            padding: 0.2vh 0.5vw;
+                        ">
+                            <button class="btn-light btn-rounded" data-selector="graphShapeOptBtn">변경</button>
+                        </li>
+                    </ul>
+                </div>
+
             </div>
 
           </div>
@@ -797,20 +408,21 @@
       <div class="col-lg-12">
         <div class="card">
           <div id="sympathyIndexGraphDiv" class="card-body">
-            <h4 class="header-title" >공감 지수</h4>
+            <h4 class="header-title colTitle" >공감 지수</h4>
 
             <div class="loading">
               <div class="spinner-border avatar-md"></div>
             </div>
 
-            <div class="itemContent" style="margin-top:3vh; width:100%;">
+            <div class="itemContent" style="margin-top:3vh; width:85vw;">
               <div style="display: flex; justify-content: right; margin:1vh 0vw">
-                <button class="btn-primary rounded" id="sympathyIndexImgBtn" style="padding: 5px 10px; margin: 0 5px;">이미지 저장</button>
-{#                <button class="btn-primary rounded" id="sympathyIndexExcelBtn" style="padding: 5px 10px; margin: 0 5px;">엑셀 다운</button>#}
+                <button class="btn-blue rounded" data-selector="downloadImgBtn" id="sympathyIndexImgBtn" style="padding: 5px 10px; margin: 0 5px;">이미지 저장</button>
+{#                <button class="btn-blue rounded" id="sympathyIndexExcelBtn" style="padding: 5px 10px; margin: 0 5px;">엑셀 다운</button>#}
               </div>
 
               <div
                 id="sympathyIndexGraph"
+                data-selector="graph"
                 style="
                   height: 450px;
                   width: 100%;
@@ -819,225 +431,28 @@
                 data-colors="#4fc6e1,#f7b84b,#4a81d4"
               ></div>
 
-              {% comment %}<div class="keyword-checkbox" id="{{ mention_type }}-checkbox" style="
+                <div class="keyword-checkbox" data-selector="keywordCheckbox" id="publishingIndex-checkbox" style="
                 width: 100%;
                 margin-top:2vh;
               ">
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    {% for keyword in keyword_list %}
-                        {% if forloop.counter <= 10 %}
-                            <li style="
-                                display: inline;
-                                padding: 0.2vh 0.5vw;
-                            ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
-                                  display: inline-block;
-                                  border: 1px solid #6658dd ;
-                                  border-radius: 2em;
-                                  padding: 0.5vh 0.6vw;
-                                ">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    value={{ keyword }}
-                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
-                                    checked="checked"
-                                    style="display: inline-block; margin-left: 0;"
-                                  />
-                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
-                                </div>
-                            </li>
-                            {% if forloop.last == True %}
-                                <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                      ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
-                                    display: inline-block;
-                                    border: 1px solid #6658dd ;
-                                    border-radius: 2em;
-                                    padding: 0.5vh 0.6vw;
-                                    ">
-                                        <input
-                                          class="form-check-input"
-                                          type="checkbox"
-                                          value="sum"
-                                          id="{{ mention_type }}-sum-checkbox"
-                                          checked="checked"
-                                          style="display: inline-block; margin-left: 0;"
-                                        />
-                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    {% for keyword in keyword_list %}
-                        {% if forloop.counter > 10 and forloop.counter <= 20 %}
-                            <li style="
-                                display: inline;
-                                padding: 0.2vh 0.5vw;
-                            ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
-                                  display: inline-block;
-                                  border: 1px solid #6658dd ;
-                                  border-radius: 2em;
-                                  padding: 0.5vh 0.6vw;
-                                ">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    value={{ keyword }}
-                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
-                                    checked="checked"
-                                    style="display: inline-block; margin-left: 0;"
-                                  />
-                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
-                                </div>
-                            </li>
-                            {% if forloop.last == True %}
-                                <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                      ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
-                                    display: inline-block;
-                                    border: 1px solid #6658dd ;
-                                    border-radius: 2em;
-                                    padding: 0.5vh 0.6vw;
-                                    ">
-                                        <input
-                                          class="form-check-input"
-                                          type="checkbox"
-                                          value="sum"
-                                          id="{{ mention_type }}-sum-checkbox"
-                                          checked="checked"
-                                          style="display: inline-block; margin-left: 0;"
-                                        />
-                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    {% for keyword in keyword_list %}
-                        {% if forloop.counter > 20 and forloop.counter <= 30 %}
-                            <li style="
-                                display: inline;
-                                padding: 0.2vh 0.5vw;
-                            ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
-                                  display: inline-block;
-                                  border: 1px solid #6658dd ;
-                                  border-radius: 2em;
-                                  padding: 0.5vh 0.6vw;
-                                ">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    value={{ keyword }}
-                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
-                                    checked="checked"
-                                    style="display: inline-block; margin-left: 0;"
-                                  />
-                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
-                                </div>
-                            </li>
-                            {% if forloop.last == True %}
-                                <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                      ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
-                                    display: inline-block;
-                                    border: 1px solid #6658dd ;
-                                    border-radius: 2em;
-                                    padding: 0.5vh 0.6vw;
-                                    ">
-                                        <input
-                                          class="form-check-input"
-                                          type="checkbox"
-                                          value="sum"
-                                          id="{{ mention_type }}-sum-checkbox"
-                                          checked="checked"
-                                          style="display: inline-block; margin-left: 0;"
-                                        />
-                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    {% for keyword in keyword_list %}
-                        {% if forloop.counter > 30 and forloop.counter <= 40 %}
-                            <li style="
-                                display: inline;
-                                padding: 0.2vh 0.5vw;
-                            ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
-                                  display: inline-block;
-                                  border: 1px solid #6658dd ;
-                                  border-radius: 2em;
-                                  padding: 0.5vh 0.6vw;
-                                ">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    value={{ keyword }}
-                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
-                                    checked="checked"
-                                    style="display: inline-block; margin-left: 0;"
-                                  />
-                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
-                                </div>
-                            </li>
-                            {% if forloop.last == True %}
-                                <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                      ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
-                                    display: inline-block;
-                                    border: 1px solid #6658dd ;
-                                    border-radius: 2em;
-                                    padding: 0.5vh 0.6vw;
-                                    ">
-                                        <input
-                                          class="form-check-input"
-                                          type="checkbox"
-                                          value="sum"
-                                          id="{{ mention_type }}-sum-checkbox"
-                                          checked="checked"
-                                          style="display: inline-block; margin-left: 0;"
-                                        />
-                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                    ">
-                        <button class="btn-secondary btn-rounded checkAll">전체선택</button>
-                    </li>
-                    <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                    ">
-                        <button class="btn-light btn-rounded unCheckAll">전체해제</button>
-                    </li>
-                </ul>
-              </div>{% endcomment %}
+                    <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                        <li style="
+                            display: inline;
+                            padding: 0.2vh 0.5vw;
+                        ">
+                            <select class="" data-selector="graphShapeLineBarSelect">
+                                <option value="line" >선 그래프</option>
+                                <option value="bar" selected>막대 그래프</option>
+                            </select>
+                        </li>
+                        <li style="
+                            display: inline;
+                            padding: 0.2vh 0.5vw;
+                        ">
+                            <button class="btn-light btn-rounded" data-selector="graphShapeOptBtn">변경</button>
+                        </li>
+                    </ul>
+                </div>
             </div>
 
           </div>
@@ -1050,20 +465,21 @@
       <div class="col-lg-12">
         <div class="card">
           <div id="posIndexGraphDiv" class="card-body">
-            <h4 class="header-title" >긍정 지수</h4>
+            <h4 class="header-title colTitle" >긍정 지수</h4>
 
             <div class="loading">
               <div class="spinner-border avatar-md"></div>
             </div>
 
-            <div class="itemContent" style="margin-top:3vh; width:100%;">
+            <div class="itemContent" style="margin-top:3vh; width:85vw;">
               <div style="display: flex; justify-content: right; margin:1vh 0vw">
-                <button class="btn-primary rounded" id="posIndexImgBtn" style="padding: 5px 10px; margin: 0 5px;">이미지 저장</button>
-{#                <button class="btn-primary rounded" id="posIndexExcelBtn" style="padding: 5px 10px; margin: 0 5px;">엑셀 다운</button>#}
+                <button class="btn-blue rounded" data-selector="downloadImgBtn" id="posIndexImgBtn" style="padding: 5px 10px; margin: 0 5px;">이미지 저장</button>
+{#                <button class="btn-blue rounded" id="posIndexExcelBtn" style="padding: 5px 10px; margin: 0 5px;">엑셀 다운</button>#}
               </div>
 
               <div
                 id="posIndexGraph"
+                data-selector="graph"
                 style="
                   height: 450px;
                   width: 100%;
@@ -1072,225 +488,29 @@
                 data-colors="#4fc6e1,#f7b84b,#4a81d4"
               ></div>
 
-              {% comment %}<div class="keyword-checkbox" id="{{ mention_type }}-checkbox" style="
+                <div class="keyword-checkbox" data-selector="keywordCheckbox" id="publishingIndex-checkbox" style="
                 width: 100%;
                 margin-top:2vh;
               ">
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    {% for keyword in keyword_list %}
-                        {% if forloop.counter <= 10 %}
-                            <li style="
-                                display: inline;
-                                padding: 0.2vh 0.5vw;
-                            ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
-                                  display: inline-block;
-                                  border: 1px solid #6658dd ;
-                                  border-radius: 2em;
-                                  padding: 0.5vh 0.6vw;
-                                ">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    value={{ keyword }}
-                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
-                                    checked="checked"
-                                    style="display: inline-block; margin-left: 0;"
-                                  />
-                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
-                                </div>
-                            </li>
-                            {% if forloop.last == True %}
-                                <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                      ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
-                                    display: inline-block;
-                                    border: 1px solid #6658dd ;
-                                    border-radius: 2em;
-                                    padding: 0.5vh 0.6vw;
-                                    ">
-                                        <input
-                                          class="form-check-input"
-                                          type="checkbox"
-                                          value="sum"
-                                          id="{{ mention_type }}-sum-checkbox"
-                                          checked="checked"
-                                          style="display: inline-block; margin-left: 0;"
-                                        />
-                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    {% for keyword in keyword_list %}
-                        {% if forloop.counter > 10 and forloop.counter <= 20 %}
-                            <li style="
-                                display: inline;
-                                padding: 0.2vh 0.5vw;
-                            ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
-                                  display: inline-block;
-                                  border: 1px solid #6658dd ;
-                                  border-radius: 2em;
-                                  padding: 0.5vh 0.6vw;
-                                ">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    value={{ keyword }}
-                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
-                                    checked="checked"
-                                    style="display: inline-block; margin-left: 0;"
-                                  />
-                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
-                                </div>
-                            </li>
-                            {% if forloop.last == True %}
-                                <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                      ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
-                                    display: inline-block;
-                                    border: 1px solid #6658dd ;
-                                    border-radius: 2em;
-                                    padding: 0.5vh 0.6vw;
-                                    ">
-                                        <input
-                                          class="form-check-input"
-                                          type="checkbox"
-                                          value="sum"
-                                          id="{{ mention_type }}-sum-checkbox"
-                                          checked="checked"
-                                          style="display: inline-block; margin-left: 0;"
-                                        />
-                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    {% for keyword in keyword_list %}
-                        {% if forloop.counter > 20 and forloop.counter <= 30 %}
-                            <li style="
-                                display: inline;
-                                padding: 0.2vh 0.5vw;
-                            ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
-                                  display: inline-block;
-                                  border: 1px solid #6658dd ;
-                                  border-radius: 2em;
-                                  padding: 0.5vh 0.6vw;
-                                ">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    value={{ keyword }}
-                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
-                                    checked="checked"
-                                    style="display: inline-block; margin-left: 0;"
-                                  />
-                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
-                                </div>
-                            </li>
-                            {% if forloop.last == True %}
-                                <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                      ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
-                                    display: inline-block;
-                                    border: 1px solid #6658dd ;
-                                    border-radius: 2em;
-                                    padding: 0.5vh 0.6vw;
-                                    ">
-                                        <input
-                                          class="form-check-input"
-                                          type="checkbox"
-                                          value="sum"
-                                          id="{{ mention_type }}-sum-checkbox"
-                                          checked="checked"
-                                          style="display: inline-block; margin-left: 0;"
-                                        />
-                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    {% for keyword in keyword_list %}
-                        {% if forloop.counter > 30 and forloop.counter <= 40 %}
-                            <li style="
-                                display: inline;
-                                padding: 0.2vh 0.5vw;
-                            ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
-                                  display: inline-block;
-                                  border: 1px solid #6658dd ;
-                                  border-radius: 2em;
-                                  padding: 0.5vh 0.6vw;
-                                ">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    value={{ keyword }}
-                                    id="{{ mention_type }}-{{ keyword }}-checkbox"
-                                    checked="checked"
-                                    style="display: inline-block; margin-left: 0;"
-                                  />
-                                  <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-{{ keyword }}-checkbox" >{{ keyword }}</label>
-                                </div>
-                            </li>
-                            {% if forloop.last == True %}
-                                <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                      ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
-                                    display: inline-block;
-                                    border: 1px solid #6658dd ;
-                                    border-radius: 2em;
-                                    padding: 0.5vh 0.6vw;
-                                    ">
-                                        <input
-                                          class="form-check-input"
-                                          type="checkbox"
-                                          value="sum"
-                                          id="{{ mention_type }}-sum-checkbox"
-                                          checked="checked"
-                                          style="display: inline-block; margin-left: 0;"
-                                        />
-                                        <label class="form-check-label" style="margin-left: 0.3vw;" for="{{ mention_type }}-sum-checkbox" >합계</label>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
-                    <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                    ">
-                        <button class="btn-secondary btn-rounded checkAll">전체선택</button>
-                    </li>
-                    <li style="
-                        display: inline;
-                        padding: 0.2vh 0.5vw;
-                    ">
-                        <button class="btn-light btn-rounded unCheckAll">전체해제</button>
-                    </li>
-                </ul>
-              </div>{% endcomment %}
+                    <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                        <li style="
+                            display: inline;
+                            padding: 0.2vh 0.5vw;
+                        ">
+                            <select class="" data-selector="graphShapeLineBarSelect">
+                                <option value="line" >선 그래프</option>
+                                <option value="bar" selected>막대 그래프</option>
+                            </select>
+                        </li>
+                        <li style="
+                            display: inline;
+                            padding: 0.2vh 0.5vw;
+                        ">
+                            <button class="btn-light btn-rounded" data-selector="graphShapeOptBtn">변경</button>
+                        </li>
+                    </ul>
+                </div>
+
             </div>
 
           </div>
@@ -1310,10 +530,10 @@
               <div class="spinner-border avatar-md"></div>
             </div>
 
-            <div class="itemContent" style="margin-top:3vh; width:100%;">
+            <div class="itemContent" style="margin-top:3vh; width:85vw;">
               <div style="display: flex; justify-content: right; margin:1vh 0vw">
-                <button class="btn-primary rounded" id="{{ mention_type }}ImgBtn" style="padding: 5px 10px; margin: 0 5px;">이미지 저장</button>
-                <button class="btn-primary rounded" id="{{ mention_type }}ExcelBtn" style="padding: 5px 10px; margin: 0 5px;">엑셀 다운</button>
+                <button class="btn-blue rounded" id="{{ mention_type }}ImgBtn" style="padding: 5px 10px; margin: 0 5px;">이미지 저장</button>
+                <button class="btn-blue rounded" id="{{ mention_type }}ExcelBtn" style="padding: 5px 10px; margin: 0 5px;">엑셀 다운</button>
               </div>
 
               <div
@@ -1331,12 +551,12 @@
               ">
                 <ul style="margin-bottom: 0; display: flex; justify-content: center;">
                     {% for keyword in keyword_list %}
-                        {% if forloop.counter <= 10 %}
+                        {% if forloop.counter <= 12 %}
                             <li style="
                                 display: inline;
                                 padding: 0.2vh 0.5vw;
                             ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-blue" style="
                                   display: inline-block;
                                   border: 1px solid #6658dd ;
                                   border-radius: 2em;
@@ -1358,7 +578,7 @@
                         display: inline;
                         padding: 0.2vh 0.5vw;
                       ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-blue" style="
                                     display: inline-block;
                                     border: 1px solid #6658dd ;
                                     border-radius: 2em;
@@ -1381,12 +601,12 @@
                 </ul>
                 <ul style="margin-bottom: 0; display: flex; justify-content: center;">
                     {% for keyword in keyword_list %}
-                        {% if forloop.counter > 10 and forloop.counter <= 20 %}
+                        {% if forloop.counter > 12 and forloop.counter <= 24 %}
                             <li style="
                                 display: inline;
                                 padding: 0.2vh 0.5vw;
                             ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-blue" style="
                                   display: inline-block;
                                   border: 1px solid #6658dd ;
                                   border-radius: 2em;
@@ -1408,7 +628,7 @@
                         display: inline;
                         padding: 0.2vh 0.5vw;
                       ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-blue" style="
                                     display: inline-block;
                                     border: 1px solid #6658dd ;
                                     border-radius: 2em;
@@ -1431,12 +651,12 @@
                 </ul>
                 <ul style="margin-bottom: 0; display: flex; justify-content: center;">
                     {% for keyword in keyword_list %}
-                        {% if forloop.counter > 20 and forloop.counter <= 30 %}
+                        {% if forloop.counter > 24 and forloop.counter <= 36 %}
                             <li style="
                                 display: inline;
                                 padding: 0.2vh 0.5vw;
                             ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-blue" style="
                                   display: inline-block;
                                   border: 1px solid #6658dd ;
                                   border-radius: 2em;
@@ -1458,7 +678,7 @@
                         display: inline;
                         padding: 0.2vh 0.5vw;
                       ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-blue" style="
                                     display: inline-block;
                                     border: 1px solid #6658dd ;
                                     border-radius: 2em;
@@ -1481,12 +701,12 @@
                 </ul>
                 <ul style="margin-bottom: 0; display: flex; justify-content: center;">
                     {% for keyword in keyword_list %}
-                        {% if forloop.counter > 30 and forloop.counter <= 40 %}
+                        {% if forloop.counter > 36 and forloop.counter <= 48 %}
                             <li style="
                                 display: inline;
                                 padding: 0.2vh 0.5vw;
                             ">
-                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-primary" style="
+                                <div id="{{ mention_type }}-{{ keyword }}" class="form-check mb-2 form-check-blue" style="
                                   display: inline-block;
                                   border: 1px solid #6658dd ;
                                   border-radius: 2em;
@@ -1508,7 +728,7 @@
                         display: inline;
                         padding: 0.2vh 0.5vw;
                       ">
-                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-primary" style="
+                                    <div id="{{ mention_type }}-sum" class="form-check mb-2 form-check-blue" style="
                                     display: inline-block;
                                     border: 1px solid #6658dd ;
                                     border-radius: 2em;
@@ -1542,8 +762,7 @@
                     ">
                         <button class="btn-light btn-rounded unCheckAll">전체해제</button>
                     </li>
-                </ul>
-                <ul style="margin-bottom: 0; display: flex; justify-content: center;">
+                    <span style="width:40px"> </span>
                     <li style="
                         display: inline;
                         padding: 0.2vh 0.5vw;
@@ -1575,17 +794,17 @@
       <div class="col-lg-12">
         <div class="card">
           <div id="posNegItem" class="card-body">
-            <h4 class="header-title" >긍부정어 추이</h4>
+            <h4 class="header-title colTitle" >긍부정어 추이</h4>
 
             <div class="loading">
               <div class="spinner-border avatar-md"></div>
             </div>
 
-            <div class="itemContent">
+            <div class="itemContent" style="width:85vw;">
               <div id="posNegKeywordRadio" >
                 <div style="display:flex; justify-content: center; ">
                     {% for keyword in keyword_list %}
-                      {% if forloop.counter <= 10 %}
+                      {% if forloop.counter <= 12 %}
                             <div class="form-check mb-2" style="margin: 1vh 1vw; ">
                               <input
                                 class="form-check-input"
@@ -1604,7 +823,7 @@
                 </div>
                 <div style="display:flex; justify-content: center; ">
                     {% for keyword in keyword_list %}
-                      {% if forloop.counter > 10 and forloop.counter <= 20 %}
+                      {% if forloop.counter > 12 and forloop.counter <= 24 %}
                             <div class="form-check mb-2" style="margin: 1vh 1vw; ">
                               <input
                                 class="form-check-input"
@@ -1623,7 +842,7 @@
                 </div>
                 <div style="display:flex; justify-content: center; ">
                     {% for keyword in keyword_list %}
-                      {% if forloop.counter > 20 and forloop.counter <= 30 %}
+                      {% if forloop.counter > 24 and forloop.counter <= 36 %}
                             <div class="form-check mb-2" style="margin: 1vh 1vw; ">
                               <input
                                 class="form-check-input"
@@ -1642,7 +861,7 @@
                 </div>
                 <div style="display:flex; justify-content: center; ">
                     {% for keyword in keyword_list %}
-                      {% if forloop.counter > 30 and forloop.counter <= 40 %}
+                      {% if forloop.counter > 36 and forloop.counter <= 48 %}
                             <div class="form-check mb-2" style="margin: 1vh 1vw; ">
                               <input
                                 class="form-check-input"
@@ -1671,7 +890,7 @@
 
                 <div style="width: 40%;">
                   <div style="display: flex; justify-content: right; margin:1vh 0vw">
-                    <button class="btn-primary rounded" id="posNegTableExcelBtn" style="padding: 5px 10px;">엑셀 다운</button>
+                    <button class="btn-blue rounded" id="posNegTableExcelBtn" style="padding: 5px 10px;">엑셀 다운</button>
                   </div>
 
                   <table
@@ -1696,7 +915,7 @@
 
               <div style="margin-top: 3vh;">
                 <div style="display: flex; justify-content: right; margin:1vh 0vw">
-                  <button class="btn-primary rounded" id="posNegGraphExcelBtn" style="padding: 5px 10px;">엑셀 다운</button>
+                  <button class="btn-blue rounded" id="posNegGraphExcelBtn" style="padding: 5px 10px;">엑셀 다운</button>
                 </div>
 
                 <div
@@ -1925,17 +1144,23 @@ $(document).ready(function () {
         {#graphData.unshift({label:"sum", data: data[keyword], bars: { show: true, fillColor:"#e3e5e5", },#}
         {#            lines:{show: false}, color: "#e3e5e5", stack: "sum"})#}
       })
+        //합계 그래프 그리기.
+        var sumSeries = []
+        var maxGraphOneSeries = []
+        for(var i=0; i<graphData.length; i++) {
+            var graphOneSeries = graphData[i]["data"]
+            {#if(graphOneSeries.length===0) continue#}
+            if(graphOneSeries.length > maxGraphOneSeries.length){maxGraphOneSeries = graphOneSeries}
 
-      var sumSeries = []
-      for(var i=0; i<graphData.length; i++) {
-        var graphOneSeries = graphData[i]["data"]
-        if(graphOneSeries.length===0) continue
-
-        for (var j = 0; j < graphOneSeries.length; j++) {
+        {% comment %}for (var j = 0; j < graphOneSeries.length; j++) {
           sumSeries.push([graphOneSeries[j][0], 0])
         }
-        break;
-      }
+        break;{% endcomment %}
+        }
+        for (var j = 0; j < maxGraphOneSeries.length; j++) {
+            sumSeries.push([maxGraphOneSeries[j][0], 0])
+        }
+
 
       for(var i=0; i<graphData.length; i++){
         var graphOneSeries = graphData[i]["data"]
@@ -1977,7 +1202,7 @@ $(document).ready(function () {
         });
 
         if($("#"+checkbox_el_id).find("input[type='checkbox'][value='sum']").is(":checked")){
-          var sumSeries = []
+          {% comment %}var sumSeries = []
           for(var i=0; i<graphData.length; i++) {
             var graphOneSeries = graphData[i]["data"]
             if(graphOneSeries.length===0) continue
@@ -1986,10 +1211,27 @@ $(document).ready(function () {
               sumSeries.push([graphOneSeries[j][0], 0])
             }
             break;
-          }
+          }{% endcomment %}
+            var sumSeries = []
+            var maxGraphOneSeries = []
+            for(var i=0; i<graphData.length; i++) {
+                var graphOneSeries = graphData[i]["data"]
+                if(graphOneSeries=== undefined) continue
+                {#if(graphOneSeries.length===0) continue#}
+                if(graphOneSeries.length > maxGraphOneSeries.length){maxGraphOneSeries = graphOneSeries}
+
+            {% comment %}for (var j = 0; j < graphOneSeries.length; j++) {
+              sumSeries.push([graphOneSeries[j][0], 0])
+            }
+            break;{% endcomment %}
+            }
+            for (var j = 0; j < maxGraphOneSeries.length; j++) {
+                sumSeries.push([maxGraphOneSeries[j][0], 0])
+            }
 
           for(var i=0; i<graphData.length; i++){
             var graphOneSeries = graphData[i]["data"]
+              if(graphOneSeries=== undefined) continue
 
             for(var j=0; j<graphOneSeries.length; j++){
               if(graphOneSeries[j][1]==="null") continue
@@ -2030,6 +1272,7 @@ $(document).ready(function () {
               barWidth: 60*60*24*3*1000,//x축(수평그래프라면 y축)의 단위 기준. 현재 y축이 시간 단위이므로, millisecond단위로 값을 주어야 y축에서 그만큼에 해당하는 넓이를 부여함.
               horizontal:false,
               align: "center",
+                fill: 1,
             },
             lines:{
               show:false,
@@ -2092,7 +1335,7 @@ $(document).ready(function () {
               {#minTickSize: [1, "month"],#}
             },
             {#xaxis: o.x,#}
-            colors: t,
+            {#colors: t,#}
             tooltip: true,
             tooltipOpts: {content: "%s : %x, %y", shifts: {x: -30, y: -50}}//마우스 올려 놓았을 때 작은 설명 모달. %x가 x축 값, .2가 표시할 소수점 자리수.
         }, b.plot(b(a), r, t)
@@ -2128,8 +1371,8 @@ $(document).ready(function () {
             },
             legend: {
                 show: true,
-                position: "sw",
-                margin: [0, -40],
+                position: "ne",
+                margin: [0, 0],
                 noColumns: 0,
                 labelBoxBorderColor: null,
                 labelFormatter: function (a, o) {
@@ -2163,12 +1406,11 @@ $(document).ready(function () {
                   {#return d.getUTCFullYear() + "/" + (d.getUTCMonth()+1);#}
               },
               tickColor: "rgba(65, 80, 95, 0.07)",
-              font: {color: "#8391a2"},
+              font: {color: "#6d7986", size: 18, },
               {#timeformat: "%Y-%m-%d",//시간 타입 형태.#}
               {#minTickSize: [1, "month"],#}
             },
             {#xaxis: o.x,#}
-            {#colors: t,#}
             tooltip: true,
             tooltipOpts: {content: "%s : %x, %y", shifts: {x: -30, y: -50}}//마우스 올려 놓았을 때 작은 설명 모달. %x가 x축 값, .2가 표시할 소수점 자리수.
         }
@@ -2177,6 +1419,7 @@ $(document).ready(function () {
     },
 
     a.prototype.init = function () {
+
         var o
         //그래프 색.
         {#var color_list = ["#4fc6e1", "#1abc9c", "#4a81d4", "#f7b84b", "#f1556c", "#754100", "#444c57", "#ffcbcb", "#ff6347", "#ee82ee", "#fa8072", "#8000080", "#ffff00", "#ff0000"]#}
@@ -2489,6 +1732,89 @@ $(document).ready(function () {
                                 mainObj.createReputationIndexGraph("#reputationIndexGraph", {}, [], reputationGraphData, reputationSortedKeywordList)
                             }
 
+                            //키워드 체크박스 정렬하여 렌더링.
+                            sortKeywordCheckbox("reputationIndexGraphDiv", reputationSortedKeywordList)
+                            function sortKeywordCheckbox(graphDivId, sortedKeywordList){
+                                var checkboxDiv = $("#"+graphDivId+" *[data-selector='keywordCheckbox']")
+
+                                var reversedSortedKeywordList = sortedKeywordList.concat(keywordList.filter(x=>!sortedKeywordList.includes(x)))
+                                reversedSortedKeywordList = [...reversedSortedKeywordList].reverse()
+
+                                //기존 키워드 체크박스 모두 제거
+                                removeExistedKeywordCheckbox(graphDivId)
+                                function removeExistedKeywordCheckbox(graphDivId){
+                                    var keywordCheckboxUl = $("#"+graphDivId+" *[data-selector='keywordCheckbox'] ul")
+
+                                    for(var i=0; i<keywordCheckboxUl.length-1; i++){
+                                        $("#"+graphDivId+" *[data-selector='keywordCheckbox'] ul:nth-child(1)").remove()
+                                    }
+                                }
+
+                                addSortedKeywordCheckbox(checkboxDiv, reversedSortedKeywordList, sortedKeywordList)
+                                function addSortedKeywordCheckbox(checkboxDiv, reversedSortedKeywordList, checkedKeywordList){
+                                    for(var i=0; i<reversedSortedKeywordList.length; ){
+                                        checkboxDiv.prepend(
+                                            "<ul style='margin-bottom: 0; display: flex; justify-content: center;'></ul>"
+                                        )
+                                        var ul = checkboxDiv.find("ul:nth-child(1)")
+
+                                        for(var j=0; j<12; j++){
+                                            if(i >= reversedSortedKeywordList.length){break;}
+
+                                            var keyword = reversedSortedKeywordList[i]
+                                            var checked = (checkedKeywordList.includes(keyword))? "checked" : ""
+
+                                            ul.prepend(
+                                                `<li style='
+                                                    display: inline;
+                                                    padding: 0.2vh 0.5vw;
+                                                '>
+                                                    <div id='reputationIndex-${keyword}' class='form-check mb-2 form-check-blue' style='
+                                                      display: inline-block;
+                                                      border: 1px solid #6658dd ;
+                                                      border-radius: 2em;
+                                                      padding: 0.5vh 0.6vw;
+                                                    '>
+                                                      <input
+                                                        class='form-check-input'
+                                                        type='checkbox'
+                                                        value=${keyword}
+                                                        id='reputationIndex-${keyword}-checkbox'
+                                                        ${checked}
+                                                        style='display: inline-block; margin-left: 0;'
+                                                      />
+                                                      <label class='form-check-label' style='margin-left: 0.3vw;' for='reputationIndex-${keyword}-checkbox' >${keyword}</label>
+                                                    </div>
+                                                </li>`
+                                            )
+
+                                            i++;
+                                        }
+                                    }
+
+                                    setAllMentionTypeKeywordCheckBoxColor()
+
+                                }
+
+                            }
+
+
+
+                            //평판 지수 제외 나머지 지수 그래프 렌더링.
+                            function createIndexGraph(graphDivId, graphData, sortedKeyList, labelName){
+                                $("#"+graphDivId+" .loading").css("display", "none")
+                                $("#"+graphDivId+" .itemContent").css("display", "block")
+
+                                var lineBarOpt = $("#"+graphDivId+" *[data-selector='graphShapeLineBarSelect']").val()
+                                var lineShow = false
+                                var barShow = false
+
+                                if(lineBarOpt === "line"){ lineShow = true }
+                                else if(lineBarOpt === "bar"){ barShow = true }
+
+                                mainObj.createReputationIndexGraph("#"+graphDivId+" *[data-selector='graph']", {}, [],
+                                        [{label: labelName, data: graphData, color:"#6a7682", lines:{show: lineShow}, bars:{show: barShow}}], sortedKeyList)
+                            }
 
                             publishingIndexGraphDataList = []
                             for(var i=0; i<publishingSortedKeywordList.length; i++){
@@ -2496,10 +1822,11 @@ $(document).ready(function () {
 
                                 publishingIndexGraphDataList.push([i, publishingIndexListByKeyword[keyword]]);
                             }
+                            createIndexGraph("publishingIndexGraphDiv", publishingIndexGraphDataList, publishingSortedKeywordList, "퍼블리싱")
+                            $("#publishingIndexGraphDiv *[data-selector='graphShapeOptBtn']").click(function (){
+                                createIndexGraph("publishingIndexGraphDiv", publishingIndexGraphDataList, publishingSortedKeywordList, "퍼블리싱")
+                            })
 
-                            $("#publishingIndexGraphDiv .loading").css("display", "none")
-                            $("#publishingIndexGraphDiv .itemContent").css("display", "block")
-                            mainObj.createReputationIndexGraph("#publishingIndexGraph", {}, [], [{label:"퍼블리싱", data: publishingIndexGraphDataList}], publishingSortedKeywordList)
 
                             interactionIndexGraphDataList = []
                             for(var i=0; i<interactionSortedKeywordList.length; i++){
@@ -2507,10 +1834,11 @@ $(document).ready(function () {
 
                                 interactionIndexGraphDataList.push([i, interactionIndexListByKeyword[keyword]]);
                             }
+                            createIndexGraph("interactionIndexGraphDiv", interactionIndexGraphDataList, interactionSortedKeywordList, "상호작용")
+                            $("#interactionIndexGraphDiv *[data-selector='graphShapeOptBtn']").click(function (){
+                                createIndexGraph("interactionIndexGraphDiv", interactionIndexGraphDataList, interactionSortedKeywordList, "상호작용")
+                            })
 
-                            $("#interactionIndexGraphDiv .loading").css("display", "none")
-                            $("#interactionIndexGraphDiv .itemContent").css("display", "block")
-                            mainObj.createReputationIndexGraph("#interactionIndexGraph", {}, [], [{label:"상호작용", data: interactionIndexGraphDataList}], interactionSortedKeywordList)
 
                             sympathyIndexGraphDataList = []
                             for(var i=0; i<sympathySortedKeywordList.length; i++){
@@ -2518,10 +1846,11 @@ $(document).ready(function () {
 
                                 sympathyIndexGraphDataList.push([i, sympathyIndexList[keyword]]);
                             }
+                            createIndexGraph("sympathyIndexGraphDiv", sympathyIndexGraphDataList, sympathySortedKeywordList, "공감")
+                            $("#sympathyIndexGraphDiv *[data-selector='graphShapeOptBtn']").click(function (){
+                                createIndexGraph("sympathyIndexGraphDiv", sympathyIndexGraphDataList, sympathySortedKeywordList, "공감")
+                            })
 
-                            $("#sympathyIndexGraphDiv .loading").css("display", "none")
-                            $("#sympathyIndexGraphDiv .itemContent").css("display", "block")
-                            mainObj.createReputationIndexGraph("#sympathyIndexGraph", {}, [], [{label:"공감", data: sympathyIndexGraphDataList}], sympathySortedKeywordList)
 
                             posIndexGraphDataList = []
                             for(var i=0; i<posSortedKeywordList.length; i++){
@@ -2529,10 +1858,10 @@ $(document).ready(function () {
 
                                 posIndexGraphDataList.push([i, posIndexList[keyword]]);
                             }
-
-                            $("#posIndexGraphDiv .loading").css("display", "none")
-                            $("#posIndexGraphDiv .itemContent").css("display", "block")
-                            mainObj.createReputationIndexGraph("#posIndexGraph", {}, [], [{label:"긍정", data: posIndexGraphDataList}], posSortedKeywordList)
+                            createIndexGraph("posIndexGraphDiv", posIndexGraphDataList, posSortedKeywordList, "긍정")
+                            $("#posIndexGraphDiv *[data-selector='graphShapeOptBtn']").click(function (){
+                                createIndexGraph("posIndexGraphDiv", posIndexGraphDataList, posSortedKeywordList, "긍정")
+                            })
                         }
                         function calculateIndex(keywordList, populationList){
                             var selectedTotalMentionSumListByKeyword = {}
@@ -2848,11 +2177,11 @@ $(document).ready(function () {
 
                             var graphData = keywordData["graph"]
                             var graphData2 = []
-                            graphData2.push({label: "긍정", data: graphData["pos"], color: "blue", stack: "posNeg"})
-                            graphData2.push({label: "부정", data: graphData["neg"], color: "red", stack: "posNeg"})
-                            graphData2.push({label: "중립", data: graphData["neu"], color: "yellow", stack: "posNeg"})
+                            graphData2.push({label: "긍정", data: graphData["pos"], color: "#3f6eb4", stack: "posNeg"})
+                            graphData2.push({label: "부정", data: graphData["neg"], color: "#f1556c", stack: "posNeg"})
+                            graphData2.push({label: "중립", data: graphData["neu"], color: "#868b8b", stack: "posNeg"})
 
-                            mainObj.createPosNegGraph("#posNegGraph", {}, color_list, graphData2);
+                            mainObj.createPosNegGraph("#posNegGraph", {}, [], graphData2);
                         }
 
                         $("#posNegKeywordRadio input[type='radio']").click(function () {

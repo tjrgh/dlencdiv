@@ -51,4 +51,5 @@ urlpatterns = [
     path("dashboard-3", view=thrid_dashboard_view, name="dashboard-3"),
     path("dashboard-2", view=second_dashboard_view, name="dashboard-2"),
     path("index", view=first_dashboard_view, name="index"),
+    # path("index", )
 ]

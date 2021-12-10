@@ -1,9 +1,12 @@
+from allauth.account.views import login
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
+
+from ubold.accounts.views import auth_pages_login_2_view
 
 urlpatterns = [
    
@@ -18,7 +21,9 @@ urlpatterns = [
     path("components/", include("ubold.components.urls", namespace="components"),),
     path("accounts/", include("ubold.accounts.urls", namespace="accounts"),),
     path("dashboard/", include("ubold.dashboard.urls", namespace="dashboard"),),
-    path("", TemplateView.as_view(template_name="landing.html"), name="landing"),
+    path("preIndex", TemplateView.as_view(template_name="landing.html"), name="landing"),
+    # path("", view=auth_pages_login_2_view, name="idx"),
+    path("", view=login, name="login"), # 첫 페이지를 로그인 페이지로.
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
